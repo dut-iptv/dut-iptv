@@ -41,6 +41,10 @@ msgid "Series"
 msgstr ""
 
 msgctxt "#30011"
+msgid "Movies"
+msgstr ""
+
+msgctxt "#30012"
 msgid "Film 1"
 msgstr ""
 
@@ -85,7 +89,7 @@ msgid "TV Pincode can't be empty"
 msgstr ""
 
 msgctxt "#30037"
-msgid "Force Surround Sound (if available)"
+msgid "Force Surround Sound"
 msgstr ""
 
 msgctxt "#32000"
@@ -347,7 +351,7 @@ msgid "Enable Debug Mode"
 msgstr ""
 
 msgctxt "#32103"
-msgid "Ask to start stream from beginning (if available)"
+msgid "Ask to start stream from beginning"
 msgstr ""
 
 msgctxt "#320104"
@@ -391,7 +395,7 @@ msgid "Test channel"
 msgstr ""
 
 msgctxt "#320114"
-msgid "Start from beginning (if available)"
+msgid "Start from beginning"
 msgstr ""
 
 msgctxt "#320115"

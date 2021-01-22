@@ -92,6 +92,14 @@ msgctxt "#30036"
 msgid "Password can't be empty"
 msgstr ""
 
+msgctxt "#30037"
+msgid "Force Surround Sound"
+msgstr ""
+
+msgctxt "#30037"
+msgid "Force Surround Sound"
+msgstr "Forceer Surround Audio"
+
 msgctxt "#32000"
 msgid "You need to login to access this content"
 msgstr ""
@@ -351,7 +359,7 @@ msgid "Enable Debug Mode"
 msgstr ""
 
 msgctxt "#32103"
-msgid "Ask to start stream from beginning (if available)"
+msgid "Ask to start stream from beginning"
 msgstr ""
 
 msgctxt "#320104"
@@ -395,7 +403,7 @@ msgid "Test channel"
 msgstr ""
 
 msgctxt "#320114"
-msgid "Start from beginning (if available)"
+msgid "Start from beginning"
 msgstr ""
 
 msgctxt "#320115"

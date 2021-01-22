@@ -37,6 +37,8 @@ def api_download(url, type, headers=None, data=None, json_data=True, return_json
     else:
         returned_data = resp.text
 
+    session.close()
+
     return { 'code': resp.status_code, 'data': returned_data, 'headers': resp.headers }
 
 def api_get_channels():
@@ -181,11 +183,14 @@ def api_get_list(start, end, channels):
         resp = Session().get(list_url, stream=True)
 
         if resp.status_code != 200:
+            resp.close()
             return None
 
         with open(tmp, 'wb') as f:
             for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
                 f.write(chunk)
+
+        resp.close()
 
         if os.path.isfile(tmp):
             from zipfile import ZipFile
@@ -270,11 +275,14 @@ def api_get_list_by_first(first, start, end, channels):
         resp = Session().get(list_url, stream=True)
 
         if resp.status_code != 200:
+            resp.close()
             return None
 
         with open(tmp, 'wb') as f:
             for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
                 f.write(chunk)
+                
+        resp.close()
 
         if os.path.isfile(tmp):
             from zipfile import ZipFile
@@ -285,7 +293,7 @@ def api_get_list_by_first(first, start, end, channels):
             except:
                 try:
                     fixBadZipfile(tmp)
-                    
+
                     with ZipFile(tmp, 'r') as zipObj:
                         zipObj.extractall(ADDON_PROFILE + "cache" + os.sep)
                 except:
@@ -361,11 +369,14 @@ def api_get_vod_by_type(type, character, subscription_filter):
         resp = Session().get(vod_url, stream=True)
 
         if resp.status_code != 200:
+            resp.close()
             return None
 
         with open(tmp, 'wb') as f:
             for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
                 f.write(chunk)
+                
+        resp.close()
 
         if os.path.isfile(tmp):
             from zipfile import ZipFile

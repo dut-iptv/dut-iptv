@@ -41,6 +41,7 @@ class BaseLanguage(object):
     LIVE_TV = 30007
     SERIES = 30010
     MOVIES = 30011
+    FILM1 = 30012
     NEXT_PAGE = 30021
     CHANNELS = 30024
     HBO_SERIES = 30025

@@ -5,7 +5,7 @@ from resources.lib.base.l1.constants import DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, load_file
+from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, load_file, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l5.api import api_get_channels
 from resources.lib.base.l6 import inputstream
@@ -17,14 +17,14 @@ except NameError:
     unicode = str
 
 def plugin_ask_for_creds(creds):
-    username = gui.input(message=_.ASK_USERNAME, default=creds['username']).strip()
+    username = unicode(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 
     if not len(username) > 0:
         gui.ok(message=_.EMPTY_USER, heading=_.LOGIN_ERROR_TITLE)
 
         return {'result': False, 'username': '', 'password': ''}
 
-    password = gui.input(message=_.ASK_PASSWORD, hide_input=True).strip()
+    password = unicode(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
 
     if not len(password) > 0:
         gui.ok(message=_.EMPTY_PASS, heading=_.LOGIN_ERROR_TITLE)
@@ -66,6 +66,9 @@ def plugin_process_info(playdata):
             if check_key(playdata['info']['params'], 'start') and check_key(playdata['info']['params'], 'end'):
                 startT = datetime.datetime.fromtimestamp(time.mktime(time.strptime(playdata['info']['params']['start'], "%Y-%m-%dT%H:%M:%SZ")))
                 endT = datetime.datetime.fromtimestamp(time.mktime(time.strptime(playdata['info']['params']['end'], "%Y-%m-%dT%H:%M:%SZ")))
+
+                write_file(file='stream_start', data=int(time.mktime(time.strptime(playdata['info']['params']['start'], "%Y-%m-%dT%H:%M:%SZ"))), isJSON=False)
+                write_file(file='stream_end', data=int(time.mktime(time.strptime(playdata['info']['params']['end'], "%Y-%m-%dT%H:%M:%SZ"))), isJSON=False)
 
                 info['duration'] = int((endT - startT).total_seconds())
 

@@ -22,6 +22,8 @@ CONST_IMAGE_URL = 'https://images.tv.kpn.com'
 
 CONST_ONLINE_SEARCH = False
 
+CONST_START_FROM_BEGINNING = True
+
 CONST_VOD_CAPABILITY = [
     { 'file': 'series', 'label': _.SERIES, 'start': 0, 'online': 0, 'split': 0 },
     { 'file': 'movies', 'label': _.MOVIES, 'start': 0, 'online': 0, 'split': 0 },

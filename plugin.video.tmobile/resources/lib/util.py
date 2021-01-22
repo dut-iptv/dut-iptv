@@ -5,7 +5,7 @@ from resources.lib.base.l1.constants import DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, load_file, load_profile
+from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, load_file, load_profile, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l5.api import api_get_channels
 from resources.lib.base.l6 import inputstream
@@ -16,16 +16,16 @@ except NameError:
     unicode = str
 
 def plugin_ask_for_creds(creds):
-    username = gui.numeric(message=_.ASK_USERNAME, default=creds['username']).strip()
+    username = unicode(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 
-    if not len(username) > 0:
+    if not len(unicode(username)) > 0:
         gui.ok(message=_.EMPTY_USER, heading=_.LOGIN_ERROR_TITLE)
 
         return {'result': False, 'username': '', 'password': ''}
 
-    password = gui.numeric(message=_.ASK_PASSWORD).strip()
+    password = unicode(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
 
-    if not len(password) > 0:
+    if not len(unicode(password)) > 0:
         gui.ok(message=_.EMPTY_PASS, heading=_.LOGIN_ERROR_TITLE)
 
         return {'result': False, 'username': '', 'password': ''}
@@ -58,10 +58,13 @@ def plugin_process_info(playdata):
     }
 
     if check_key(playdata['info'], 'startTime') and check_key(playdata['info'], 'endTime'):
-        startT = datetime.datetime.fromtimestamp((int(playdata['info']['startTime']) / 1000))
+        startT = datetime.datetime.fromtimestamp(int(int(playdata['info']['startTime']) // 1000))
         startT = convert_datetime_timezone(startT, "UTC", "UTC")
-        endT = datetime.datetime.fromtimestamp((int(playdata['info']['endTime']) / 1000))
+        endT = datetime.datetime.fromtimestamp(int(int(playdata['info']['endTime']) // 1000))
         endT = convert_datetime_timezone(endT, "UTC", "UTC")
+
+        write_file(file='stream_start', data=int(int(playdata['info']['startTime']) // 1000), isJSON=False)
+        write_file(file='stream_end', data=int(int(playdata['info']['endTime']) // 1000), isJSON=False)
 
         info['duration'] = int((endT - startT).total_seconds())
 

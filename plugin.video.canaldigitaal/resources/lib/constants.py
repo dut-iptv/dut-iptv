@@ -35,6 +35,8 @@ CONST_BASE_HEADERS = {
     'Accept-Language': 'en-US,en;q: 0.9,nl;q: 0.8',
 }
 
+CONST_START_FROM_BEGINNING = True
+
 CONST_ONLINE_SEARCH = False
 
 CONST_VOD_CAPABILITY = []

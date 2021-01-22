@@ -1,4 +1,5 @@
-import io, json, os, re, requests, sys, threading, time, xbmc, xbmcaddon
+import datetime, io, json, pytz, os, re, requests, sys, threading, time, xbmc, xbmcaddon, xbmcgui
+from xml.dom.minidom import parseString
 
 try:
     import http.server as ProxyServer
@@ -101,6 +102,12 @@ CONST_BASE_HEADERS['ziggo'] = {
 
 DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36'
 
+stream_url = {}
+now_playing = 0
+audio_segments = {}
+last_segment = 0
+last_timecode = 0
+
 class HTTPMonitor(xbmc.Monitor):
     def __init__(self, addon):
         super(HTTPMonitor, self).__init__()
@@ -113,6 +120,8 @@ class HTTPServer(ProxyServer.HTTPServer):
 
 class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
     def do_GET(self):
+        global stream_url, now_playing, audio_segments, last_segment, last_timecode
+
         if "/status" in self.path:
             self.send_response(200)
             self.send_header('X-TEST', 'OK')
@@ -138,37 +147,58 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
             else:
                 ADDON_PROFILE = xbmc.translatePath(ADDON.getAddonInfo('profile'))
 
-            try:
-                self._stream_url
-            except:
-                self._stream_url = {}
-                self._stream_url[addon_name] = load_file(file=ADDON_PROFILE + 'stream_hostname', isJSON=False)
-
-            try:
-                self._last_playing
-            except:
-                self._last_playing = {}
-                self._last_playing[addon_name] = 0
-
             if proxy_get_match(path=self.path, addon_name=addon_name):
-                self._stream_url[addon_name] = load_file(file=ADDON_PROFILE + 'stream_hostname', isJSON=False)
+                stream_url[addon_name] = load_file(file=ADDON_PROFILE + 'stream_hostname', isJSON=False)
+                now_playing = int(time.time())
 
                 URL = proxy_get_url(proxy=self, addon_name=addon_name, ADDON_PROFILE=ADDON_PROFILE)
+
+                if addon_name == 'kpn':
+                    start = load_file(file=ADDON_PROFILE + 'stream_start', isJSON=False)
+
+                    if start:
+                        startT = datetime.datetime.fromtimestamp(int(start))
+                        mytz = pytz.timezone('Europe/Amsterdam')
+                        startTUTC = mytz.normalize(mytz.localize(startT, is_dst=True)).astimezone(pytz.timezone('UTC'))
+                        URL += '&t=' + unicode(startTUTC.strftime('%Y-%m-%dT%H')) + '%3A' + unicode(startTUTC.strftime('%M')) + '%3A' + unicode(startTUTC.strftime('%S.000'))
 
                 session = proxy_get_session(proxy=self, addon_name=addon_name)
                 r = session.get(URL)
 
                 xml = r.text
 
+                #write_file(file=ADDON_PROFILE + 'orig_xml', data=xml, isJSON=False)
+
+                xml = sly_mpd_parse(xml=xml, base=URL.rsplit('/', 1)[0] + '/').decode('utf-8')
+
+                #write_file(file=ADDON_PROFILE + 'after_sly_xml', data=xml, isJSON=False)
+
                 xml = set_duration(xml=xml, addon_name=addon_name, ADDON_PROFILE=ADDON_PROFILE)
+
+                #write_file(file=ADDON_PROFILE + 'after_set_duration_xml', data=xml, isJSON=False)
 
                 if ADDON.getSettingBool('disable_subtitle'):
                     xml = remove_subs(xml=xml)
+                    #write_file(file=ADDON_PROFILE + 'after_remove_subs_xml', data=xml, isJSON=False)
 
                 if ADDON.getSettingBool('force_highest_bandwidth'):
-                    xml = force_highest_bandwidth(xml=xml)
+                    xml = force_highest_bandwidth(xml=xml, trick=False)
+                    xml = force_highest_bandwidth(xml=xml, trick=True)
+                    #write_file(file=ADDON_PROFILE + 'after_force_highest_bandwidth_xml', data=xml, isJSON=False)
 
                 xml = proxy_xml_mod(xml=xml, addon_name=addon_name)
+
+                #write_file(file=ADDON_PROFILE + 'after_proxy_xml_mod_xml', data=xml, isJSON=False)
+
+                if ADDON.getSettingBool("force_ac3"):
+                    xml = force_ac3(xml=xml)
+
+                #write_file(file=ADDON_PROFILE + 'after_force_surround_xml', data=xml, isJSON=False)
+
+                if addon_name == "kpn" and 'NPO1' in URL:
+                    fix_audio_start(xml)
+                    last_segment = 0
+                    last_timecode = 0
 
                 self.send_response(r.status_code)
 
@@ -179,6 +209,7 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
                         self.send_header(header, r.headers[header])
 
                 self.end_headers()
+                r.close()
 
                 try:
                     xml = xml.encode('utf-8')
@@ -189,23 +220,27 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
                     self.wfile.write(xml)
                 except:
                     pass
+
+                try:
+                    self.connection.close()
+                except:
+                    pass
             else:
                 URL = proxy_get_url(proxy=self, addon_name=addon_name, ADDON_PROFILE=ADDON_PROFILE)
 
-                try:
-                    self._now_playing
-                except:
-                    self._now_playing = {}
+                if addon_name == "kpn" and 'NPO1-audio_dut=128000-' in URL:
+                    URL = fix_audio(URL)
 
-                self._now_playing[addon_name] = int(time.time())
-
-                if self._last_playing[addon_name] + 60 < self._now_playing[addon_name]:
-                    self._last_playing[addon_name] = int(time.time())
-                    write_file(file=ADDON_PROFILE + 'stream_playing_time', data=self._last_playing[addon_name], isJSON=False)
+                now_playing = int(time.time())
 
                 self.send_response(302)
                 self.send_header('Location', URL)
                 self.end_headers()
+
+                try:
+                    self.connection.close()
+                except:
+                    pass
 
     def log_message(self, format, *args):
         return
@@ -345,27 +380,209 @@ class Session(requests.Session):
                 f.write(chunk)
 
 def main():
+    global now_playing
+
     service = RemoteControlBrowserService()
     service.clearBrowserLock()
     monitor = HTTPMonitor(service)
-    service.reloadHTTPServer()
 
-    monitor.waitForAbort()
+    loop = True
+
+    while loop == True:
+        xbmc.log('(RE)START DUT-IPTV PROXY')
+        service.reloadHTTPServer()
+
+        if monitor.waitForAbort(3600):
+            loop = False
+
+        while int(now_playing) + 120 > int(time.time()) and loop == True:
+            if monitor.waitForAbort(600):
+                loop = False
 
     service.shutdownHTTPServer()
+
+def sly_mpd_parse(xml, base=''):
+    data = xml
+
+    data = data.replace('_xmlns:cenc', 'xmlns:cenc')
+    data = data.replace('_:default_KID', 'cenc:default_KID')
+    data = data.replace('<pssh', '<cenc:pssh')
+    data = data.replace('</pssh>', '</cenc:pssh>')
+
+    root = parseString(data.encode('utf8'))
+
+    mpd = root.getElementsByTagName("MPD")[0]
+
+    ## Set publishtime to utctime
+    utc_time = mpd.getElementsByTagName("UTCTiming")
+    if utc_time:
+        value = utc_time[0].getAttribute('value')
+        mpd.setAttribute('publishTime', value)
+
+    for elem in mpd.getElementsByTagName("SupplementalProperty"):
+        if elem.getAttribute('schemeIdUri') == 'urn:scte:dash:utc-time':
+            value = elem.getAttribute('value')
+            mpd.setAttribute('publishTime', value)
+            break
+
+    base_url_nodes = []
+
+    for node in mpd.childNodes:
+        if node.nodeType == node.ELEMENT_NODE:
+            if node.localName == 'BaseURL':
+                #url = node.firstChild.nodeValue
+
+                #if not url.startswith('http'):
+                #    node.firstChild.nodeValue = base + url
+
+                base_url_nodes.append(node)
+
+    # Keep first base_url node
+    if base_url_nodes:
+        base_url_nodes.pop(0)
+
+        for e in base_url_nodes:
+            e.parentNode.removeChild(e)
+    #else:
+    #    base_url_node = root.createElement("BaseURL")
+    #    base_url_node_text = root.createTextNode(base)
+    #    base_url_node.appendChild(base_url_node_text)
+    #    mpd_chidren = mpd.childNodes
+    #    mpd.insertBefore(base_url_node, mpd_chidren[0])
+
+    ####################
+
+    ## Live mpd needs non-last periods removed
+    ## https://github.com/peak3d/inputstream.adaptive/issues/574
+    if 'type' in mpd.attributes.keys() and mpd.getAttribute('type').lower() == 'dynamic':
+        periods = [elem for elem in root.getElementsByTagName('Period')]
+
+        # Keep last period
+        if len(periods) > 1:
+            periods.pop()
+            for e in periods:
+                e.parentNode.removeChild(e)
+    #################################################
+
+    ## SUPPORT NEW DOLBY FORMAT
+    ## PR to fix in IA: https://github.com/peak3d/inputstream.adaptive/pull/466
+    for elem in root.getElementsByTagName('AudioChannelConfiguration'):
+        if elem.getAttribute('schemeIdUri') == 'tag:dolby.com,2014:dash:audio_channel_configuration:2011':
+            elem.setAttribute('schemeIdUri', 'urn:dolby:dash:audio_channel_configuration:2011')
+    ###########################
+
+    ## Make sure Representation are last in adaptionset
+    for elem in root.getElementsByTagName('Representation'):
+        parent = elem.parentNode
+        parent.removeChild(elem)
+        parent.appendChild(elem)
+
+    ## SORT ADAPTION SETS BY BITRATE ##
+    video_sets = []
+    audio_sets = []
+    trick_sets = []
+    lang_adap_sets = []
+
+    for adap_set in root.getElementsByTagName('AdaptationSet'):
+        highest_bandwidth = 0
+        is_video = False
+        is_trick = False
+
+        adapt_frame_rate = adap_set.getAttribute('frameRate')
+        if adapt_frame_rate and '/' not in adapt_frame_rate:
+            adapt_frame_rate = None
+
+        if adapt_frame_rate:
+            adap_set.removeAttribute('frameRate')
+
+        for stream in adap_set.getElementsByTagName("Representation"):
+            attrib = {}
+
+            for key in adap_set.attributes.keys():
+                attrib[key] = adap_set.getAttribute(key)
+
+            for key in stream.attributes.keys():
+                attrib[key] = stream.getAttribute(key)
+
+            if adapt_frame_rate and not stream.getAttribute('frameRate'):
+                stream.setAttribute('frameRate', adapt_frame_rate)
+
+            if 'bandwidth' in attrib:
+                bandwidth = int(attrib['bandwidth'])
+                if bandwidth > highest_bandwidth:
+                    highest_bandwidth = bandwidth
+
+            if 'video' in attrib.get('mimeType', ''):
+                is_video = True
+
+            if 'maxPlayoutRate' in attrib:
+                is_trick = True
+
+        parent = adap_set.parentNode
+        parent.removeChild(adap_set)
+
+        if is_trick:
+            trick_sets.append([highest_bandwidth, adap_set, parent])
+        elif is_video:
+            video_sets.append([highest_bandwidth, adap_set, parent])
+        else:
+            audio_sets.append([highest_bandwidth, adap_set, parent])
+
+    video_sets.sort(key=lambda  x: x[0], reverse=True)
+    audio_sets.sort(key=lambda  x: x[0], reverse=True)
+    trick_sets.sort(key=lambda  x: x[0], reverse=True)
+
+    for elem in video_sets:
+        elem[2].appendChild(elem[1])
+
+    for elem in audio_sets:
+        elem[2].appendChild(elem[1])
+
+    for elem in trick_sets:
+        elem[2].appendChild(elem[1])
+    ##################
+
+    elems = root.getElementsByTagName('SegmentTemplate')
+    elems.extend(root.getElementsByTagName('SegmentURL'))
+
+    for e in elems:
+        def process_attrib(attrib):
+            if attrib not in e.attributes.keys():
+                return
+
+            url = e.getAttribute(attrib)
+
+            if url.startswith('http'):
+                e.setAttribute(attrib, PROXY_PATH + url)
+
+        process_attrib('initialization')
+        process_attrib('media')
+
+        ## PR TO FIX: https://github.com/peak3d/inputstream.adaptive/pull/564
+        if 'presentationTimeOffset' in e.attributes.keys():
+            e.removeAttribute('presentationTimeOffset')
+        ###################
+
+    return root.toxml(encoding='utf-8')
 
 def force_ac3(xml):
     try:
         found = False
 
-        result = re.findall(r'<[aA]daptation[sS]et content[tT]ype=\"audio\"(?:(?!<[aA]daptation[sS]et)(?!</[aA]daptation[sS]et>)[\S\s])+</[aA]daptation[sS]et>', xml)
+        result = re.findall(r'<[aA]daptation[sS]et(?:(?!<[aA]daptation[sS]et)(?!</[aA]daptation[sS]et>)[\S\s])+</[aA]daptation[sS]et>', xml)
+        result2 = []
 
         for match in result:
+            if not 'contentType="audio"' in match:
+                continue
+
             if 'codecs="ac-3"' in match:
                 found = True
 
+            result2.append(match)
+
         if found:
-            for match in result:
+            for match in result2:
                 if not 'codecs="ac-3"' in match:
                     xml = xml.replace(match, "")
 
@@ -374,15 +591,105 @@ def force_ac3(xml):
 
     return xml
 
-def force_highest_bandwidth(xml):
-    try:
-        results = {}
+def fix_audio_start(xml):
+    global audio_segments
 
-        result = re.findall(r'<[rR]epresentation(?:(?!<[rR]epresentation)(?!</[rR]epresentation>)[\S\s])+</[rR]epresentation>', xml)
-        bandwidth_regex = r"bandwidth=\"([0-9]+)\""
+    audio_segments = {}
+    temp_segments = {}
+    temp_audio_segments = []
+
+    found = False
+
+    result = re.findall(r'<[aA]daptation[sS]et(?:(?!<[aA]daptation[sS]et)(?!</[aA]daptation[sS]et>)[\S\s])+</[aA]daptation[sS]et>', xml)
+
+    for match in result:
+        if not 'contentType="audio"' in match:
+            continue
+
+        match2 = re.findall(r'<S[\sA-Za-z0-9="]*\s*d="([0-9]*)"[\s\/A-Za-z0-9="]*\/>', match)
+
+        for match3 in match2:
+            temp_segments[match3] = 1
+
+    for segment in temp_segments:
+        temp_audio_segments.append(segment)
+
+    last = 0
+    count = int(len(temp_audio_segments)) - 1
+
+    temp_audio_segments.reverse()
+
+    for segment in temp_audio_segments:
+        if last == 0:
+            audio_segments[segment] = temp_audio_segments[count]
+        else:
+            audio_segments[segment] = last
+
+        last = segment
+
+def fix_audio(URL):
+    global audio_segments, last_segment, last_timecode
+
+    old_last_timecode = 0
+    temp_last_timecode = 0
+
+    if int(URL.replace('.dash', '').rsplit('-', 1)[1]) < last_timecode:
+        last_segment = 0
+        last_timecode = 0
+
+    if last_segment == 0 and last_timecode == 0:
+        last_timecode = int(URL.replace('.dash', '').rsplit('-', 1)[1])
+    elif last_segment == 0:
+        old_last_timecode = last_timecode
+        last_timecode = int(URL.replace('.dash', '').rsplit('-', 1)[1])
+        last_segment = int(last_timecode - old_last_timecode)
+    else:
+        old_last_timecode = last_timecode
+        last_timecode = int(URL.replace('.dash', '').rsplit('-', 1)[1])
+
+        if (last_timecode - old_last_timecode) != audio_segments[unicode(last_segment)]:
+            temp_last_timecode = last_timecode
+            last_timecode = int(old_last_timecode + int(audio_segments[unicode(last_segment)]))
+            last_segment = int(audio_segments[unicode(last_segment)])
+
+            URL = URL.replace(unicode(temp_last_timecode), unicode(last_timecode))
+        else:
+            last_segment = int(last_timecode - old_last_timecode)
+    return URL
+
+def force_highest_bandwidth(xml, trick=False):
+    results = {}
+    bandwidth_regex = r"bandwidth=\"([0-9]+)\""
+
+    result = re.findall(r'<[rR]epresentation(?:(?!<[rR]epresentation)(?!</[rR]epresentation>)[\S\s])+</[rR]epresentation>', xml)
+
+    for match in result:
+        if not 'bandwidth' in match or not 'codecs' in match or not 'width' in match or not 'height' in match:
+            continue
+
+        if trick == True and not 'trik' in match and not 'trick' in match:
+            continue
+        elif trick == False and ('trik' in match or 'trick' in match):
+            continue
+
+        bandwidth = 0
+        match2 = re.search(bandwidth_regex, match)
+
+        if match2:
+            bandwidth = match2.group(1)
+
+        results[bandwidth] = match
+
+    if len(results) == 0:
+        result = re.findall(r'<[rR]epresentation(?:(?!<[rR]epresentation)(?!/>)[\S\s])+/>', xml)
 
         for match in result:
-            if not 'id="video' in match and not 'id="Video' in match:
+            if not 'bandwidth' in match or not 'codecs' in match or not 'width' in match or not 'height' in match:
+                continue
+
+            if trick == True and not 'trik' in match and not 'trick' in match:
+                continue
+            elif trick == False and ('trik' in match or 'trick' in match):
                 continue
 
             bandwidth = 0
@@ -393,14 +700,11 @@ def force_highest_bandwidth(xml):
 
             results[bandwidth] = match
 
-        if len(results) > 1:
-            results.pop(max(results, key=int))
+    if len(results) > 1:
+        results.pop(max(results, key=int))
 
-        for bandwidth in results:
-            xml = xml.replace(results[bandwidth], "")
-
-    except:
-        pass
+    for bandwidth in results:
+        xml = xml.replace(results[bandwidth], "")
 
     return xml
 
@@ -438,18 +742,17 @@ def proxy_get_session(proxy, addon_name):
         return Session(addon_name=addon_name, cookies_key='cookies', save_cookies=False)
 
 def proxy_get_url(proxy, addon_name, ADDON_PROFILE):
+    global stream_url
+
     if addon_name == 'ziggo':
-        return proxy._stream_url[addon_name] + str(proxy.path).replace('WIDEVINETOKEN', load_file(file=ADDON_PROFILE + 'widevine_token', isJSON=False))
+        return stream_url[addon_name] + str(proxy.path).replace('WIDEVINETOKEN', load_file(file=ADDON_PROFILE + 'widevine_token', isJSON=False))
     else:
-        return proxy._stream_url[addon_name] + str(proxy.path)
+        return stream_url[addon_name] + str(proxy.path)
 
 def proxy_xml_mod(xml, addon_name):
-    if addon_name == 'tmobile':
-        if xbmcaddon.Addon(id="plugin.video." + addon_name).getSettingBool("force_ac3") == True:
-            xml = force_ac3(xml=xml)
-    elif addon_name == 'ziggo':
-        if xbmcaddon.Addon(id="plugin.video." + addon_name).getSettingBool("disableac3") == True:
-            xml = remove_ac3(xml=xml)
+    #if addon_name == 'ziggo':
+    #    if xbmcaddon.Addon(id="plugin.video." + addon_name).getSettingBool("disableac3") == True:
+    #        xml = remove_ac3(xml=xml)
 
     return xml
 
@@ -483,7 +786,8 @@ def set_duration(xml, addon_name, ADDON_PROFILE):
     try:
         duration = load_file(file=ADDON_PROFILE + 'stream_duration', isJSON=False)
 
-        if duration and duration > 0:
+        if duration and int(duration) > 0:
+            duration = int(duration)
             given_duration = 0
             matched = False
 

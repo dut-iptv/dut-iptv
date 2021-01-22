@@ -1,4 +1,4 @@
-import glob, hashlib, io, json, os, platform, pytz, re, requests, shutil, string, struct, time, unicodedata, xbmc
+import glob, hashlib, io, json, os, platform, pytz, re, requests, shutil, string, struct, time, unicodedata, xbmc, xbmcaddon
 
 from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PATH, ADDON_PROFILE, CONST_DUT_EPG_SETTINGS, PROVIDER_NAME
@@ -24,9 +24,13 @@ def change_icon():
                     for chunk in r.iter_content(1024):
                         f.write(chunk)
             except:
+                r.close()
                 return
         else:
+            r.close()
             return
+            
+        r.close()
 
     settingsJSON = load_file(file='settings.json', isJSON=True)
 
@@ -39,8 +43,10 @@ def change_icon():
                     for chunk in r.iter_content(1024):
                         f.write(chunk)
             except:
+                r.close()
                 return
         else:
+            r.close()
             return
 
         try:
@@ -75,11 +81,40 @@ def change_icon():
         except:
             pass
 
+        r.close()
+
+def check_addon(addon):
+    if xbmc.getCondVisibility('System.HasAddon(%s)' % addon) == 1:
+        try:
+            VIDEO_ADDON = xbmcaddon.Addon(id=addon)
+
+            return True
+        except:
+            return False
+
+    return False
+
 def check_key(object, key):
     if key in object and object[key] and len(unicode(object[key])) > 0:
         return True
     else:
         return False
+        
+def check_loggedin(addon):
+    VIDEO_ADDON_PROFILE = ADDON_PROFILE.replace(ADDON_ID, addon)
+
+    profile = load_file(VIDEO_ADDON_PROFILE + 'profile.json', ext=True, isJSON=True)
+
+    if not profile:
+        return False
+    else:
+        try:
+            if len(unicode(profile['pswd'])) > 0 and int(profile['last_login_success']) == 1:
+                return True
+            else:
+                return False
+        except:
+            return False
 
 def clear_cache():
     if not os.path.isdir(ADDON_PROFILE + "cache"):
@@ -175,27 +210,6 @@ def disable_prefs(type, channels):
                 prefs[unicode(currow)] = mod_pref
 
     save_prefs(profile_id=1, prefs=prefs)
-
-def find_highest_bandwidth(xml):
-    bandwidth = 0
-
-    result = re.findall(r'<[rR]epresentation(?:(?!<[rR]epresentation)(?!</[rR]epresentation>)[\S\s])+</[rR]epresentation>', xml)
-    bandwidth_regex = r"bandwidth=\"([0-9]+)\""
-
-    for match in result:
-        if not 'id="video' in match and not 'id="Video' in match:
-            continue
-
-        match2 = re.search(bandwidth_regex, match)
-
-        if match2:
-            try:
-                if int(match2.group(1)) > bandwidth:
-                    bandwidth = int(match2.group(1))
-            except:
-                pass
-
-    return bandwidth
 
 def fixBadZipfile(zipFile):
     f = open(zipFile, 'r+b')
@@ -295,14 +309,37 @@ def is_file_older_than_x_minutes(file, minutes=1):
     else:
         return False
 
-def load_file(file, isJSON=False):
-    if not os.path.isfile(ADDON_PROFILE + file):
+def load_channels(type):
+    if type == 'ziggo':
+        VIDEO_ADDON_PROFILE = ADDON_PROFILE.replace(ADDON_ID, 'plugin.video.ziggo')
+        profile = load_file(VIDEO_ADDON_PROFILE + 'profile.json', ext=True, isJSON=True)
+
+        try:
+            if int(profile['v3']) == 1:
+                return load_file(file='cache' + os.sep + type[0] + '.channels.v3.json', ext=False, isJSON=True)
+        except:
+            pass
+
+    return load_file(file='cache' + os.sep + type[0] + '.channels.json', ext=False, isJSON=True)
+
+def load_file(file, ext=False, isJSON=False):
+    if ext:
+        full_path = file
+    else:
+        full_path = ADDON_PROFILE + file
+
+    if not os.path.isfile(full_path):
         file = re.sub(r'[^a-z0-9.]+', '_', file).lower()
 
-        if not os.path.isfile(ADDON_PROFILE + file):
+        if ext:
+            full_path = file
+        else:
+            full_path = ADDON_PROFILE + file
+
+        if not os.path.isfile(full_path):
             return None
 
-    with io.open(ADDON_PROFILE + file, 'r', encoding='utf-8') as f:
+    with io.open(full_path, 'r', encoding='utf-8') as f:
         try:
             if isJSON == True:
                 return json.load(f, object_pairs_hook=OrderedDict)
@@ -312,7 +349,7 @@ def load_file(file, isJSON=False):
             return None
 
 def load_prefs(profile_id=1):
-    prefs = load_file('prefs.json', isJSON=True)
+    prefs = load_file('prefs.json', ext=False, isJSON=True)
 
     if not prefs:
         return OrderedDict()
@@ -320,12 +357,36 @@ def load_prefs(profile_id=1):
         return prefs
 
 def load_profile(profile_id=1):
-    profile = load_file('profile.json', isJSON=True)
+    profile = load_file('profile.json', ext=False, isJSON=True)
 
     if not profile:
         return OrderedDict()
     else:
         return profile
+
+def load_order(profile_id=1):
+    order = load_file('order.json', ext=False, isJSON=True)
+
+    if not order:
+        return OrderedDict()
+    else:
+        return order
+
+def load_radio_prefs(profile_id=1):
+    prefs = load_file('radio_prefs.json', ext=False, isJSON=True)
+
+    if not prefs:
+        return OrderedDict()
+    else:
+        return prefs
+
+def load_radio_order(profile_id=1):
+    order = load_file('radio_order.json', ext=False, isJSON=True)
+
+    if not order:
+        return OrderedDict()
+    else:
+        return order
 
 def md5sum(filepath):
     if not os.path.isfile(filepath):
@@ -388,18 +449,32 @@ def update_prefs(profile_id=1, channels=None):
     save_prefs(profile_id=1, prefs=prefs)
 
 def save_prefs(profile_id=1, prefs=None):
-    write_file('prefs.json', data=prefs, isJSON=True)
+    write_file('prefs.json', data=prefs, ext=False, isJSON=True)
 
 def save_profile(profile_id=1, profile=None):
-    write_file('profile.json', data=profile, isJSON=True)
+    write_file('profile.json', data=profile, ext=False, isJSON=True)
 
-def write_file(file, data, isJSON=False):
-    directory = os.path.dirname(ADDON_PROFILE + file)
+def save_order(profile_id=1, order=None):
+    write_file('order.json', data=order, ext=False, isJSON=True)
+
+def save_radio_prefs(profile_id=1, prefs=None):
+    write_file('radio_prefs.json', data=prefs, ext=False, isJSON=True)
+
+def save_radio_order(profile_id=1, order=None):
+    write_file('radio_order.json', data=order, ext=False, isJSON=True)
+
+def write_file(file, data, ext=False, isJSON=False):
+    if ext:
+        full_path = file
+    else:
+        full_path = ADDON_PROFILE + file
+
+    directory = os.path.dirname(full_path)
 
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    with io.open(ADDON_PROFILE + file, 'w', encoding="utf-8") as f:
+    with io.open(full_path, 'w', encoding="utf-8") as f:
         if isJSON == True:
             f.write(unicode(json.dumps(data, ensure_ascii=False)))
         else:

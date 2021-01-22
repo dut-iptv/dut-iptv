@@ -1,22 +1,22 @@
-import base64, datetime, hmac, os, random, re, string, time, xbmc
-from hashlib import sha1
-from requests_oauthlib import OAuth1
+import base64, datetime, hashlib, hmac, os, random, re, string, time, xbmc
 
+from bs4 import BeautifulSoup as bs4
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, find_highest_bandwidth, get_credentials, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
+from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, get_credentials, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download, api_get_channels
-from resources.lib.constants import CONST_API_URL, CONST_BASE_URL, CONST_IMAGE_URL
+from resources.lib.constants import CONST_API_URL, CONST_APP_URL, CONST_BASE_URL, CONST_ID_URL, CONST_IMAGE_URL
+from resources.lib.util import plugin_process_info
 
 try:
-    from urllib.parse import parse_qs, urlparse, quote
+    from urllib.parse import parse_qs, urlparse, quote_plus
 except ImportError:
     from urlparse import parse_qs, urlparse
-    from urllib import quote
+    from urllib import quote_plus
 
 try:
     unicode
@@ -25,6 +25,54 @@ except NameError:
 
 def api_add_to_watchlist():
     return None
+
+def api_get_info(id, channel=''):
+    profile_settings = load_profile(profile_id=1)
+
+    info = {}
+    friendly = ''
+    headers = { 'authorization': 'Bearer {id_token}'.format(id_token=profile_settings['access_token'])}
+
+    data = api_get_channels()
+
+    try:
+        friendly = data[unicode(id)]['assetid']
+    except:
+        return info
+
+    channel_url = '{base_url}/v6/epg/locations/{friendly}/live/1?fromDate={date}'.format(base_url=CONST_API_URL, friendly=friendly, date=datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S"))
+
+    download = api_download(url=channel_url, type='get', headers=None, data=None, json_data=False, return_json=True)
+    data = download['data']
+    code = download['code']
+
+    if not code or not code == 200 or not data:
+        return info
+
+    for row in data:
+        if not check_key(row, 'Channel') or not check_key(row, 'Locations'):
+            return info
+
+        for row2 in row['Locations']:
+            id = row2['LocationId']
+
+    if not id:
+        return info
+
+    info_url = '{base_url}/v6/epg/location/{location}'.format(base_url=CONST_API_URL, location=id)
+
+    download = api_download(url=info_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+    data = download['data']
+    code = download['code']
+
+    if not code or not code == 200 or not data:
+        return info
+
+    info = data
+
+    info = plugin_process_info({'title': '', 'channel': channel, 'info': info})
+
+    return info
 
 def api_get_session(force=0):
     force = int(force)
@@ -35,27 +83,11 @@ def api_get_session(force=0):
     #elif force == 1 and not profile_settings['last_login_success'] == 1:
     #    return False
 
-    if not check_key(profile_settings, 'resource_verifier'):
+    if not check_key(profile_settings, 'access_token_age') or not check_key(profile_settings, 'access_token') or int(profile_settings['access_token_age']) < int(time.time() - 3540):
         login_result = api_login()
 
         if not login_result['result']:
             return False
-    else:
-        token_url_base = '{base_url}/v6/favorites/items'.format(base_url=CONST_API_URL)
-
-        token_parameter = 'oauth_consumer_key=key&oauth_signature_method=HMAC-SHA1&oauth_verifier=' + unicode(profile_settings['resource_verifier']) + '&oauth_token={token}&oauth_version=1.0&oauth_timestamp={timestamp}&oauth_nonce={nonce}&count=1&expand=false&expandlist=false&maxResults=1&offset=0'
-
-        url_encoded = api_oauth_encode(type="GET", base_url=token_url_base, parameters=token_parameter)
-
-        download = api_download(url=url_encoded, type='get', headers=None, data=None, json_data=False, return_json=False)
-        data = download['data']
-        code = download['code']
-
-        if not code or not code == 200:
-            login_result = api_login()
-
-            if not login_result['result']:
-                return False
 
     try:
         profile_settings = load_profile(profile_id=1)
@@ -75,109 +107,152 @@ def api_login(force=False):
     username = creds['username']
     password = creds['password']
     use_old = False
+    loggedin = False
 
     profile_settings = load_profile(profile_id=1)
 
-    if not check_key(profile_settings, 'base_resource_key') or not check_key(profile_settings, 'base_resource_secret') or len(profile_settings['base_resource_key']) == 0 or len(profile_settings['base_resource_secret']) == 0 or force == True:
+    code_verifier = base64.urlsafe_b64encode(os.urandom(40)).decode('utf-8')
+    code_verifier = re.sub('[^a-zA-Z0-9]+', '', code_verifier)
+    code_challenge = hashlib.sha256(code_verifier.encode('utf-8')).digest()
+    code_challenge = base64.urlsafe_b64encode(code_challenge).decode('utf-8')
+    code_challenge = code_challenge.replace('=', '')
+    state = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(32))
+
+    base_authorization_url = "{id_url}/connect/authorize".format(id_url=CONST_ID_URL)
+
+    if check_key(profile_settings, 'id_token') and force == False:
+        id_token_hint = profile_settings['id_token']
+
+        authorization_url = "{base_url}?response_type=code&client_id=triple-web&scope=openid api&redirect_uri={app_url}/callback-silent.html&state={state}&code_challenge={code_challenge}&code_challenge_method=S256&response_mode=query&prompt=none&id_token_hint={id_token_hint}".format(base_url=base_authorization_url, app_url=CONST_APP_URL, state=state, code_challenge=code_challenge, id_token_hint=id_token_hint)
+
+        download = api_download(url=authorization_url, type='get', headers=None, data=None, json_data=False, return_json=False, allow_redirects=False)
+        data = download['data']
+        code = download['code']
+
+        if code == 302:
+            redirect = download['headers']['Location']
+
+            query = urlparse(redirect).query
+            redirect_params = parse_qs(query)
+            auth_code = redirect_params['code'][0]
+
+            download = api_download(url=redirect, type='get', headers=None, data=None, json_data=False, return_json=False, allow_redirects=False)
+            data = download['data']
+            code = download['code']
+
+            if code == 200:
+                post_data={
+                    "client_id": 'triple-web',
+                    "code": auth_code,
+                    "redirect_uri": "{app_url}/callback-silent.html".format(app_url=CONST_APP_URL),
+                    "code_verifier": code_verifier,
+                    "grant_type": "authorization_code"
+                }
+
+                download = api_download(url="{id_url}/connect/token".format(id_url=CONST_ID_URL), type='post', headers=None, data=post_data, json_data=False, return_json=True, allow_redirects=False)
+                data = download['data']
+                code = download['code']
+
+                if data and code == 200 and check_key(data, 'id_token') and check_key(data, 'access_token'):
+                    loggedin = True
+
+    if not loggedin:
         try:
             os.remove(ADDON_PROFILE + 'stream_cookies')
         except:
             pass
 
         try:
-            profile_settings['base_resource_key'] = ''
-            profile_settings['base_resource_secret'] = ''
-            profile_settings['resource_key'] = ''
-            profile_settings['resource_secret'] = ''
-            profile_settings['resource_verifier'] = ''
+            profile_settings['access_token'] = ''
+            profile_settings['access_token_age'] = 0
+            profile_settings['id_token'] = ''
             save_profile(profile_id=1, profile=profile_settings)
         except:
             pass
 
-        request_token_url = '{base_url}/OAuth/GetRequestToken'.format(base_url=CONST_BASE_URL)
-
-        oauth = OAuth1('key', client_secret='secret', callback_uri='null')
-
-        download = api_download(url=request_token_url, type='post', headers=None, data=None, json_data=False, return_json=False, auth=oauth)
-        data = download['data']
-        code = download['code']
-
-        credentials = parse_qs(data)
-
-        base_resource_owner_key = credentials.get('oauth_token')[0]
-        base_resource_owner_secret = credentials.get('oauth_token_secret')[0]
-
-        login_url = '{base_url}/account/applogin'.format(base_url=CONST_BASE_URL)
-
-        session_post_data = {
-            "username": username,
-            "password": password,
-        }
-
-        headers = {
-            'content-type': 'application/x-www-form-urlencoded'
-        }
-
-        download = api_download(url=login_url, type='post', headers=headers, data=session_post_data, json_data=False, return_json=False)
-        data = download['data']
-        code = download['code']
-
-        if code != 200 and code != 302:
-            return { 'code': code, 'data': data, 'result': False }
-
-        authorization_url = "{base_url}/OAuth/Authorize?oauth_token={token}".format(base_url=CONST_BASE_URL, token=base_resource_owner_key)
+        authorization_url = "{base_url}?response_type=code&client_id=triple-web&scope=openid api&redirect_uri={app_url}/callback&state={state}&code_challenge={code_challenge}&code_challenge_method=S256&response_mode=query".format(base_url=base_authorization_url, app_url=CONST_APP_URL, state=state, code_challenge=code_challenge)
 
         download = api_download(url=authorization_url, type='get', headers=None, data=None, json_data=False, return_json=False, allow_redirects=False)
         data = download['data']
         code = download['code']
 
-        regex = r"oauth_verifier=([a-zA-Z0-9]+)"
-        matches = re.finditer(regex, data, re.MULTILINE)
+        if code == 302:
+            redirect = download['headers']['Location']
 
-        resource_verifier = ''
+            download = api_download(url=redirect, type='get', headers=None, data=None, json_data=False, return_json=False, allow_redirects=False)
+            data = download['data']
+            code = download['code']
 
-        try:
-            for match in matches:
-               resource_verifier = match.group(1)
-        except:
-            pass
+            if code == 200:
+                soup = bs4(data, 'html.parser')
+                token = None
 
-        if len(resource_verifier) == 0:
-            return { 'code': code, 'data': data, 'result': False }
-    else:
-        use_old = True
-        base_resource_owner_key = profile_settings['base_resource_key']
-        base_resource_owner_secret = profile_settings['base_resource_secret']
-        resource_verifier = profile_settings['resource_verifier']
+                try:
+                    token = soup.find('input', {'name':'__RequestVerificationToken'})['value']
+                except:
+                    pass
 
-    access_token_url = '{base_url}/OAuth/GetAccessToken'.format(base_url=CONST_BASE_URL)
+                query = urlparse(redirect).query
+                request_params = parse_qs(query)
 
-    oauth = OAuth1('key', client_secret='secret', callback_uri='null', resource_owner_key=base_resource_owner_key, resource_owner_secret=base_resource_owner_secret, verifier=resource_verifier)
+                if token and request_params and check_key(request_params, 'ReturnUrl'):
+                    post_data={
+                        "ReturnUrl": request_params['ReturnUrl'][0],
+                        "EmailAddress": username,
+                        "Password": password,
+                        "RememberLogin": "true",
+                        "button": "login",
+                        "__RequestVerificationToken": token
+                    }
 
-    download = api_download(url=access_token_url, type='post', headers=None, data=None, json_data=False, return_json=False, auth=oauth)
-    data = download['data']
-    code = download['code']
+                    download = api_download(url=redirect, type='post', headers=None, data=post_data, json_data=False, return_json=False, allow_redirects=False)
+                    data = download['data']
+                    code = download['code']
 
-    credentials = parse_qs(data)
+                    if code == 302:
+                        redirect = download['headers']['Location']
 
-    try:
-        resource_owner_key = credentials.get('oauth_token')[0]
-        resource_owner_secret = credentials.get('oauth_token_secret')[0]
-    except:
-        if use_old == True:
-            return api_login(force=True)
+                        download = api_download(url=CONST_ID_URL + redirect, type='get', headers=None, data=None, json_data=False, return_json=False, allow_redirects=False)
+                        data = download['data']
+                        code = download['code']
 
+                        if code == 302:
+                            redirect = download['headers']['Location']
+
+                            query = urlparse(redirect).query
+                            redirect_params = parse_qs(query)
+                            auth_code = redirect_params['code'][0]
+
+                            download = api_download(url=redirect, type='get', headers=None, data=None, json_data=False, return_json=False, allow_redirects=False)
+                            data = download['data']
+                            code = download['code']
+
+                            if code == 200:
+                                post_data={
+                                    "client_id": 'triple-web',
+                                    "code": auth_code,
+                                    "redirect_uri": "{app_url}/callback".format(app_url=CONST_APP_URL),
+                                    "code_verifier": code_verifier,
+                                    "grant_type": "authorization_code"
+                                }
+
+                                download = api_download(url="{id_url}/connect/token".format(id_url=CONST_ID_URL), type='post', headers=None, data=post_data, json_data=False, return_json=True, allow_redirects=False)
+                                data = download['data']
+                                code = download['code']
+
+                                if data and check_key(data, 'id_token') and check_key(data, 'access_token'):
+                                    loggedin = True
+
+    if not loggedin:
         return { 'code': code, 'data': data, 'result': False }
-    
+
     try:
-        profile_settings['base_resource_key'] = base_resource_owner_key
-        profile_settings['base_resource_secret'] = base_resource_owner_secret
-        profile_settings['resource_key'] = resource_owner_key
-        profile_settings['resource_secret'] = resource_owner_secret
-        profile_settings['resource_verifier'] = resource_verifier
+        profile_settings['id_token'] = data['id_token']
+        profile_settings['access_token'] = data['access_token']
+        profile_settings['access_token_age'] = int(time.time())
         save_profile(profile_id=1, profile=profile_settings)
     except:
-            pass
+        pass
 
     return { 'code': code, 'data': data, 'result': True }
 
@@ -196,39 +271,8 @@ def api_mix(list1, list2, list3=None):
 
     return result
 
-def api_oauth_encode(type, base_url, parameters):
-    profile_settings = load_profile(profile_id=1)
-
-    base_url_encode = quote(base_url, safe='')
-
-    nonce = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(6))
-    token_timestamp = int(time.time())
-
-    parameters = parameters.format(token=profile_settings['resource_key'], timestamp=token_timestamp, nonce=nonce)
-
-    parsed_parameters = parse_qs(parameters, keep_blank_values=True)
-    encode_string = ''
-
-    for parameter in sorted(parsed_parameters):
-        encode_string += quote(unicode(parameter).replace(" ", "%2520") + "=" + unicode(parsed_parameters[parameter][0]).replace(" ", "%2520") + "&", safe='%')
-
-    if encode_string.endswith("%26"):
-        encode_string = encode_string[:-len("%26")]
-
-    base_string = '{type}&{token_url_base_encode}&{token_parameter_encode}'.format(type=type, token_url_base_encode=base_url_encode, token_parameter_encode=encode_string)
-    base_string_bytes = base_string.encode('utf-8')
-    key = 'secret&{key}'.format(key=profile_settings['resource_secret'])
-    key_bytes = key.encode('utf-8')
-
-    hashed = hmac.new(key_bytes, base_string_bytes, sha1)
-    signature = quote(base64.b64encode(hashed.digest()).decode(), safe='')
-
-    url = '{token_url_base}?{token_parameter}&oauth_signature={signature}'.format(token_url_base=base_url, token_parameter=parameters, signature=signature)
-
-    return url
-
 def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0):
-    playdata = {'path': '', 'license': '', 'info': '', 'alt_path': '', 'alt_license': ''}
+    playdata = {'path': '', 'license': '', 'info': '', 'properties': {}}
 
     if not api_get_session():
         return playdata
@@ -237,11 +281,11 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     pvr = int(pvr)
     profile_settings = load_profile(profile_id=1)
 
-    alt_path = ''
-    alt_license = ''
-    found_alt = False
+    headers = { 'authorization': 'Bearer {id_token}'.format(id_token=profile_settings['access_token'])}
+
     friendly = ''
     info = {}
+    properties = {}
 
     data = api_get_channels()
 
@@ -250,7 +294,39 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     except:
         pass
 
-    if not type == 'vod' and (pvr == 0 or settings.getBool(key='ask_start_from_beginning') or from_beginning == 1):
+    if type == 'vod':
+        play_url = '{base_url}/v6/playnow/ondemand/0/{location}'.format(base_url=CONST_API_URL, location=id)
+
+        download = api_download(url=play_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+        data = download['data']
+        code = download['code']
+
+        if not code or not code == 200 or not data or not check_key(data, 'VideoInformation'):
+            return playdata
+
+        info = data['VideoInformation']
+        url_base = '{base_url}/v6/stream/handshake/Widevine/dash/VOD/{id}'.format(base_url=CONST_API_URL, id=info['Id'])
+        timeshift = info['Id']
+    elif type == 'channel' and channel and friendly:
+        url_base = '{base_url}/v6/stream/handshake/Widevine/dash/Live/{friendly}'.format(base_url=CONST_API_URL, friendly=friendly)
+        timeshift = 'false'
+    else:
+        url_base = '{base_url}/v6/stream/handshake/Widevine/dash/Replay/{id}'.format(base_url=CONST_API_URL, id=id)
+        timeshift = id
+
+    play_url = '{url_base}?playerName=NLZIET%20Meister%20Player%20Web&profile=default&maxResolution=&timeshift={timeshift}'.format(url_base=url_base, timeshift=timeshift)
+
+    download = api_download(url=play_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+    data = download['data']
+    code = download['code']
+
+    if not code or not code == 200 or not data or not check_key(data, 'uri'):
+        return playdata
+
+    license = data
+    path = data['uri']
+
+    if not type == 'vod' and (pvr == 0):
         if type == 'channel' and friendly:
             channel_url = '{base_url}/v6/epg/locations/{friendly}/live/1?fromDate={date}'.format(base_url=CONST_API_URL, friendly=friendly, date=datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S"))
 
@@ -271,105 +347,21 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         if not id:
             return playdata
 
-        token_url_base = '{base_url}/v6/epg/location/{location}'.format(base_url=CONST_API_URL, location=id)
+        info_url = '{base_url}/v6/epg/location/{location}'.format(base_url=CONST_API_URL, location=id)
 
-        token_parameter = 'oauth_token={token}&oauth_consumer_key=key&oauth_signature_method=HMAC-SHA1&oauth_version=1.0&oauth_timestamp={timestamp}&oauth_nonce={nonce}'
-        url_encoded = api_oauth_encode(type="GET", base_url=token_url_base, parameters=token_parameter)
-
-        download = api_download(url=url_encoded, type='get', headers=None, data=None, json_data=False, return_json=True)
+        download = api_download(url=info_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']
-        
+
         if not code or not code == 200 or not data:
             return playdata
 
         info = data
 
-        timeshift = ''
-
-        if check_key(info, 'VodContentId') and len(unicode(info['VodContentId'])) > 0:
-            token_url_base = '{base_url}/v6/stream/handshake/Widevine/dash/VOD/{id}'.format(base_url=CONST_API_URL, id=info['VodContentId'])
-            timeshift = info['VodContentId']
-
-            token_parameter = 'oauth_token={token}&oauth_consumer_key=key&oauth_signature_method=HMAC-SHA1&playerName=NLZIET%20Meister%20Player%20Web&profile=default&maxResolution=&timeshift=' + unicode(timeshift) + '&oauth_version=1.0&oauth_timestamp={timestamp}&oauth_nonce={nonce}'
-            url_encoded = api_oauth_encode(type="GET", base_url=token_url_base, parameters=token_parameter)
-
-            download = api_download(url=url_encoded, type='get', headers=None, data=None, json_data=False, return_json=True)
-            data = download['data']
-            code = download['code']
-
-            if not code or not code == 200 or not data or not check_key(data, 'uri'):
-                pass
-            else:
-                alt_license = data
-                alt_path = data['uri']
-                found_alt = True
-
-        elif type == 'channel' and channel and friendly:
-            token_url_base = '{base_url}/v6/stream/handshake/Widevine/dash/Restart/{id}'.format(base_url=CONST_API_URL, id=id)
-            timeshift = 'false'
-
-            token_parameter = 'oauth_token={token}&oauth_consumer_key=key&oauth_signature_method=HMAC-SHA1&playerName=NLZIET%20Meister%20Player%20Web&profile=default&maxResolution=&timeshift=' + unicode(timeshift) + '&oauth_version=1.0&oauth_timestamp={timestamp}&oauth_nonce={nonce}'
-            url_encoded = api_oauth_encode(type="GET", base_url=token_url_base, parameters=token_parameter)
-
-            download = api_download(url=url_encoded, type='get', headers=None, data=None, json_data=False, return_json=True)
-            data = download['data']
-            code = download['code']
-
-            if not code or not code == 200 or not data or not check_key(data, 'uri'):
-                pass
-            else:
-                alt_license = data
-                alt_path = data['uri']
-                found_alt = True
-
-    if type == 'vod':
-        token_url_base = '{base_url}/v6/playnow/ondemand/0/{location}'.format(base_url=CONST_API_URL, location=id)
-
-        token_parameter = 'oauth_token={token}&oauth_consumer_key=key&oauth_signature_method=HMAC-SHA1&oauth_version=1.0&oauth_timestamp={timestamp}&oauth_nonce={nonce}'
-        url_encoded = api_oauth_encode(type="GET", base_url=token_url_base, parameters=token_parameter)
-
-        download = api_download(url=url_encoded, type='get', headers=None, data=None, json_data=False, return_json=True)
-        data = download['data']
-        code = download['code']
-
-        if not code or not code == 200 or not data or not check_key(data, 'VideoInformation'):
-            return playdata
-
-        info = data['VideoInformation']
-        token_url_base = '{base_url}/v6/stream/handshake/Widevine/dash/VOD/{id}'.format(base_url=CONST_API_URL, id=info['Id'])
-        timeshift = info['Id']
-    elif type == 'channel' and channel and friendly:
-        token_url_base = '{base_url}/v6/stream/handshake/Widevine/dash/Live/{friendly}'.format(base_url=CONST_API_URL, friendly=friendly)
-        timeshift = 'false'
-    else:
-        if len(unicode(alt_path)) == 0:
-            token_url_base = '{base_url}/v6/stream/handshake/Widevine/dash/Replay/{id}'.format(base_url=CONST_API_URL, id=id)
-            timeshift = id
-        else:
-            license = alt_license = data
-            path = alt_path
-            alt_license = ''
-            alt_path = ''
-
-    if not type == 'program' or found_alt == False:
-        token_parameter = 'oauth_token={token}&oauth_consumer_key=key&oauth_signature_method=HMAC-SHA1&playerName=NLZIET%20Meister%20Player%20Web&profile=default&maxResolution=&timeshift=' + unicode(timeshift) + '&oauth_version=1.0&oauth_timestamp={timestamp}&oauth_nonce={nonce}'
-        url_encoded = api_oauth_encode(type="GET", base_url=token_url_base, parameters=token_parameter)
-
-        download = api_download(url=url_encoded, type='get', headers=None, data=None, json_data=False, return_json=True)
-        data = download['data']
-        code = download['code']
-
-        if not code or not code == 200 or not data or not check_key(data, 'uri'):
-            return playdata
-
-        license = data
-        path = data['uri']
-
     if not len(unicode(license)) > 0:
         return playdata
 
-    playdata = {'path': path, 'license': license, 'info': info, 'alt_path': alt_path, 'alt_license': alt_license}
+    playdata = {'path': path, 'license': license, 'info': info, 'properties': properties}
 
     return playdata
 
@@ -466,7 +458,7 @@ def api_search(query):
     if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
         data = load_file(file=file, isJSON=True)
     else:
-        search_url = '{base_url}/v6/search/v2/combined?searchterm={query}&maxSerieResults=99999999&maxVideoResults=99999999&expand=true&expandlist=true'.format(base_url=CONST_API_URL, query=query)
+        search_url = '{base_url}/v6/search/v2/combined?searchterm={query}&maxSerieResults=99999999&maxVideoResults=99999999&expand=true&expandlist=true'.format(base_url=CONST_API_URL, query=quote_plus(query))
 
         download = api_download(url=search_url, type='get', headers=None, data=None, json_data=False, return_json=True)
         data = download['data']
@@ -523,11 +515,11 @@ def api_search(query):
             id = row['Video']['VideoId']
 
             if row['Video']['VideoType'] == 'VOD':
-                type = 'VideoTile'
+                type = 'Vod'
             elif row['Video']['VideoType'] == 'Replay':
-                type = 'EpgTile'
+                type = 'Epg'
             elif row['Video']['VideoType'] == 'Serie':
-                type = 'SerieTile'
+                type = 'Serie'
             else:
                 continue
 
@@ -824,3 +816,6 @@ def api_vod_seasons(type, id):
 
 def api_watchlist_listing():
     return None
+
+def api_clean_after_playback():
+    pass

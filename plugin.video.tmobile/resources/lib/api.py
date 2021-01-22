@@ -4,11 +4,18 @@ from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, find_highest_bandwidth, get_credentials, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
+from resources.lib.base.l3.util import check_key, get_credentials, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download, api_get_channels
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_BASE_URL
+from resources.lib.util import plugin_process_info
+
+try:
+    from urllib.parse import parse_qs, urlparse, quote_plus
+except ImportError:
+    from urlparse import parse_qs, urlparse
+    from urllib import quote_plus
 
 try:
     unicode
@@ -22,6 +29,65 @@ def api_getCookies(cookie_jar, domain):
     cookie_dict = json.loads(cookie_jar)
     found = ['%s=%s' % (name, value) for (name, value) in cookie_dict.items()]
     return '; '.join(found)
+
+def api_get_info(id, channel=''):
+    profile_settings = load_profile(profile_id=1)
+
+    info = {}
+    headers = {'Content-Type': 'application/json', 'X_CSRFToken': profile_settings['csrf_token']}
+    militime = int(time.time() * 1000)
+
+    data = api_get_channels()
+
+    session_post_data = {
+        'needChannel': '0',
+        'queryChannel': {
+            'channelIDs': [
+                id,
+            ],
+            'isReturnAllMedia': '1',
+        },
+        'queryPlaybill': {
+            'count': '1',
+            'endTime': militime,
+            'isFillProgram': '1',
+            'offset': '0',
+            'startTime': militime,
+            'type': '0',
+        }
+    }
+
+    channel_url = '{base_url}/VSP/V3/QueryPlaybillListStcProps?SID=queryPlaybillListStcProps3&DEVICE=PC&DID={deviceID}&from=throughMSAAccess'.format(base_url=CONST_BASE_URL, deviceID=profile_settings['devicekey'])
+
+    download = api_download(url=channel_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
+    data = download['data']
+    code = download['code']
+
+    if not code or not code == 200 or not data or not check_key(data, 'result') or not check_key(data['result'], 'retCode') or not data['result']['retCode'] == '000000000' or not check_key(data, 'channelPlaybills') or not check_key(data['channelPlaybills'][0], 'playbillLites') or not check_key(data['channelPlaybills'][0]['playbillLites'][0], 'ID'):
+        return info
+
+    id = data['channelPlaybills'][0]['playbillLites'][0]['ID']
+
+    session_post_data = {
+        'playbillID': id,
+        'channelNamespace': '310303',
+        'isReturnAllMedia': '1',
+    }
+
+    program_url = '{base_url}/VSP/V3/QueryPlaybill?from=throughMSAAccess'.format(base_url=CONST_BASE_URL)
+
+    download = api_download(url=program_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
+    data = download['data']
+    code = download['code']
+
+    if not code or not code == 200 or not data or not check_key(data, 'result') or not check_key(data['result'], 'retCode') or not data['result']['retCode'] == '000000000' or not check_key(data, 'playbillDetail'):
+        return info
+    else:
+        info = data['playbillDetail']
+
+    info = plugin_process_info({'title': '', 'channel': channel, 'info': info})
+
+    return info
 
 def api_get_session(force=0):
     force = int(force)
@@ -143,13 +209,10 @@ def api_login():
     return { 'code': code, 'data': data, 'result': True }
 
 def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0):
-    playdata = {'path': '', 'license': '', 'info': '', 'alt_path': '', 'alt_license': ''}
+    playdata = {'path': '', 'license': '', 'info': '', 'properties': {}}
 
     if not api_get_session():
         return playdata
-
-    alt_path = ''
-    alt_license = ''
 
     from_beginning = int(from_beginning)
     pvr = int(pvr)
@@ -159,6 +222,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     mediaID = None
     info = {}
+    properties = {}
 
     if not type or not len(unicode(type)) > 0:
         return playdata
@@ -227,36 +291,6 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
                 info = {}
             else:
                 info = data['playbillDetail']
-
-            if settings.getBool(key='ask_start_from_beginning') or from_beginning == 1:
-                session_post_data = {
-                    "businessType": "PLTV",
-                    "channelID": channel,
-                    "checkLock": {
-                        "checkType": "0",
-                    },
-                    "isHTTPS": "1",
-                    "isReturnProduct": "1",
-                    "mediaID": mediaID,
-                    'playbillID': id,
-                }
-
-                play_url_path = '{base_url}/VSP/V3/PlayChannel?from=throughMSAAccess'.format(base_url=CONST_BASE_URL)
-
-                download = api_download(url=play_url_path, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
-                data = download['data']
-                code = download['code']
-
-                if not code or not code == 200 or not data or not check_key(data, 'result') or not check_key(data['result'], 'retCode') or not data['result']['retCode'] == '000000000' or not check_key(data, 'playURL'):
-                    pass
-                else:
-                    alt_path = data['playURL']
-
-                    if check_key(data, 'authorizeResult'):
-                        profile_settings = load_profile(profile_id=1)
-
-                        data['authorizeResult']['cookie'] = api_getCookies(load_file('stream_cookies'), '')
-                        alt_license = data['authorizeResult']
 
         session_post_data = {
             "businessType": "BTV",
@@ -355,7 +389,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         data['authorizeResult']['cookie'] = api_getCookies(load_file('stream_cookies'), '')
         license = data['authorizeResult']
 
-    playdata = {'path': path, 'license': license, 'info': info, 'alt_path': alt_path, 'alt_license': alt_license}
+    playdata = {'path': path, 'license': license, 'info': info, 'properties': properties}
 
     return playdata
 
@@ -479,3 +513,6 @@ def api_vod_subscription():
 
 def api_watchlist_listing():
     return None
+
+def api_clean_after_playback():
+    pass

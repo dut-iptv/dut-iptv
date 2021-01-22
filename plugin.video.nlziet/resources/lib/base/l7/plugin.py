@@ -2,14 +2,21 @@ import os, shutil, sys, time, xbmc, xbmcaddon, xbmcplugin
 
 from functools import wraps
 
+from resources.lib.api import api_clean_after_playback, api_get_info
 from resources.lib.base.l1.constants import ADDON_ICON, ADDON_FANART, ADDON_ID, ADDON_NAME, ADDON_PROFILE, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
+from resources.lib.base.l3.util import load_file, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import PluginError
 from resources.lib.base.l5 import signals
 from resources.lib.base.l6 import inputstream, router
+
+try:
+    unicode
+except NameError:
+    unicode = str
 
 ## SHORTCUTS
 url_for = router.url_for
@@ -173,40 +180,126 @@ class Item(gui.Item):
         except:
             pass
 
-        result = True
-
         li = self.get_li()
         handle = _handle()
 
+        #if 'seekTime' in self.properties:
+            #li.setProperty('ResumeTime', unicode(self.properties['seekTime']))
+
+            #if 'totalTime' in self.properties:
+            #    li.setProperty('TotalTime', unicode(self.properties['totalTime']))
+            #else:
+            #    li.setProperty('TotalTime', '999999')
+
+        player = MyPlayer()
+
+        playbackStarted = False
+        seekTime = False
+        replay_pvr = False
+
         if handle > 0:
-            xbmcplugin.setResolvedUrl(handle, result, li)
-        elif result:
-            xbmc.Player().play(self.path, li)
+            if 'Replay' in self.properties or 'PVR' in self.properties:
+                replay_pvr = True
+                self.properties.pop('Replay', None)
+                self.properties.pop('PVR', None)
+                xbmcplugin.setResolvedUrl(handle, True, li)
+            else:
+                xbmcplugin.setResolvedUrl(handle, False, li)
+                player.play(self.path, li)
+        else:
+            player.play(self.path, li)
 
-        #if settings.getBool(key='disable_subtitle'):
-        #    counter = 0
+        while player.is_active:
+            if xbmc.getCondVisibility("Player.HasMedia") and player.is_started:
+                playbackStarted = True
 
-        #    while not xbmc.Player().isPlayingVideo() and not counter == 4:
-        #        if xbmc.Monitor().waitForAbort(0.25):
-        #            break
+                if 'seekTime' in self.properties:
+                    seekTime = True
+                    xbmc.Monitor().waitForAbort(1)
+                    player.seekTime(int(self.properties['seekTime']))
+                    self.properties.pop('seekTime', None)
 
-        #        counter += 1
+                if not replay_pvr and not seekTime and 'Live' in self.properties and 'Live_ID' in self.properties and 'Live_Channel' in self.properties:
+                    id = self.properties['Live_ID']
+                    channel = self.properties['Live_Channel']
 
-        #    if xbmc.Player().isPlayingVideo():
-        #        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Player.SetSubtitle","params":{"playerid":1,"subtitle":"off"}}')
+                    self.properties.pop('Live', None)
+                    self.properties.pop('Live_ID', None)
+                    self.properties.pop('Live_Channel', None)
 
-        #if 'seekTime' in self.properties and sys.argv[3] != 'resume:true':
-        #    counter = 0
+                    wait = 60
 
-        #    while not xbmc.Player().isPlayingVideo() and not counter == 20:
-        #        if xbmc.Monitor().waitForAbort(0.25):
-        #            break
+                    end = load_file(file='stream_end', isJSON=False)
 
-        #        counter += 1
+                    if end:
+                        calc_wait = int(end) - int(time.time()) + 30
 
-        #    if xbmc.Player().isPlayingVideo():
-        #        xbmc.Player().seekTime(int(self.properties['seekTime']))
-        #        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"Player.Seek", "params": { "playerid":1, "value":{ "seconds": 1 } }, "id":1}')
+                        if calc_wait > 60:
+                            wait = calc_wait
+
+                    while not xbmc.Monitor().waitForAbort(wait) and xbmc.getCondVisibility("Player.HasMedia") and player.is_started:
+                        info = api_get_info(id=id, channel=channel)
+
+                        if info:
+                            info2 = {
+                                'plot': unicode(info['description']),
+                                'title': unicode(info['label1']),
+                                'tagline': unicode(info['label2']),
+                                'duration': info['duration'],
+                                'credits': info['credits'],
+                                'cast': info['cast'],
+                                'director': info['director'],
+                                'writer': info['writer'],
+                                'genre': info['genres'],
+                                'year': info['year'],
+                            }
+
+                            li.setInfo('video', info2)
+
+                            li.setArt({'thumb': info['image'], 'icon': info['image'], 'fanart': info['image_large'] })
+
+                            try:
+                                player.updateInfoTag(li)
+                            except:
+                                pass
+
+                            wait = 60
+                            end = load_file(file='stream_end', isJSON=False)
+
+                            if end:
+                                calc_wait = int(end) - int(time.time()) + 30
+
+                                if calc_wait > 60:
+                                    wait = calc_wait
+
+            xbmc.Monitor().waitForAbort(1)
+
+        if playbackStarted == True:
+            api_clean_after_playback()
+
+class MyPlayer(xbmc.Player):
+    def __init__(self):
+        self.is_active = True
+        self.is_started = False
+
+    def onPlayBackPaused(self):
+        pass
+
+    def onPlayBackResumed(self):
+        pass
+
+    def onPlayBackStarted(self):
+        self.is_started = True
+        pass
+
+    def onPlayBackEnded(self):
+        self.is_active = False
+
+    def onPlayBackStopped(self):
+        self.is_active = False
+
+    def sleep(self, s):
+        xbmc.sleep(s)
 
 #Plugin.Folder()
 class Folder(object):

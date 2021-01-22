@@ -6,7 +6,7 @@ from resources.lib.base.l1.constants import DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, load_file
+from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, load_file, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l6 import inputstream
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_IMAGE_URL
@@ -23,14 +23,14 @@ def plugin_ask_for_creds(creds):
         if unicode(creds['username']).isnumeric():
             creds['username'] = ''
 
-        username = gui.input(message=_.ASK_USERNAME2, default=creds['username']).strip()
+        username = unicode(gui.input(message=_.ASK_USERNAME2, default=creds['username'])).strip()
     else:
         if not unicode(creds['username']).isnumeric():
             creds['username'] = ''
 
-        username = gui.numeric(message=_.ASK_USERNAME, default=creds['username']).strip()
+        username = unicode(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 
-    if not len(username) > 0:
+    if not len(unicode(username)) > 0:
         if email_or_pin:
             gui.ok(message=_.EMPTY_USER2, heading=_.LOGIN_ERROR_TITLE)
         else:
@@ -39,11 +39,11 @@ def plugin_ask_for_creds(creds):
         return {'result': False, 'username': '', 'password': ''}
 
     if email_or_pin:
-        password = gui.input(message=_.ASK_PASSWORD2, hide_input=True).strip()
+        password = unicode(gui.input(message=_.ASK_PASSWORD2, hide_input=True)).strip()
     else:
-        password = gui.numeric(message=_.ASK_PASSWORD).strip()
+        password = unicode(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
 
-    if not len(password) > 0:
+    if not len(unicode(password)) > 0:
         if email_or_pin:
             gui.ok(message=_.EMPTY_PASS2, heading=_.LOGIN_ERROR_TITLE)
         else:
@@ -84,9 +84,9 @@ def plugin_process_info(playdata):
         for row in playdata['info']['resultObj']['containers']:
             if check_key(row, 'metadata'):
                 if check_key(row['metadata'], 'airingStartTime') and check_key(row['metadata'], 'airingEndTime'):
-                    startT = datetime.datetime.fromtimestamp(int(int(row['metadata']['airingStartTime']) / 1000))
+                    startT = datetime.datetime.fromtimestamp(int(int(row['metadata']['airingStartTime']) // 1000))
                     startT = convert_datetime_timezone(startT, "UTC", "UTC")
-                    endT = datetime.datetime.fromtimestamp(int(int(row['metadata']['airingEndTime']) / 1000))
+                    endT = datetime.datetime.fromtimestamp(int(int(row['metadata']['airingEndTime']) // 1000))
                     endT = convert_datetime_timezone(endT, "UTC", "UTC")
 
                     info['duration'] = int((endT - startT).total_seconds())
@@ -98,11 +98,24 @@ def plugin_process_info(playdata):
 
                     info['label1'] += " - "
 
-                if playdata['title']:
-                    info['label1'] += playdata['title'] + ' - '
+                    write_file(file='stream_start', data=int(int(row['metadata']['airingStartTime']) // 1000), isJSON=False)
+                    write_file(file='stream_end', data=int(int(row['metadata']['airingEndTime']) // 1000), isJSON=False)
 
-                if check_key(row['metadata'], 'title'):
+                if check_key(playdata, 'title') and len(unicode(playdata['title'])) > 0:
+                    info['label1'] += playdata['title']
+
+                    if len(unicode(info['label2'])) > 0:
+                        info['label2'] += " - "
+
+                    info['label2'] += playdata['title']
+
+                if check_key(row['metadata'], 'title') and len(unicode(row['metadata']['title'])) > 0:
                     info['label1'] += row['metadata']['title']
+
+                    if len(unicode(info['label2'])) > 0:
+                        info['label2'] += " - "
+
+                    info['label2'] += row['metadata']['title']
 
                 if check_key(row['metadata'], 'longDescription'):
                     info['description'] = row['metadata']['longDescription']
@@ -144,16 +157,20 @@ def plugin_process_info(playdata):
                     epcode += 'E' + unicode(row['metadata']['episodeNumber'])
 
                 if check_key(row['metadata'], 'episodeTitle'):
-                    info['label2'] = row['metadata']['episodeTitle']
+                    if len(unicode(info['label2'])) > 0:
+                        info['label2'] += " - "
+
+                    info['label2'] += unicode(row['metadata']['episodeTitle'])
 
                     if len(epcode) > 0:
                         info['label2'] += " (" + epcode + ")"
-                elif check_key(row['metadata'], 'title'):
-                    info['label2'] = row['metadata']['title']
 
                 if check_key(row, 'channel'):
                     if check_key(row['channel'], 'channelName'):
-                        info['label2'] += " - "  + row['channel']['channelName']
+                        if len(unicode(info['label2'])) > 0:
+                            info['label2'] += " - "
+
+                        info['label2'] += unicode(row['channel']['channelName'])
 
     return info
 

@@ -3,7 +3,8 @@ import base64, json, os, requests, xbmc
 from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, CONST_DUT_EPG_BASE, SESSION_CHUNKSIZE
 from resources.lib.base.l2.log import log
-from resources.lib.util import check_key, clear_cache, fixBadZipfile, is_file_older_than_x_days, load_file, load_profile, write_file
+from resources.lib.base.l3.util import check_key, fixBadZipfile, is_file_older_than_x_days, load_file, load_profile, write_file
+from resources.lib.util import clear_cache_connector
 
 try:
     unicode
@@ -61,9 +62,12 @@ def api_get_channels():
         else:
             return False
 
-        clear_cache()
+        clear_cache_connector()
 
     return True
+
+def api_get_info(id, channel=''):
+    pass
 
 def api_get_all_epg():
     updated = False
@@ -76,7 +80,7 @@ def api_get_all_epg():
                 if api_get_epg_by_addon(profile_settings['addon' + unicode(x)].replace('plugin.video.', '')) == True:
                     updated = True
 
-    clear_cache()
+    clear_cache_connector()
 
     if updated == True:
         return True
@@ -145,3 +149,6 @@ def api_get_epg_by_addon(addon):
             return False
 
     return True
+    
+def api_clean_after_playback():
+    pass

@@ -5,7 +5,7 @@ from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, get_credentials, load_file, load_profile
+from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, get_credentials, load_file, load_profile, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l5.api import api_download, api_get_channels
 from resources.lib.base.l6 import inputstream
@@ -170,13 +170,13 @@ def get_play_url(content):
     return {'play_url': '', 'locator': ''}
 
 def plugin_ask_for_creds(creds):
-    username = gui.input(message=_.ASK_USERNAME, default=creds['username']).strip()
+    username = unicode(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 
     if not len(username) > 0:
         gui.ok(message=_.EMPTY_USER, heading=_.LOGIN_ERROR_TITLE)
         return {'result': False, 'username': '', 'password': ''}
 
-    password = gui.input(message=_.ASK_PASSWORD, hide_input=True).strip()
+    password = unicode(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
 
     if not len(password) > 0:
         gui.ok(message=_.EMPTY_PASS, heading=_.LOGIN_ERROR_TITLE)
@@ -208,14 +208,17 @@ def plugin_process_info(playdata):
 
     if check_key(playdata, 'info'):
         if check_key(playdata['info'], 'latestBroadcastEndTime') and check_key(playdata['info'], 'latestBroadcastStartTime'):
-            startsplit = int(playdata['info']['latestBroadcastStartTime']) // 1000
-            endsplit = int(playdata['info']['latestBroadcastEndTime']) // 1000
+            startsplit = int(int(playdata['info']['latestBroadcastStartTime']) // 1000)
+            endsplit = int(int(playdata['info']['latestBroadcastEndTime']) // 1000)
             duration = endsplit - startsplit
 
             startT = datetime.datetime.fromtimestamp(startsplit)
             startT = convert_datetime_timezone(startT, "UTC", "UTC")
             endT = datetime.datetime.fromtimestamp(endsplit)
             endT = convert_datetime_timezone(endT, "UTC", "UTC")
+
+            write_file(file='stream_start', data=startsplit, isJSON=False)
+            write_file(file='stream_end', data=endsplit, isJSON=False)
 
             if xbmc.getLanguage(xbmc.ISO_639_1) == 'nl':
                 info['label1'] = '{weekday} {day} {month} {yearhourminute} '.format(weekday=date_to_nl_dag(startT), day=startT.strftime("%d"), month=date_to_nl_maand(startT), yearhourminute=startT.strftime("%Y %H:%M"))

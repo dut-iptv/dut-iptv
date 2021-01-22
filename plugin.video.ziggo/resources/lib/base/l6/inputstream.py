@@ -19,6 +19,7 @@ class InputstreamItem(object):
     mimetype = ''
     media_renewal_url = ''
     media_renewal_time = ''
+    manifest_update_parameter = ''
 
     def check(self):
         return False
@@ -34,9 +35,10 @@ class MPD(InputstreamItem):
     manifest_type = 'mpd'
     mimetype = 'application/dash+xml'
 
-    def __init__(self, media_renewal_url=None, media_renewal_time=None):
+    def __init__(self, media_renewal_url=None, media_renewal_time=None, manifest_update_parameter=None):
         self.media_renewal_url = media_renewal_url
         self.media_renewal_time = media_renewal_time
+        self.manifest_update_parameter = manifest_update_parameter
 
     def check(self):
         return supports_mpd()
@@ -54,13 +56,14 @@ class Widevine(InputstreamItem):
     license_type = 'com.widevine.alpha'
     mimetype = 'application/dash+xml'
 
-    def __init__(self, license_key=None, content_type='application/octet-stream', challenge='R{SSM}', response='', media_renewal_url=None, media_renewal_time=None):
+    def __init__(self, license_key=None, content_type='application/octet-stream', challenge='R{SSM}', response='', media_renewal_url=None, media_renewal_time=None, manifest_update_parameter=None):
         self.license_key = license_key
         self.content_type = content_type
         self.challenge = challenge
         self.response = response
         self.media_renewal_url = media_renewal_url
         self.media_renewal_time = media_renewal_time
+        self.manifest_update_parameter = manifest_update_parameter
 
     def check(self):
         return install_widevine()
@@ -226,6 +229,7 @@ def _download(url, dst, dst_path, arch, md5=None):
     with gui.progress(_(_.IA_DOWNLOADING_FILE, url=filename), heading=_.IA_WIDEVINE_DRM) as progress:
         resp = Session().get(url, stream=True)
         if resp.status_code != 200:
+            resp.close()
             raise InputStreamError(_(_.ERROR_DOWNLOADING_FILE, filename=filename))
 
         total_length = float(resp.headers.get('content-length', 1))
@@ -240,9 +244,10 @@ def _download(url, dst, dst_path, arch, md5=None):
 
                 if progress.iscanceled():
                     progress.close()
-                    resp.close()
 
                 progress.update(percent)
+
+        resp.close()
 
         if os.path.isfile(tmp):
             if 'arm' in arch:

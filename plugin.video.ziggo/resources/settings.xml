@@ -27,9 +27,9 @@
                     <default>true</default>
                     <control type="toggle" />
                 </setting>
-                <setting id="disableac3" type="boolean" label="32077">
-                    <default>true</default>
-                    <control type="toggle"/>
+                <setting id="force_ac3" type="boolean" label="30037">
+                    <default>false</default>
+                    <control type="toggle" />
                 </setting>
                 <setting id="force_highest_bandwidth" type="boolean" label="32101">
                     <default>true</default>

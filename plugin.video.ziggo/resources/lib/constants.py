@@ -9,6 +9,7 @@ CONST_API_URLS = {}
 
 CONST_API_URLS[0] = {
     'base_url': complete_base_url + '/web',
+    'clearstreams_url': 'https://web-api-pepper.horizon.tv/oesp/v2/NL/nld/web/playback/clearstreams',
     'devices_url': "https://web-api-pepper.horizon.tv/oesp/v2/NL/nld/web/settopboxes/profile",
     'search_url': "https://web-api-pepper.horizon.tv/oesp/v2/NL/nld/web/search/content",
     'session_url': "https://web-api-pepper.horizon.tv/oesp/v2/NL/nld/web/session",
@@ -23,6 +24,7 @@ CONST_API_URLS[0] = {
 
 CONST_API_URLS[1] = {
     'base_url': complete_base_url_three + '/web',
+    'clearstreams_url': 'https://web-api-prod-obo.horizon.tv/oesp/v3/NL/nld/web/playback/clearstreams',
     'devices_url': "https://web-api-prod-obo.horizon.tv/oesp/v3/NL/nld/web/settopboxes/profile",
     'search_url': "https://web-api-prod-obo.horizon.tv/oesp/v3/NL/nld/web/search/content",
     'session_url': "https://web-api-prod-obo.horizon.tv/oesp/v3/NL/nld/web/session",
@@ -63,6 +65,8 @@ CONST_BASE_HEADERS = {
 CONST_DEFAULT_CLIENTID = '4.23.13'
 
 CONST_ONLINE_SEARCH = False
+
+CONST_START_FROM_BEGINNING = True
 
 CONST_VOD_CAPABILITY = [
     { 'file': 'series', 'label': _.SERIES, 'start': 0, 'online': 0, 'split': 0 },

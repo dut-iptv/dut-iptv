@@ -351,7 +351,7 @@ msgid "Enable Debug Mode"
 msgstr ""
 
 msgctxt "#32103"
-msgid "Ask to start stream from beginning (if available)"
+msgid "Ask to start stream from beginning"
 msgstr ""
 
 msgctxt "#320104"
@@ -395,7 +395,7 @@ msgid "Test channel"
 msgstr ""
 
 msgctxt "#320114"
-msgid "Start from beginning (if available)"
+msgid "Start from beginning"
 msgstr ""
 
 msgctxt "#320115"

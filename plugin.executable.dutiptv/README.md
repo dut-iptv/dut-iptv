@@ -12,7 +12,7 @@
 
 ### Required
 
--Two or more subscriptions to CanalDigitaal, KPN/Telfort/XS4ALL, NLZiet, T-Mobile or Ziggo (not free)
+-One or more subscriptions to CanalDigitaal, KPN/Telfort/XS4ALL, NLZiet, T-Mobile or Ziggo (not free)
 
 -Kodi 18 or higher with Widevine Support (free)
 

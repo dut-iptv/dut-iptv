@@ -4,18 +4,18 @@ from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, DEFAULT_USE
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, find_highest_bandwidth, get_credentials, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
+from resources.lib.base.l3.util import check_key, get_credentials, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_vod_by_type
 from resources.lib.constants import CONST_API_URLS, CONST_DEFAULT_CLIENTID, CONST_VOD_CAPABILITY
-from resources.lib.util import get_image, get_play_url
+from resources.lib.util import get_image, get_play_url, plugin_process_info
 
 try:
-    from urllib.parse import urlparse, quote
+    from urllib.parse import parse_qs, urlparse, quote_plus
 except ImportError:
-    from urllib import quote
-    from urlparse import urlparse
+    from urlparse import parse_qs, urlparse
+    from urllib import quote_plus
 
 try:
     unicode
@@ -70,6 +70,26 @@ def api_get_headers():
         HEADERS['X-OESP-Profile-Id'] = profile_settings['ziggo_profile_id']
 
     return HEADERS
+
+def api_get_info(id, channel=''):
+    profile_settings = load_profile(profile_id=1)
+
+    info = {}
+    base_listing_url = CONST_API_URLS[int(profile_settings['v3'])]['listings_url']
+
+    listing_url = '{listings_url}?byEndTime={time}~&byStationId={channel}&range=1-1&sort=startTime'.format(listings_url=base_listing_url, time=int(time.time() * 1000), channel=id)
+    download = api_download(url=listing_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
+    data = download['data']
+    code = download['code']
+
+    if code and code == 200 and data and check_key(data, 'listings'):
+        for row in data['listings']:
+            if check_key(row, 'program'):
+                info = row['program']
+
+    info = plugin_process_info({'title': '', 'channel': channel, 'info': info})
+
+    return info
 
 def api_get_play_token(locator=None, path=None, force=0):
     if not api_get_session():
@@ -218,7 +238,7 @@ def api_login():
         profile_settings['access_token'] = ''
         profile_settings['ziggo_profile_id'] = ''
         profile_settings['household_id'] = ''
-        profile_settings['watchlist_id'] = ''        
+        profile_settings['watchlist_id'] = ''
         save_profile(profile_id=1, profile=profile_settings)
     except:
         pass
@@ -231,7 +251,7 @@ def api_login():
     download = api_download(url=CONST_API_URLS[int(profile_settings['v3'])]['session_url'], type='post', headers=HEADERS, data={"username": username, "password": password}, json_data=True, return_json=True)
     data = download['data']
     code = download['code']
-    
+
     switch_backoffice = False
 
     if code and data and check_key(data, 'reason') and data['reason'] == 'wrong backoffice':
@@ -249,7 +269,7 @@ def api_login():
             os.remove(ADDON_PROFILE + "prefs.json")
         except:
             pass
-            
+
         switch_backoffice = True
 
         download = api_download(url=CONST_API_URLS[int(profile_settings['v3'])]['session_url'], type='post', headers=HEADERS, data={"username": username, "password": password}, json_data=True, return_json=True)
@@ -287,7 +307,7 @@ def api_login():
     return { 'code': code, 'data': data, 'result': True }
 
 def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0):
-    playdata = {'path': '', 'license': '', 'token': '', 'locator': '', 'type': '', 'alt_path': '', 'alt_license': '', 'alt_locator': ''}
+    playdata = {'path': '', 'license': '', 'token': '', 'locator': '', 'type': '', 'properties': {}}
 
     if not api_get_session():
         return playdata
@@ -299,10 +319,8 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     if type == "channel":
         id = channel
 
-    alt_path = ''
-    alt_license = ''
-    alt_locator = ''
     info = {}
+    properties = {}
     base_listing_url = CONST_API_URLS[int(profile_settings['v3'])]['listings_url']
     urldata = None
     urldata2 = None
@@ -380,11 +398,12 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         urldata2['locator'] = data['contentLocator']
 
     if urldata and urldata2 and check_key(urldata, 'play_url') and check_key(urldata, 'locator') and check_key(urldata2, 'play_url') and check_key(urldata2, 'locator'):
-        path = urldata['play_url']
-        locator = urldata['locator']
-
-        alt_path = urldata2['play_url']
-        alt_locator = urldata2['locator']
+        if not from_beginning == 1:
+            path = urldata['play_url']
+            locator = urldata['locator']
+        else:
+            path = urldata2['play_url']
+            locator = urldata2['locator']
     else:
         if urldata and check_key(urldata, 'play_url') and check_key(urldata, 'locator'):
             path = urldata['play_url']
@@ -397,7 +416,6 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         return playdata
 
     license = CONST_API_URLS[int(profile_settings['v3'])]['widevine_url']
-    alt_license = CONST_API_URLS[int(profile_settings['v3'])]['widevine_url']
 
     token = api_get_play_token(locator=locator, path=path, force=1)
 
@@ -424,7 +442,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
             if len(spliturl) == 2:
                 path = '{urlpart1};vxttoken={token}/{urlpart2}'.format(urlpart1=spliturl[0], token=token, urlpart2=spliturl[1])
 
-    playdata = {'path': path, 'license': license, 'token': token, 'locator': locator, 'info': info, 'type': type, 'alt_path': alt_path, 'alt_license': alt_license, 'alt_locator': alt_license}
+    playdata = {'path': path, 'license': license, 'token': token, 'locator': locator, 'info': info, 'type': type, 'properties': properties}
 
     return playdata
 
@@ -474,7 +492,7 @@ def api_search(query):
     except:
         pass
 
-    search_url = '{search_url}?byBroadcastStartTimeRange={start}~{end}&numItems=25&byEntitled=true&personalised=true&q={query}'.format(search_url=CONST_API_URLS[int(profile_settings['v3'])]['search_url'], start=start, end=end, query=quote(query))
+    search_url = '{search_url}?byBroadcastStartTimeRange={start}~{end}&numItems=25&byEntitled=true&personalised=true&q={query}'.format(search_url=CONST_API_URLS[int(profile_settings['v3'])]['search_url'], start=start, end=end, query=quote_plus(query))
 
     if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
         data = load_file(file=file, isJSON=True)
@@ -697,3 +715,11 @@ def api_watchlist_listing(id):
         return False
 
     return data
+
+def api_clean_after_playback():
+    profile_settings = load_profile(profile_id=1)
+
+    headers = api_get_headers()
+    headers['Content-type'] = 'application/json'
+
+    download = api_download(url=CONST_API_URLS[int(profile_settings['v3'])]['clearstreams_url'], type='post', headers=headers, data='{}', json_data=False, return_json=False)

@@ -13,7 +13,7 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_list, api_get_list_by_first, api_get_vod_by_type
 from resources.lib.base.l7 import plugin
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_ONLINE_SEARCH, CONST_VOD_CAPABILITY, CONST_WATCHLIST
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_VOD_CAPABILITY, CONST_WATCHLIST
 from resources.lib.util import plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
 
 try:
@@ -100,7 +100,7 @@ def live_tv(**kwargs):
             info = {'plot': row['description']},
             art = {'thumb': row['image']},
             path = row['path'],
-            playable = row['playable'],
+            #playable = row['playable'],
             context = row['context'],
         )
 
@@ -491,7 +491,7 @@ def online_search(query=None, **kwargs):
 
     folder = plugin.Folder(title=_(_.SEARCH_FOR, query=query))
 
-    processed = process_vod_content(data=None, start=0, search=query, type='Online', online=1)
+    processed = process_vod_content(data='', start=0, search=query, type='Online', online=1)
     items += processed['items']
 
     items[:] = sorted(items, key=_sort_replay_items, reverse=True)
@@ -660,6 +660,9 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
         gui.ok(message=_.PROXY_NOT_SET)
         return False
 
+    if CONST_START_FROM_BEGINNING and not from_beginning == 1 and settings.getBool(key='ask_start_from_beginning') and gui.yes_no(message=_.START_FROM_BEGINNING, heading=playdata['title']):
+        from_beginning = 1
+
     playdata = api_play_url(type=type, channel=channel, id=id, video_data=data, from_beginning=from_beginning, pvr=pvr)
 
     if not playdata or not check_key(playdata, 'path'):
@@ -668,12 +671,36 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
     playdata['channel'] = channel
     playdata['title'] = title
 
-    if check_key(playdata, 'alt_path') and (from_beginning == 1 or (settings.getBool(key='ask_start_from_beginning') and gui.yes_no(message=_.START_FROM_BEGINNING, heading=playdata['title']))):
-        path = playdata['alt_path']
-        license = playdata['alt_license']
+    info = plugin_process_info(playdata)
+
+    if pvr == 1:
+        try:
+            data = api_get_channels()
+
+            info['image'] = data[unicode(channel)]['icon']
+            info['image_large'] = data[unicode(channel)]['icon']
+        except:
+            pass
+
+    path = playdata['path']
+    license = playdata['license']
+
+    if CONST_START_FROM_BEGINNING and from_beginning == 1:
+        playdata['properties']['seekTime'] = 0
+
+        if PROVIDER_NAME == 'tmobile':
+            start = load_file(file='stream_start', isJSON=False)
+
+            if start:
+                time_diff = int(time.time()) - int(start)
+
+                if time_diff > 0:
+                    time_diff2 = 7190 - time_diff
+
+                    if time_diff2 > 0:
+                        playdata['properties']['seekTime'] = time_diff2
     else:
-        path = playdata['path']
-        license = playdata['license']
+        remove_stream_start()
 
     real_url = "{hostscheme}://{netloc}".format(hostscheme=urlparse(path).scheme, netloc=urlparse(path).netloc)
 
@@ -683,10 +710,17 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
 
     item_inputstream, CDMHEADERS = plugin_process_playdata(playdata)
 
-    info = plugin_process_info(playdata)
-
     write_file(file='stream_hostname', data=real_url, isJSON=False)
     write_file(file='stream_duration', data=info['duration'], isJSON=False)
+
+    if pvr == 1:
+        playdata['properties']['PVR'] = 1
+    elif type == 'program' or type == 'vod':
+        playdata['properties']['Replay'] = 1
+    else:
+        playdata['properties']['Live'] = 1
+        playdata['properties']['Live_ID'] = channel
+        playdata['properties']['Live_Channel'] = playdata['channel']
 
     listitem = plugin.Item(
         label = unicode(info['label1']),
@@ -709,6 +743,7 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
         },
         path = path,
         headers = CDMHEADERS,
+        properties = playdata['properties'],
         inputstream = item_inputstream,
     )
 
@@ -802,6 +837,13 @@ def get_live_channels(all=False):
             id = unicode(row['id'])
 
             if all or not prefs or not check_key(prefs, id) or prefs[id]['live'] == 1:
+                context = []
+
+                if CONST_START_FROM_BEGINNING:
+                    context = [
+                        (_.START_BEGINNING, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='channel', channel=id, id=unicode(row['assetid']), from_beginning=1, _is_live=True)), ),
+                    ]
+
                 channels.append({
                     'label': unicode(row['name']),
                     'channel': id,
@@ -810,9 +852,7 @@ def get_live_channels(all=False):
                     'image': unicode(row['icon']),
                     'path':  path,
                     'playable': playable,
-                    'context': [
-                        (_.START_BEGINNING, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='channel', channel=id, id=unicode(row['assetid']), from_beginning=1, _is_live=True)), ),
-                    ],
+                    'context': context,
                 })
 
     return channels
@@ -1282,3 +1322,9 @@ def check_first():
 
         profile_settings['setup_complete'] = 1
         save_profile(profile_id=1, profile=profile_settings)
+
+def remove_stream_start():
+    try:
+        os.remove(ADDON_PROFILE + 'stream_start')
+    except:
+        pass

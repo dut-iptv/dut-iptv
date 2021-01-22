@@ -31,12 +31,12 @@
                     <default>true</default>
                     <control type="toggle" />
                 </setting>
-				<setting id="force_highest_bandwidth" type="boolean" label="32101">
-                    <default>true</default>
+				<setting id="force_ac3" type="boolean" label="30037">
+                    <default>false</default>
                     <control type="toggle" />
                 </setting>
-                <setting id="force_ac3" type="boolean" label="30037">
-                    <default>false</default>
+                <setting id="force_highest_bandwidth" type="boolean" label="32101">
+                    <default>true</default>
                     <control type="toggle" />
                 </setting>
                 <setting id="add_duration" type="integer" label="32092">

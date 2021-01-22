@@ -80,8 +80,8 @@ def build_url(url, addon_id=ADDON_ID, **kwargs):
         try: params.append((k, str(kwargs[k]).encode('utf-8')))
         except: params.append((k, kwargs[k]))
         
-    if is_live:
-        params.append(('_l', '.pvr'))
+    #if is_live:
+    #    params.append(('_l', '.pvr'))
 
     return 'plugin://{0}/?{1}'.format(addon_id, urlencode(encode_obj(params)))
 

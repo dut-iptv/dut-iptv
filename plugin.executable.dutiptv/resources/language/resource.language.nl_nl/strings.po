@@ -361,8 +361,8 @@ msgid "Enable Debug Mode"
 msgstr "Debug mode inschakelen"
 
 msgctxt "#32103"
-msgid "Ask to start stream from beginning (if available)"
-msgstr "Vraag om stream vanaf begin te starten (indien beschikbaar)"
+msgid "Ask to start stream from beginning"
+msgstr "Vraag om stream vanaf begin te starten"
 
 msgctxt "#320104"
 msgid "Channel selection"
@@ -405,8 +405,8 @@ msgid "Test channel"
 msgstr "Test zender"
 
 msgctxt "#320114"
-msgid "Start from beginning (if available)"
-msgstr "Vanaf begin starten (indien beschikbaar)"
+msgid "Start from beginning"
+msgstr "Vanaf begin starten"
 
 msgctxt "#320115"
 msgid "Login was successfull"

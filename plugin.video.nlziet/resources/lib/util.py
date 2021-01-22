@@ -5,7 +5,7 @@ from resources.lib.base.l1.constants import DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, load_file, load_profile
+from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, load_file, load_profile, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l6 import inputstream
 from resources.lib.constants import CONST_IMAGE_URL
@@ -16,14 +16,14 @@ except NameError:
     unicode = str
 
 def plugin_ask_for_creds(creds):
-    username = gui.input(message=_.ASK_USERNAME, default=creds['username']).strip()
+    username = unicode(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 
     if not len(username) > 0:
         gui.ok(message=_.EMPTY_USER, heading=_.LOGIN_ERROR_TITLE)
 
         return {'result': False, 'username': '', 'password': ''}
 
-    password = gui.input(message=_.ASK_PASSWORD, hide_input=True).strip()
+    password = unicode(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
 
     if not len(password) > 0:
         gui.ok(message=_.EMPTY_PASS, heading=_.LOGIN_ERROR_TITLE)
@@ -66,6 +66,9 @@ def plugin_process_info(playdata):
         endT = datetime.datetime.fromtimestamp(time.mktime(time.strptime(playdata['info']['End'], "%Y-%m-%dT%H:%M:%S")))
         endT = convert_datetime_timezone(endT, "UTC", "UTC")
 
+        write_file(file='stream_start', data=int(time.mktime(time.strptime(playdata['info']['Start'], "%Y-%m-%dT%H:%M:%S"))), isJSON=False)
+        write_file(file='stream_end', data=int(time.mktime(time.strptime(playdata['info']['End'], "%Y-%m-%dT%H:%M:%S"))), isJSON=False)
+
         if check_key(playdata['info'], 'DurationInSeconds'):
             info['duration'] = playdata['info']['DurationInSeconds']
         elif check_key(playdata['info'], 'Duur'):
@@ -78,23 +81,37 @@ def plugin_process_info(playdata):
         else:
             info['label1'] = startT.strftime("%A %d %B %Y %H:%M ").capitalize()
 
-        info['label1'] += " - "
-    elif check_key(playdata['info'], 'Duur'):
+    if check_key(playdata['info'], 'Duur'):
         info['duration'] = playdata['info']['Duur']
 
     if check_key(playdata['info'], 'Title'):
+        if len(unicode(info['label1'])) > 0:
+            info['label1'] += " - "
+
+        if len(unicode(info['label2'])) > 0:
+            info['label2'] += " - "
+
         info['label1'] += playdata['info']['Title']
-        info['label2'] = playdata['info']['Title']
+        info['label2'] += playdata['info']['Title']
     elif check_key(playdata['info'], 'Serie') and check_key(playdata['info']['Serie'], 'Titel') and len(playdata['info']['Serie']['Titel']):
+        if len(unicode(info['label1'])) > 0:
+            info['label1'] += " - "
+
+        if len(unicode(info['label2'])) > 0:
+            info['label2'] += " - "
+
         info['label1'] += playdata['info']['Serie']['Titel']
-        info['label2'] = playdata['info']['Serie']['Titel']
+        info['label2'] += playdata['info']['Serie']['Titel']
 
         if check_key(playdata['info'], 'Titel') and len(playdata['info']['Titel']) > 0 and playdata['info']['Titel'] != playdata['info']['Serie']['Titel']:
-            info['label1'] += ": " + playdata['info']['Titel']
-            info['label2'] += ": " + playdata['info']['Titel']
-    elif check_key(playdata['info'], 'Titel'):
-        info['label1'] += playdata['info']['Titel']
-        info['label2'] = playdata['info']['Titel']
+            if len(unicode(info['label1'])) > 0:
+                info['label1'] += ": "
+
+            if len(unicode(info['label2'])) > 0:
+                info['label2'] += ": "
+
+            info['label1'] += playdata['info']['Titel']
+            info['label2'] += playdata['info']['Titel']
 
     if check_key(playdata['info'], 'LongDescription'):
         info['description'] = playdata['info']['LongDescription']
@@ -109,9 +126,15 @@ def plugin_process_info(playdata):
         info['image_large'] = playdata['info']['AfbeeldingUrl']
 
     if check_key(playdata['info'], 'ChannelTitle'):
-        info['label2'] += " - "  + playdata['info']['ChannelTitle']
+        if len(unicode(info['label2'])) > 0:
+            info['label2'] += " - "
+
+        info['label2'] += playdata['info']['ChannelTitle']
     elif check_key(playdata['info'], 'Zender'):
-        info['label2'] += " - "  + playdata['info']['Zender']
+        if len(unicode(info['label2'])) > 0:
+            info['label2'] += " - "
+
+        info['label2'] += playdata['info']['Zender']
 
     return info
 

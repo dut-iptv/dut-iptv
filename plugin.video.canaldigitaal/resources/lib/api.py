@@ -1,20 +1,21 @@
-import base64, datetime, os, time, uuid, xbmc
+import base64, datetime, os, re, time, uuid, xbmc
 
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, DEFAULT_BROWSER_NAME, DEFAULT_BROWSER_VERSION, DEFAULT_OS_NAME, DEFAULT_OS_VERSION
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, find_highest_bandwidth, get_credentials, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
+from resources.lib.base.l3.util import check_key, get_credentials, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_BASE_URL, CONST_DEFAULT_API, CONST_LOGIN_HEADERS, CONST_LOGIN_URL
+from resources.lib.util import plugin_process_info
 
 try:
-    from urllib.parse import parse_qs, urlparse, quote
+    from urllib.parse import parse_qs, urlparse, quote_plus
 except ImportError:
     from urlparse import parse_qs, urlparse
-    from urllib import quote
+    from urllib import quote_plus
 
 try:
     unicode
@@ -24,6 +25,27 @@ except NameError:
 def api_add_to_watchlist():
     return None
 
+def api_get_info(id, channel=''):
+    profile_settings = load_profile(profile_id=1)
+
+    info = {}
+    headers = {'Authorization': 'Bearer ' + profile_settings['session_token']}
+
+    info_url = '{api_url}/assets/{channel}'.format(api_url=CONST_DEFAULT_API, channel=id)
+
+    download = api_download(url=info_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+    data = download['data']
+    code = download['code']
+
+    if not code or not code == 200 or not data or not check_key(data, 'id'):
+        return info
+
+    info = data
+
+    info = plugin_process_info({'title': '', 'channel': channel, 'info': info})
+
+    return info
+
 def api_get_session(force=0):
     force = int(force)
     profile_settings = load_profile(profile_id=1)
@@ -32,7 +54,7 @@ def api_get_session(force=0):
     #    return True
     #elif force == 1 and not profile_settings['last_login_success'] == 1:
     #    return False
-    
+
     headers = {'Authorization': 'Bearer ' + profile_settings['session_token']}
 
     capi_url = '{api_url}/settings'.format(api_url=CONST_DEFAULT_API)
@@ -192,19 +214,18 @@ def api_login():
     return { 'code': code, 'data': data, 'result': True }
 
 def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0):
-    playdata = {'path': '', 'license': '', 'info': '', 'alt_path': '', 'alt_license': ''}
+    playdata = {'path': '', 'license': '', 'info': '', 'properties': {}}
 
     if not api_get_session():
         return playdata
 
-    alt_path = ''
-    alt_license = ''
-
     from_beginning = int(from_beginning)
     pvr = int(pvr)
     profile_settings = load_profile(profile_id=1)
+    found_alt = False
 
-    info = []
+    info = {}
+    properties = {}
 
     headers = {'Authorization': 'Bearer ' + profile_settings['session_token']}
 
@@ -214,8 +235,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         info_url = '{api_url}/assets/{id}'.format(api_url=CONST_DEFAULT_API, id=id)
 
     play_url = info_url + '/play'
-    playfrombeginning = False
-    
+
     session_post_data = {
         "player": {
             "name":"Bitmovin",
@@ -242,38 +262,136 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
             play_url2 = '{api_url}/assets/{id}/play'.format(api_url=CONST_DEFAULT_API, id=data['params']['now']['id'])
             info = data['params']['now']
 
-            download = api_download(url=play_url2, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
-            data = download['data']
-            code = download['code']
+            if from_beginning == 1:
+                download = api_download(url=play_url2, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
+                data = download['data']
+                code = download['code']
 
-            if code and code == 200 and data and check_key(data, 'url'):
-                if check_key(data, 'drm') and check_key(data['drm'], 'licenseUrl'):
-                    alt_license = data['drm']['licenseUrl']
+                if code and code == 200 and data and check_key(data, 'url'):
+                    if check_key(data, 'drm') and check_key(data['drm'], 'licenseUrl'):
+                        license = data['drm']['licenseUrl']
 
-                alt_path = data['url']
+                    path = data['url']
+                    found_alt = True
 
-    if not playfrombeginning:
+    if not from_beginning == 1 or not found_alt:
         download = api_download(url=play_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
         data = download['data']
         code = download['code']
 
-    if not code or not code == 200 or not data or not check_key(data, 'url'):
-        return playdata
+        if not code or not code == 200 or not data or not check_key(data, 'url'):
+            return playdata
 
-    if check_key(data, 'drm') and check_key(data['drm'], 'licenseUrl'):
-        license = data['drm']['licenseUrl']
+        if check_key(data, 'drm') and check_key(data['drm'], 'licenseUrl'):
+            license = data['drm']['licenseUrl']
 
-    path = data['url']
+        path = data['url']
 
-    playdata = {'path': path, 'license': license, 'info': info, 'alt_path': alt_path, 'alt_license': alt_license}
+    playdata = {'path': path, 'license': license, 'info': info, 'properties': properties}
 
     return playdata
 
 def api_remove_from_watchlist():
     return None
 
-def api_search():
-    return None
+def api_search(query):
+    if not api_get_session():
+        return None
+
+    profile_settings = load_profile(profile_id=1)
+
+    encodedBytes = base64.b32encode(query.encode("utf-8"))
+    queryb32 = unicode(encodedBytes, "utf-8")
+
+    file = "cache" + os.sep + "{query}.json".format(query=queryb32)
+
+    headers = {'Authorization': 'Bearer ' + profile_settings['session_token']}
+
+    search_url = '{api_url}/search?query={query}'.format(api_url=CONST_DEFAULT_API, query=quote_plus(query))
+
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+        data = load_file(file=file, isJSON=True)
+    else:
+        download = api_download(url=search_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+        data = download['data']
+        code = download['code']
+
+        if code and code == 200 and data and check_key(data, 'collection'):
+            write_file(file=file, data=data, isJSON=True)
+
+    if not data or not check_key(data, 'collection'):
+        return None
+
+    items = []
+    items_vod = []
+    items_program = []
+
+    for currow in data['collection']:
+        if not settings.getBool('showMoviesSeries') and currow['label'] == 'sg.ui.search.vod':
+            continue
+        elif currow['label'] == 'sg.ui.search.epg':
+            continue
+
+        if currow['label'] == 'sg.ui.search.vod':
+            type = 'vod'
+        else:
+            type = 'program'
+
+        for row in currow['assets']:
+            if not check_key(row, 'id') or not check_key(row, 'title'):
+                continue
+
+            item = {}
+
+            id = row['id']
+            label = row['title']
+            description = ''
+            duration = 0
+            program_image = ''
+            program_image_large = ''
+            start = ''
+
+            if check_key(row, 'images'):
+                program_image = row['images'][0]['url']
+                program_image_large = row['images'][0]['url']
+
+            if type == 'vod':
+                item_type = 'Vod'
+
+                label += " (VOD)"
+            else:
+                item_type = 'Epg'
+                label += " (ReplayTV)"
+
+            if check_key(row, 'params'):
+                if check_key(row['params'], 'duration'):
+                    duration = int(row['params']['duration'])
+                elif check_key(row['params'], 'start') and check_key(row['params'], 'end'):
+                    duration = int(re.sub('[^0-9]','', row['params']['end'])) - int(re.sub('[^0-9]','', row['params']['end']))
+
+            item['id'] = id
+            item['title'] = label
+            item['description'] = description
+            item['duration'] = duration
+            item['type'] = item_type
+            item['icon'] = program_image_large
+            item['start'] = start
+
+            if type == "vod":
+                items_vod.append(item)
+            else:
+                items_program.append(item)
+
+    #num = min(len(items_program), len(items_vod))
+    #items = [None]*(num*2)
+    #items[::2] = items_program[:num]
+    #items[1::2] = items_vod[:num]
+    #items.extend(items_program[num:])
+    #items.extend(items_vod[num:])
+
+    items = items_program
+
+    return items
 
 def api_vod_download():
     return None
@@ -298,3 +416,6 @@ def api_vod_subscription():
 
 def api_watchlist_listing():
     return None
+
+def api_clean_after_playback():
+    pass
