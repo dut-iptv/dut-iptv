@@ -1,11 +1,5 @@
 import logging, xbmc
-
 from resources.lib.base.l1.constants import ADDON_ID
-
-try:
-    unicode
-except NameError:
-    unicode = str
 
 class Logger(logging.Logger):
     def __call__(self, *args, **kwargs):
@@ -23,7 +17,7 @@ class LoggerHandler(logging.StreamHandler):
     def emit(self, record):
         msg = self.format(record)
         level = self.LEVELS.get(record.levelno, xbmc.LOGDEBUG)
-        xbmc.log(unicode(msg), level)
+        xbmc.log(str(msg), level)
 
 logging.setLoggerClass(Logger)
 

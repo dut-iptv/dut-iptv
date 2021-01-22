@@ -10,22 +10,17 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l5.api import api_get_channels
 from resources.lib.base.l6 import inputstream
 
-try:
-    unicode
-except NameError:
-    unicode = str
-
 def plugin_ask_for_creds(creds):
-    username = unicode(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
+    username = str(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 
-    if not len(unicode(username)) > 0:
+    if not len(str(username)) > 0:
         gui.ok(message=_.EMPTY_USER, heading=_.LOGIN_ERROR_TITLE)
 
         return {'result': False, 'username': '', 'password': ''}
 
-    password = unicode(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
+    password = str(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
 
-    if not len(unicode(password)) > 0:
+    if not len(str(password)) > 0:
         gui.ok(message=_.EMPTY_PASS, heading=_.LOGIN_ERROR_TITLE)
 
         return {'result': False, 'username': '', 'password': ''}
@@ -89,7 +84,7 @@ def plugin_process_info(playdata):
     data = api_get_channels()
 
     try:
-        info['label2'] += " - "  + data[unicode(playdata['channel'])]['name']
+        info['label2'] += " - "  + data[str(playdata['channel'])]['name']
     except:
         pass
 

@@ -1,11 +1,6 @@
 from resources.lib.base.l1.constants import ADDON
 from resources.lib.base.l2.log import log
 
-try:
-    unicode
-except NameError:
-    unicode = str
-
 def format_string(string, _bold=False, _label=False, _color=None, _strip=False, **kwargs):
     if kwargs:
         string = string.format(**kwargs)
@@ -30,7 +25,7 @@ def addon_string(id):
 
     if not string:
         log("LANGUAGE: Addon didn't return a string for id: {}".format(id))
-        string = unicode(id)
+        string = str(id)
 
     return string
 

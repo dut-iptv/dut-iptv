@@ -1,4 +1,4 @@
-import glob, time, os, platform, shutil, sys, xbmc, xbmcaddon
+import glob, time, os, platform, shutil, sys, xbmc, xbmcaddon, xbmcvfs
 
 from resources.lib.base.l1.constants import ADDON_PROFILE, CONST_DUT_EPG_BASE, SESSION_CHUNKSIZE
 from resources.lib.base.l2.log import log
@@ -118,22 +118,17 @@ def supports_mpd():
 
 def supports_playready():
     ia_addon = get_ia_addon()
-    return bool(ia_addon and get_kodi_version() > 17 and xbmc.getCondVisibility('system.platform.android'))
+    return bool(ia_addon and xbmc.getCondVisibility('system.platform.android'))
 
 def install_widevine(reinstall=False):
     ia_addon = get_ia_addon(required=True)
     system, arch = _get_system_arch()
     kodi_version = get_kodi_version()
 
-    if kodi_version < 18:
-        raise InputStreamError(_(_.IA_KODI18_REQUIRED, system=system))
-
-    elif system == 'Android':
+    if system == 'Android':
         return True
-
     elif system == 'UWP':
         raise InputStreamError(_.IA_UWP_ERROR)
-
     elif 'aarch64' in arch or 'arm64' in arch:
         raise InputStreamError(_.IA_AARCH64_ERROR)
 
@@ -157,10 +152,7 @@ def install_widevine(reinstall=False):
     if not wv_platform:
         raise InputStreamError(_(_.IA_NOT_SUPPORTED, system=system, arch=arch, kodi_version=kodi_version))
 
-    decryptpath = xbmc.translatePath(ia_addon.getSetting('DECRYPTERPATH'))
-
-    if sys.version_info < (3, 0):
-        decryptpath = decryptpath.decode("utf-8")
+    decryptpath = xbmcvfs.translatePath(ia_addon.getSetting('DECRYPTERPATH'))
 
     if 'arm' in arch:
         url = wv_platform['zip']
@@ -188,7 +180,7 @@ def install_widevine(reinstall=False):
 def _get_system_arch():
     if xbmc.getCondVisibility('system.platform.android'):
         system = 'Android'
-    elif 'WindowsApps' in xbmc.translatePath('special://xbmcbin/'):
+    elif 'WindowsApps' in xbmcvfs.translatePath('special://xbmcbin/'):
         system = 'UWP'
     else:
         system = platform.system()

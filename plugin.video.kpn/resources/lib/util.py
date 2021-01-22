@@ -11,26 +11,21 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l6 import inputstream
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_IMAGE_URL
 
-try:
-    unicode
-except NameError:
-    unicode = str
-
 def plugin_ask_for_creds(creds):
     email_or_pin = settings.getBool(key='email_instead_of_customer')
 
     if email_or_pin:
-        if unicode(creds['username']).isnumeric():
+        if str(creds['username']).isnumeric():
             creds['username'] = ''
 
-        username = unicode(gui.input(message=_.ASK_USERNAME2, default=creds['username'])).strip()
+        username = str(gui.input(message=_.ASK_USERNAME2, default=creds['username'])).strip()
     else:
-        if not unicode(creds['username']).isnumeric():
+        if not str(creds['username']).isnumeric():
             creds['username'] = ''
 
-        username = unicode(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
+        username = str(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 
-    if not len(unicode(username)) > 0:
+    if not len(str(username)) > 0:
         if email_or_pin:
             gui.ok(message=_.EMPTY_USER2, heading=_.LOGIN_ERROR_TITLE)
         else:
@@ -39,11 +34,11 @@ def plugin_ask_for_creds(creds):
         return {'result': False, 'username': '', 'password': ''}
 
     if email_or_pin:
-        password = unicode(gui.input(message=_.ASK_PASSWORD2, hide_input=True)).strip()
+        password = str(gui.input(message=_.ASK_PASSWORD2, hide_input=True)).strip()
     else:
-        password = unicode(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
+        password = str(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
 
-    if not len(unicode(password)) > 0:
+    if not len(str(password)) > 0:
         if email_or_pin:
             gui.ok(message=_.EMPTY_PASS2, heading=_.LOGIN_ERROR_TITLE)
         else:
@@ -101,18 +96,18 @@ def plugin_process_info(playdata):
                     write_file(file='stream_start', data=int(int(row['metadata']['airingStartTime']) // 1000), isJSON=False)
                     write_file(file='stream_end', data=int(int(row['metadata']['airingEndTime']) // 1000), isJSON=False)
 
-                if check_key(playdata, 'title') and len(unicode(playdata['title'])) > 0:
+                if check_key(playdata, 'title') and len(str(playdata['title'])) > 0:
                     info['label1'] += playdata['title']
 
-                    if len(unicode(info['label2'])) > 0:
+                    if len(str(info['label2'])) > 0:
                         info['label2'] += " - "
 
                     info['label2'] += playdata['title']
 
-                if check_key(row['metadata'], 'title') and len(unicode(row['metadata']['title'])) > 0:
+                if check_key(row['metadata'], 'title') and len(str(row['metadata']['title'])) > 0:
                     info['label1'] += row['metadata']['title']
 
-                    if len(unicode(info['label2'])) > 0:
+                    if len(str(info['label2'])) > 0:
                         info['label2'] += " - "
 
                     info['label2'] += row['metadata']['title']
@@ -151,26 +146,26 @@ def plugin_process_info(playdata):
                 epcode = ''
 
                 if check_key(row['metadata'], 'season'):
-                    epcode += 'S' + unicode(row['metadata']['season'])
+                    epcode += 'S' + str(row['metadata']['season'])
 
                 if check_key(row['metadata'], 'episodeNumber'):
-                    epcode += 'E' + unicode(row['metadata']['episodeNumber'])
+                    epcode += 'E' + str(row['metadata']['episodeNumber'])
 
                 if check_key(row['metadata'], 'episodeTitle'):
-                    if len(unicode(info['label2'])) > 0:
+                    if len(str(info['label2'])) > 0:
                         info['label2'] += " - "
 
-                    info['label2'] += unicode(row['metadata']['episodeTitle'])
+                    info['label2'] += str(row['metadata']['episodeTitle'])
 
                     if len(epcode) > 0:
                         info['label2'] += " (" + epcode + ")"
 
                 if check_key(row, 'channel'):
                     if check_key(row['channel'], 'channelName'):
-                        if len(unicode(info['label2'])) > 0:
+                        if len(str(info['label2'])) > 0:
                             info['label2'] += " - "
 
-                        info['label2'] += unicode(row['channel']['channelName'])
+                        info['label2'] += str(row['channel']['channelName'])
 
     return info
 
@@ -195,7 +190,7 @@ def plugin_vod_subscription_filter():
 
     subscription_filter = load_file(file='cache/vod_subscription.json', isJSON=True)
 
-    if subscription_filter and sys.version_info >= (3, 0):
+    if subscription_filter:
         subscription_filter = list(subscription_filter)
 
     return subscription_filter

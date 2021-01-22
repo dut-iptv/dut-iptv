@@ -7,11 +7,6 @@ from resources.lib.base.l2.log import log
 from resources.lib.base.l3.util import change_icon, clear_cache, fixBadZipfile, is_file_older_than_x_days, load_file, load_profile, update_prefs, write_file
 from resources.lib.base.l4.session import Session
 
-try:
-    unicode
-except NameError:
-    unicode = str
-
 def api_download(url, type, headers=None, data=None, json_data=True, return_json=True, allow_redirects=True, auth=None):
     session = Session(cookies_key='cookies')
 
@@ -63,7 +58,6 @@ def api_get_channels():
 
         if code and code == 200 and data:
             write_file(file=file, data=data, isJSON=True)
-
             update_prefs(profile_id=1, channels=data)
         else:
             return None
@@ -83,7 +77,7 @@ def api_get_epg_by_date_channel(date, channel):
     type = '{date}_{channel}'.format(date=date, channel=channel)
 
     encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = unicode(encodedBytes, "utf-8")
+    type = str(encodedBytes, "utf-8")
 
     epg_url = '{dut_epg_url}/{type}.json'.format(dut_epg_url=CONST_DUT_EPG, type=type)
     file = "cache" + os.sep + "{type}.json".format(type=type)
@@ -115,7 +109,7 @@ def api_get_epg_by_idtitle(idtitle, start, end, channels):
     type = '{idtitle}'.format(idtitle=idtitle)
 
     encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = unicode(encodedBytes, "utf-8")
+    type = str(encodedBytes, "utf-8")
 
     epg_url = '{dut_epg_url}/{type}.json'.format(dut_epg_url=CONST_DUT_EPG, type=type)
     file = "cache" + os.sep + "{type}.json".format(type=type)
@@ -281,7 +275,7 @@ def api_get_list_by_first(first, start, end, channels):
         with open(tmp, 'wb') as f:
             for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
                 f.write(chunk)
-                
+
         resp.close()
 
         if os.path.isfile(tmp):
@@ -314,7 +308,7 @@ def api_get_list_by_first(first, start, end, channels):
 
     data2 = OrderedDict()
 
-    data = data[unicode(first)]
+    data = data[str(first)]
 
     for currow in data:
         row = data[currow]
@@ -347,7 +341,7 @@ def api_get_vod_by_type(type, character, subscription_filter):
         os.makedirs(ADDON_PROFILE + 'tmp')
 
     encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = unicode(encodedBytes, "utf-8")
+    type = str(encodedBytes, "utf-8")
 
     vod_url = '{dut_epg_url}/{type}.zip'.format(dut_epg_url=CONST_DUT_EPG, type=type)
     file = "cache" + os.sep + "{type}.json".format(type=type)
@@ -375,7 +369,7 @@ def api_get_vod_by_type(type, character, subscription_filter):
         with open(tmp, 'wb') as f:
             for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
                 f.write(chunk)
-                
+
         resp.close()
 
         if os.path.isfile(tmp):

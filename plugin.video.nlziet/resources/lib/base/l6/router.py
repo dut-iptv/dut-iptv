@@ -5,17 +5,7 @@ from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
 from resources.lib.base.l4.exceptions import RouterError
 from resources.lib.base.l5 import signals
-
-try:
-    unicode
-except NameError:
-    unicode = str
-
-try:
-    from urllib.parse import parse_qsl, unquote, urlencode
-except ImportError:
-    from urlparse import parse_qsl, unquote
-    from urllib import urlencode
+from urllib.parse import parse_qsl, unquote, urlencode
 
 _routes = {}
 
@@ -79,7 +69,7 @@ def build_url(url, addon_id=ADDON_ID, **kwargs):
 
         try: params.append((k, str(kwargs[k]).encode('utf-8')))
         except: params.append((k, kwargs[k]))
-        
+
     #if is_live:
     #    params.append(('_l', '.pvr'))
 
@@ -105,16 +95,12 @@ def encode_obj(in_obj):
     def encode_dict(in_dict):
         out_dict = {}
 
-        if sys.version_info < (3, 0):
-            for k, v in in_dict.iteritems():
-                out_dict[k] = encode_obj(v)
-        else:
-            for k, v in in_dict.items():
-                out_dict[k] = encode_obj(v)
+        for k, v in in_dict.items():
+            out_dict[k] = encode_obj(v)
 
         return out_dict
 
-    if isinstance(in_obj, unicode):
+    if isinstance(in_obj, str):
         return in_obj.encode('utf-8')
     elif isinstance(in_obj, list):
         return encode_list(in_obj)

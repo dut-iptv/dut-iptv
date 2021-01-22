@@ -8,25 +8,23 @@
 
 -Unofficial 3rd Party NLZiet plugin for Kodi
 
--Watch 33 Live TV channels
+-Watch Live TV for supported channels in your subscription
 
--Replay programs from the last 7 days from all channels in your subscription
+-Replay programs from the last 7 days for supported channels in your subscription
 
 -Search Content
 
--Supports watching TV and listening to Radio using the PVR IPTV Simple Addon (through the separate Dut-IPTV Simple IPTV Connector)
+-Supports watching TV and listening to Radio using the IPTV Simple PVR Addon (through the separate Dut-IPTV Simple IPTV Connector addon)
 
--Supports Catchup using PVR IPTV Simple Addon in Kodi 19 (through the separate Dut-IPTV Simple IPTV Connector addon)
+-Supports Catchup using IPTV Simple PVR Addon in Kodi 19 (through the separate Dut-IPTV Simple IPTV Connector addon)
 
 ### Required
 
--NLZiet Subscription (not free)
+-Subscription to NLZiet (not free)
 
--Kodi 18 or higher with Widevine Support (free)
+-Kodi 18 or higher with Widevine Support (free) for versions up to 1.0.0
 
-### To-Do
-
--
+-Kodi 19 or higher with Widevine Support (free) for versions above 1.0.0
 
 ### Thanks
 

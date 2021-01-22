@@ -8,9 +8,9 @@
 
 -Unofficial 3rd Party repo and plugins for Kodi
 
--Watch Live TV channels (dependent on your subscription)
+-Watch Live TV for supported channels in your subscription
 
--Replay programs from the last 7 days from all channels in your subscription
+-Replay programs from the last 7 days for supported channels in your subscription
 
 -Search Content
 
@@ -22,7 +22,9 @@
 
 -Subscription to any of the supported providers (not free)
 
--Kodi 18 or higher with Widevine Support (free)
+-Kodi 18 or higher with Widevine Support (free) for versions up to 1.0.0
+
+-Kodi 19 or higher with Widevine Support (free) for versions above 1.0.0
 
 ### Installation
 Instructions adopted from the kodi wiki, see [HOW-TO:Install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
@@ -79,6 +81,6 @@ sudo pip install pycryptodomex
 
 -peak3d for Inputstream Adaptive
 
--phunkyfish for  IPTV Simple PVR
+-phunkyfish for IPTV Simple PVR
 
 -Team Kodi for Kodi

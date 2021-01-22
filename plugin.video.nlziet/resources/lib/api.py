@@ -11,17 +11,7 @@ from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download, api_get_channels
 from resources.lib.constants import CONST_API_URL, CONST_APP_URL, CONST_BASE_URL, CONST_ID_URL, CONST_IMAGE_URL
 from resources.lib.util import plugin_process_info
-
-try:
-    from urllib.parse import parse_qs, urlparse, quote_plus
-except ImportError:
-    from urlparse import parse_qs, urlparse
-    from urllib import quote_plus
-
-try:
-    unicode
-except NameError:
-    unicode = str
+from urllib.parse import parse_qs, urlparse, quote_plus
 
 def api_add_to_watchlist():
     return None
@@ -36,7 +26,7 @@ def api_get_info(id, channel=''):
     data = api_get_channels()
 
     try:
-        friendly = data[unicode(id)]['assetid']
+        friendly = data[str(id)]['assetid']
     except:
         return info
 
@@ -290,7 +280,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     data = api_get_channels()
 
     try:
-        friendly = data[unicode(channel)]['assetid']
+        friendly = data[str(channel)]['assetid']
     except:
         pass
 
@@ -358,7 +348,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
         info = data
 
-    if not len(unicode(license)) > 0:
+    if not len(str(license)) > 0:
         return playdata
 
     playdata = {'path': path, 'license': license, 'info': info, 'properties': properties}
@@ -451,7 +441,7 @@ def api_search(query):
 
     type = "search_" + query
     encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = unicode(encodedBytes, "utf-8")
+    type = str(encodedBytes, "utf-8")
 
     file = "cache" + os.sep + type + ".json"
 
@@ -578,7 +568,7 @@ def api_sort_episodes(element):
         return 0
 
 def api_sort_season(element):
-    if unicode(element['seriesNumber']).isnumeric():
+    if str(element['seriesNumber']).isnumeric():
         return int(element['seriesNumber'])
     else:
         matches = re.findall(r"Seizoen (\d+)", element['seriesNumber'])
@@ -605,9 +595,9 @@ def api_vod_download(type, start=0):
     else:
         return None
 
-    type = "vod_" + type + "_" + unicode(start)
+    type = "vod_" + type + "_" + str(start)
     encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = unicode(encodedBytes, "utf-8")
+    type = str(encodedBytes, "utf-8")
 
     file = "cache" + os.sep + type + ".json"
 
@@ -634,9 +624,9 @@ def api_vod_season(series, id):
 
     program_url = '{base_url}/v6/series/{series}/seizoenItems?seizoenId={id}&count=99999999&expand=true&expandlist=true&maxResults=99999999&offset=0'.format(base_url=CONST_API_URL, series=series, id=id)
 
-    type = "vod_series_" + unicode(series) + "_season_" + unicode(id)
+    type = "vod_series_" + str(series) + "_season_" + str(id)
     encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = unicode(encodedBytes, "utf-8")
+    type = str(encodedBytes, "utf-8")
 
     file = "cache" + os.sep + type + ".json"
 
@@ -696,13 +686,13 @@ def api_vod_season(series, id):
                 label += startT.strftime("%A %d %B %Y %H:%M ").capitalize()
 
         if check_key(row, 'SeizoenVolgnummer'):
-            label += unicode(row['SeizoenVolgnummer'])
+            label += str(row['SeizoenVolgnummer'])
 
         if check_key(row, 'AfleveringVolgnummer'):
             if len(label) > 0:
                 label += "."
 
-            label += unicode(row['AfleveringVolgnummer'])
+            label += str(row['AfleveringVolgnummer'])
 
         if len(label) > 0:
             label += " - "
@@ -723,9 +713,9 @@ def api_vod_seasons(type, id):
 
     program_url = '{base_url}/v6/series/{id}/fullWithSeizoenen?count=99999999&expand=true&expandlist=true&maxResults=99999999&offset=0'.format(base_url=CONST_API_URL, id=id)
 
-    type = "vod_seasons_" + unicode(id)
+    type = "vod_seasons_" + str(id)
     encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = unicode(encodedBytes, "utf-8")
+    type = str(encodedBytes, "utf-8")
 
     file = "cache" + os.sep + type + ".json"
 
@@ -792,13 +782,13 @@ def api_vod_seasons(type, id):
                 start = row['Uitzenddatum']
 
             if check_key(row, 'SeizoenVolgnummer'):
-                label += unicode(row['SeizoenVolgnummer'])
+                label += str(row['SeizoenVolgnummer'])
 
             if check_key(row, 'AfleveringVolgnummer'):
                 if len(label) > 0:
                     label += "."
 
-                label += unicode(row['AfleveringVolgnummer'])
+                label += str(row['AfleveringVolgnummer'])
 
             if len(label) > 0:
                 label += " - "

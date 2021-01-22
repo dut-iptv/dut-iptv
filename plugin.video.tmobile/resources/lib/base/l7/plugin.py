@@ -1,7 +1,6 @@
 import os, shutil, sys, time, xbmc, xbmcaddon, xbmcplugin
 
 from functools import wraps
-
 from resources.lib.api import api_clean_after_playback, api_get_info
 from resources.lib.base.l1.constants import ADDON_ICON, ADDON_FANART, ADDON_ID, ADDON_NAME, ADDON_PROFILE, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
@@ -12,11 +11,6 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import PluginError
 from resources.lib.base.l5 import signals
 from resources.lib.base.l6 import inputstream, router
-
-try:
-    unicode
-except NameError:
-    unicode = str
 
 ## SHORTCUTS
 url_for = router.url_for
@@ -184,10 +178,10 @@ class Item(gui.Item):
         handle = _handle()
 
         #if 'seekTime' in self.properties:
-            #li.setProperty('ResumeTime', unicode(self.properties['seekTime']))
+            #li.setProperty('ResumeTime', str(self.properties['seekTime']))
 
             #if 'totalTime' in self.properties:
-            #    li.setProperty('TotalTime', unicode(self.properties['totalTime']))
+            #    li.setProperty('TotalTime', str(self.properties['totalTime']))
             #else:
             #    li.setProperty('TotalTime', '999999')
 
@@ -242,9 +236,9 @@ class Item(gui.Item):
 
                         if info:
                             info2 = {
-                                'plot': unicode(info['description']),
-                                'title': unicode(info['label1']),
-                                'tagline': unicode(info['label2']),
+                                'plot': str(info['description']),
+                                'title': str(info['label1']),
+                                'tagline': str(info['label2']),
                                 'duration': info['duration'],
                                 'credits': info['credits'],
                                 'cast': info['cast'],

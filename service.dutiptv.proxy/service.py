@@ -1,20 +1,9 @@
-import datetime, io, json, pytz, os, re, requests, sys, threading, time, xbmc, xbmcaddon, xbmcgui
+import datetime, io, json, pytz, os, re, requests, sys, threading, time, xbmc, xbmcaddon, xbmcvfs, xbmcgui
+import http.server as ProxyServer
+
 from xml.dom.minidom import parseString
 
-try:
-    import http.server as ProxyServer
-except ImportError:
-    import BaseHTTPServer as ProxyServer
-
-try:
-    unicode
-except NameError:
-    unicode = str
-
-if sys.version_info < (3, 0):
-    PROXY_PROFILE = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile')).decode('utf_8')
-else:
-    PROXY_PROFILE = xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
+PROXY_PROFILE = xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
 
 CONST_ALLOWED_HEADERS = {}
 
@@ -142,10 +131,7 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
 
             ADDON = xbmcaddon.Addon(id="plugin.video." + addon_name)
 
-            if sys.version_info < (3, 0):
-                ADDON_PROFILE = xbmc.translatePath(ADDON.getAddonInfo('profile')).decode('utf_8')
-            else:
-                ADDON_PROFILE = xbmc.translatePath(ADDON.getAddonInfo('profile'))
+            ADDON_PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 
             if proxy_get_match(path=self.path, addon_name=addon_name):
                 stream_url[addon_name] = load_file(file=ADDON_PROFILE + 'stream_hostname', isJSON=False)
@@ -160,7 +146,7 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
                         startT = datetime.datetime.fromtimestamp(int(start))
                         mytz = pytz.timezone('Europe/Amsterdam')
                         startTUTC = mytz.normalize(mytz.localize(startT, is_dst=True)).astimezone(pytz.timezone('UTC'))
-                        URL += '&t=' + unicode(startTUTC.strftime('%Y-%m-%dT%H')) + '%3A' + unicode(startTUTC.strftime('%M')) + '%3A' + unicode(startTUTC.strftime('%S.000'))
+                        URL += '&t=' + str(startTUTC.strftime('%Y-%m-%dT%H')) + '%3A' + str(startTUTC.strftime('%M')) + '%3A' + str(startTUTC.strftime('%S.000'))
 
                 session = proxy_get_session(proxy=self, addon_name=addon_name)
                 r = session.get(URL)
@@ -250,12 +236,8 @@ class RemoteControlBrowserService(xbmcaddon.Addon):
         super(RemoteControlBrowserService, self).__init__()
         self.pluginId = self.getAddonInfo('id')
 
-        if sys.version_info < (3, 0):
-            self.addonFolder = xbmc.translatePath(self.getAddonInfo('path')).decode('utf_8')
-            self.profileFolder = xbmc.translatePath(self.getAddonInfo('profile')).decode('utf_8')
-        else:
-            self.addonFolder = xbmc.translatePath(self.getAddonInfo('path'))
-            self.profileFolder = xbmc.translatePath(self.getAddonInfo('profile'))
+        self.addonFolder = xbmcvfs.translatePath(self.getAddonInfo('path'))
+        self.profileFolder = xbmcvfs.translatePath(self.getAddonInfo('profile'))
 
         self.settingsChangeLock = threading.Lock()
         self.isShutdown = False
@@ -321,10 +303,7 @@ class Session(requests.Session):
 
         ADDON = xbmcaddon.Addon(id="plugin.video." + addon_name)
 
-        if sys.version_info < (3, 0):
-            self._addon_profile = xbmc.translatePath(ADDON.getAddonInfo('profile')).decode('utf_8')
-        else:
-            self._addon_profile = xbmc.translatePath(ADDON.getAddonInfo('profile'))
+        self._addon_profile = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 
         self.headers.update(self._headers)
 
@@ -647,12 +626,12 @@ def fix_audio(URL):
         old_last_timecode = last_timecode
         last_timecode = int(URL.replace('.dash', '').rsplit('-', 1)[1])
 
-        if (last_timecode - old_last_timecode) != audio_segments[unicode(last_segment)]:
+        if (last_timecode - old_last_timecode) != audio_segments[str(last_segment)]:
             temp_last_timecode = last_timecode
-            last_timecode = int(old_last_timecode + int(audio_segments[unicode(last_segment)]))
-            last_segment = int(audio_segments[unicode(last_segment)])
+            last_timecode = int(old_last_timecode + int(audio_segments[str(last_segment)]))
+            last_segment = int(audio_segments[str(last_segment)])
 
-            URL = URL.replace(unicode(temp_last_timecode), unicode(last_timecode))
+            URL = URL.replace(str(temp_last_timecode), str(last_timecode))
         else:
             last_segment = int(last_timecode - old_last_timecode)
     return URL
@@ -761,7 +740,10 @@ def remove_ac3(xml):
         result = re.findall(r'<[aA]daptation[sS]et(?:(?!</[aA]daptation[sS]et>)[\S\s])+</[aA]daptation[sS]et>', xml)
 
         for match in result:
-            if "codecs=\"ac-3\"" in match:
+            if not 'contentType="audio"' in match:
+                continue
+
+            if 'codecs="ac-3"' in match:
                 xml = xml.replace(match, "")
     except:
         pass
@@ -786,6 +768,9 @@ def set_duration(xml, addon_name, ADDON_PROFILE):
     try:
         duration = load_file(file=ADDON_PROFILE + 'stream_duration', isJSON=False)
 
+        #if 'type="dynamic"' in xml and not 'mediaPresentationDuration' in xml:
+        #    xml = xml.replace('minimumUpdatePeriod', 'mediaPresentationDuration="PT4H0M0S" minimumUpdatePeriod')
+        #elif duration and int(duration) > 0:
         if duration and int(duration) > 0:
             duration = int(duration)
             given_duration = 0
@@ -847,6 +832,7 @@ def set_duration(xml, addon_name, ADDON_PROFILE):
 
                 xml = re.sub(regex4, subst, xml, 0, re.MULTILINE)
                 xml = re.sub(regex5, subst2, xml, 0, re.MULTILINE)
+
     except:
         pass
 
@@ -855,9 +841,9 @@ def set_duration(xml, addon_name, ADDON_PROFILE):
 def write_file(file, data, isJSON=False):
     with io.open(file, 'w', encoding="utf-8") as f:
         if isJSON == True:
-            f.write(unicode(json.dumps(data, ensure_ascii=False)))
+            f.write(json.dumps(data, ensure_ascii=False))
         else:
-            f.write(unicode(data))
+            f.write(data)
 
 if __name__ == "__main__":
     main()

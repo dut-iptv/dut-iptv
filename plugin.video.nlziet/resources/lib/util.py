@@ -10,20 +10,15 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l6 import inputstream
 from resources.lib.constants import CONST_IMAGE_URL
 
-try:
-    unicode
-except NameError:
-    unicode = str
-
 def plugin_ask_for_creds(creds):
-    username = unicode(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
+    username = str(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 
     if not len(username) > 0:
         gui.ok(message=_.EMPTY_USER, heading=_.LOGIN_ERROR_TITLE)
 
         return {'result': False, 'username': '', 'password': ''}
 
-    password = unicode(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
+    password = str(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
 
     if not len(password) > 0:
         gui.ok(message=_.EMPTY_PASS, heading=_.LOGIN_ERROR_TITLE)
@@ -85,29 +80,29 @@ def plugin_process_info(playdata):
         info['duration'] = playdata['info']['Duur']
 
     if check_key(playdata['info'], 'Title'):
-        if len(unicode(info['label1'])) > 0:
+        if len(str(info['label1'])) > 0:
             info['label1'] += " - "
 
-        if len(unicode(info['label2'])) > 0:
+        if len(str(info['label2'])) > 0:
             info['label2'] += " - "
 
         info['label1'] += playdata['info']['Title']
         info['label2'] += playdata['info']['Title']
     elif check_key(playdata['info'], 'Serie') and check_key(playdata['info']['Serie'], 'Titel') and len(playdata['info']['Serie']['Titel']):
-        if len(unicode(info['label1'])) > 0:
+        if len(str(info['label1'])) > 0:
             info['label1'] += " - "
 
-        if len(unicode(info['label2'])) > 0:
+        if len(str(info['label2'])) > 0:
             info['label2'] += " - "
 
         info['label1'] += playdata['info']['Serie']['Titel']
         info['label2'] += playdata['info']['Serie']['Titel']
 
         if check_key(playdata['info'], 'Titel') and len(playdata['info']['Titel']) > 0 and playdata['info']['Titel'] != playdata['info']['Serie']['Titel']:
-            if len(unicode(info['label1'])) > 0:
+            if len(str(info['label1'])) > 0:
                 info['label1'] += ": "
 
-            if len(unicode(info['label2'])) > 0:
+            if len(str(info['label2'])) > 0:
                 info['label2'] += ": "
 
             info['label1'] += playdata['info']['Titel']
@@ -126,12 +121,12 @@ def plugin_process_info(playdata):
         info['image_large'] = playdata['info']['AfbeeldingUrl']
 
     if check_key(playdata['info'], 'ChannelTitle'):
-        if len(unicode(info['label2'])) > 0:
+        if len(str(info['label2'])) > 0:
             info['label2'] += " - "
 
         info['label2'] += playdata['info']['ChannelTitle']
     elif check_key(playdata['info'], 'Zender'):
-        if len(unicode(info['label2'])) > 0:
+        if len(str(info['label2'])) > 0:
             info['label2'] += " - "
 
         info['label2'] += playdata['info']['Zender']

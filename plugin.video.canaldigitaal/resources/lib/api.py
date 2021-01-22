@@ -10,17 +10,7 @@ from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_BASE_URL, CONST_DEFAULT_API, CONST_LOGIN_HEADERS, CONST_LOGIN_URL
 from resources.lib.util import plugin_process_info
-
-try:
-    from urllib.parse import parse_qs, urlparse, quote_plus
-except ImportError:
-    from urlparse import parse_qs, urlparse
-    from urllib import quote_plus
-
-try:
-    unicode
-except NameError:
-    unicode = str
+from urllib.parse import parse_qs, urlparse, quote_plus
 
 def api_add_to_watchlist():
     return None
@@ -301,7 +291,7 @@ def api_search(query):
     profile_settings = load_profile(profile_id=1)
 
     encodedBytes = base64.b32encode(query.encode("utf-8"))
-    queryb32 = unicode(encodedBytes, "utf-8")
+    queryb32 = str(encodedBytes, "utf-8")
 
     file = "cache" + os.sep + "{query}.json".format(query=queryb32)
 

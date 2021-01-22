@@ -1,4 +1,4 @@
-import json, requests, sys
+import requests
 
 from resources.lib.base.l1.constants import DEFAULT_USER_AGENT, SESSION_CHUNKSIZE
 from resources.lib.base.l2.log import log
@@ -42,10 +42,7 @@ class Session(requests.Session):
         kwargs['timeout'] = timeout or self._timeout
         attempts = attempts or self._attempts
 
-        if sys.version_info < (3, 0):
-            rngattempts = range(1, attempts+1)
-        else:
-            rngattempts = list(range(1, attempts+1))
+        rngattempts = list(range(1, attempts+1))
 
         for i in rngattempts:
             #log.debug('Attempt {}/{}: {} {} {}'.format(i, attempts, method, url, kwargs if method.lower() != 'post' else ""))

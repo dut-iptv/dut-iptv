@@ -10,16 +10,7 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l5.api import api_download, api_get_channels
 from resources.lib.base.l6 import inputstream
 from resources.lib.constants import CONST_API_URLS, CONST_DEFAULT_CLIENTID
-
-try:
-    unicode
-except NameError:
-    unicode = str
-
-try:
-    from urllib.parse import urlencode
-except ImportError:
-    from urllib import urlencode
+from urllib.parse import urlencode
 
 def check_entitlements():
     from resources.lib.api import api_get_play_token
@@ -110,7 +101,7 @@ def encode_obj(in_obj):
 
         return out_dict
 
-    if isinstance(in_obj, unicode):
+    if isinstance(in_obj, str):
         return in_obj.encode('utf-8')
     elif isinstance(in_obj, list):
         return encode_list(in_obj)
@@ -170,13 +161,13 @@ def get_play_url(content):
     return {'play_url': '', 'locator': ''}
 
 def plugin_ask_for_creds(creds):
-    username = unicode(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
+    username = str(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 
     if not len(username) > 0:
         gui.ok(message=_.EMPTY_USER, heading=_.LOGIN_ERROR_TITLE)
         return {'result': False, 'username': '', 'password': ''}
 
-    password = unicode(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
+    password = str(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
 
     if not len(password) > 0:
         gui.ok(message=_.EMPTY_PASS, heading=_.LOGIN_ERROR_TITLE)
@@ -268,10 +259,10 @@ def plugin_process_info(playdata):
         epcode = ''
 
         if check_key(playdata['info'], 'seriesNumber'):
-            epcode += 'S' + unicode(playdata['info']['seriesNumber'])
+            epcode += 'S' + str(playdata['info']['seriesNumber'])
 
         if check_key(playdata['info'], 'seriesEpisodeNumber'):
-            epcode += 'E' + unicode(playdata['info']['seriesEpisodeNumber'])
+            epcode += 'E' + str(playdata['info']['seriesEpisodeNumber'])
 
         if check_key(playdata['info'], 'secondaryTitle'):
             info['label2'] = playdata['info']['secondaryTitle']
@@ -284,7 +275,7 @@ def plugin_process_info(playdata):
         data = api_get_channels()
 
         try:
-            info['label2'] += " - "  + data[unicode(playdata['channel'])]['name']
+            info['label2'] += " - "  + data[str(playdata['channel'])]['name']
         except:
             pass
 
@@ -465,7 +456,7 @@ def plugin_process_watchlist_listing(data, id=None):
             data2 = api_get_channels()
 
             try:
-                label += ' ({station})'.format(station=data2[unicode(currow['stationId'])]['name'])
+                label += ' ({station})'.format(station=data2[str(currow['stationId'])]['name'])
             except:
                 pass
 

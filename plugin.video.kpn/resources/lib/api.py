@@ -10,17 +10,7 @@ from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_DEFAULT_API, CONST_IMAGE_URL
-
-try:
-    from urllib.parse import parse_qs, urlparse, quote_plus
-except ImportError:
-    from urlparse import parse_qs, urlparse
-    from urllib import quote_plus
-
-try:
-    unicode
-except NameError:
-    unicode = str
+from urllib.parse import parse_qs, urlparse, quote_plus
 
 def api_add_to_watchlist():
     return None
@@ -93,18 +83,18 @@ def api_get_info(id, channel=''):
                     write_file(file='stream_start', data=int(int(row['metadata']['airingStartTime']) // 1000), isJSON=False)
                     write_file(file='stream_end', data=int(int(row['metadata']['airingEndTime']) // 1000), isJSON=False)
 
-                if check_key(playdata, 'title') and len(unicode(playdata['title'])) > 0:
+                if check_key(playdata, 'title') and len(str(playdata['title'])) > 0:
                     info['label1'] += playdata['title']
 
-                    if len(unicode(info['label2'])) > 0:
+                    if len(str(info['label2'])) > 0:
                         info['label2'] += " - "
 
                     info['label2'] += playdata['title']
 
-                if check_key(row['metadata'], 'title') and len(unicode(row['metadata']['title'])) > 0:
+                if check_key(row['metadata'], 'title') and len(str(row['metadata']['title'])) > 0:
                     info['label1'] += row['metadata']['title']
 
-                    if len(unicode(info['label2'])) > 0:
+                    if len(str(info['label2'])) > 0:
                         info['label2'] += " - "
 
                     info['label2'] += row['metadata']['title']
@@ -138,26 +128,26 @@ def api_get_info(id, channel=''):
                 epcode = ''
 
                 if check_key(row['metadata'], 'season'):
-                    epcode += 'S' + unicode(row['metadata']['season'])
+                    epcode += 'S' + str(row['metadata']['season'])
 
                 if check_key(row['metadata'], 'episodeNumber'):
-                    epcode += 'E' + unicode(row['metadata']['episodeNumber'])
+                    epcode += 'E' + str(row['metadata']['episodeNumber'])
 
                 if check_key(row['metadata'], 'episodeTitle'):
-                    if len(unicode(info['label2'])) > 0:
+                    if len(str(info['label2'])) > 0:
                         info['label2'] += " - "
 
-                    info['label2'] += unicode(row['metadata']['episodeTitle'])
+                    info['label2'] += str(row['metadata']['episodeTitle'])
 
                     if len(epcode) > 0:
                         info['label2'] += " (" + epcode + ")"
 
                 if check_key(row, 'channel'):
                     if check_key(row['channel'], 'channelName'):
-                        if len(unicode(info['label2'])) > 0:
+                        if len(str(info['label2'])) > 0:
                             info['label2'] += " - "
 
-                        info['label2'] += unicode(row['channel']['channelName'])
+                        info['label2'] += str(row['channel']['channelName'])
 
     return info
 
@@ -316,17 +306,17 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
                 for asset in row['entitlement']['assets']:
                     if type == 'program':
                         if check_key(asset, 'videoType') and check_key(asset, 'programType') and asset['videoType'] == 'SD_DASH_PR' and asset['programType'] == 'CUTV':
-                            asset_id = unicode(asset['assetId'])
+                            asset_id = str(asset['assetId'])
                             break
                     else:
                         if check_key(asset, 'videoType') and check_key(asset, 'assetType') and asset['videoType'] == 'SD_DASH_PR' and asset['assetType'] == 'MASTER':
                             if check_key(asset, 'rights') and asset['rights'] == 'buy':
                                 return playdata
 
-                            asset_id = unicode(asset['assetId'])
+                            asset_id = str(asset['assetId'])
                             break
 
-        if len(unicode(asset_id)) == 0:
+        if len(str(asset_id)) == 0:
             return playdata
 
         play_url = '{api_url}/CONTENT/VIDEOURL/{type}/{id}/{asset_id}/?deviceId={device_key}&profile=G02&time={time}'.format(api_url=CONST_DEFAULT_API, type=typestr, id=id, asset_id=asset_id, device_key=profile_settings['devicekey'], time=militime)
@@ -355,7 +345,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     path = data['resultObj']['src']['sources']['src']
     token = data['resultObj']['token']
 
-    if not len(unicode(token)) > 0:
+    if not len(str(token)) > 0:
         return playdata
 
     if type == 'channel':
@@ -385,9 +375,9 @@ def api_vod_season(series, id):
 
     program_url = '{api_url}/CONTENT/DETAIL/BUNDLE/{id}'.format(api_url=CONST_DEFAULT_API, id=id)
 
-    type = "vod_season_" + unicode(id)
+    type = "vod_season_" + str(id)
     encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = unicode(encodedBytes, "utf-8")
+    type = str(encodedBytes, "utf-8")
 
     file = "cache" + os.sep + type + ".json"
 
@@ -406,19 +396,19 @@ def api_vod_season(series, id):
 
     for row in data['resultObj']['containers']:
         for currow in row['containers']:
-            if check_key(currow, 'metadata') and check_key(currow['metadata'], 'season') and unicode(currow['metadata']['contentSubtype']) == 'EPISODE' and not unicode(currow['metadata']['episodeNumber']) in episodes:
+            if check_key(currow, 'metadata') and check_key(currow['metadata'], 'season') and str(currow['metadata']['contentSubtype']) == 'EPISODE' and not str(currow['metadata']['episodeNumber']) in episodes:
                 asset_id = ''
 
                 for asset in currow['assets']:
                     if check_key(asset, 'videoType') and asset['videoType'] == 'SD_DASH_PR' and check_key(asset, 'assetType') and asset['assetType'] == 'MASTER':
-                        asset_id = unicode(asset['assetId'])
+                        asset_id = str(asset['assetId'])
                         break
 
-                episodes.append(unicode(currow['metadata']['episodeNumber']))
+                episodes.append(str(currow['metadata']['episodeNumber']))
 
-                label = '{season}.{episode} - {title}'.format(season=unicode(currow['metadata']['season']), episode=unicode(currow['metadata']['episodeNumber']), title=unicode(currow['metadata']['episodeTitle']))
+                label = '{season}.{episode} - {title}'.format(season=str(currow['metadata']['season']), episode=str(currow['metadata']['episodeNumber']), title=str(currow['metadata']['episodeTitle']))
 
-                season.append({'label': label, 'id': unicode(currow['metadata']['contentId']), 'assetid': asset_id, 'duration': currow['metadata']['duration'], 'title': unicode(currow['metadata']['episodeTitle']), 'episodeNumber': '{season}.{episode}'.format(season=unicode(currow['metadata']['season']), episode=unicode(currow['metadata']['episodeNumber'])), 'description': unicode(currow['metadata']['shortDescription']), 'image': "{image_url}/vod/{image}/1920x1080.jpg?blurred=false".format(image_url=CONST_IMAGE_URL, image=unicode(currow['metadata']['pictureUrl']))})
+                season.append({'label': label, 'id': str(currow['metadata']['contentId']), 'assetid': asset_id, 'duration': currow['metadata']['duration'], 'title': str(currow['metadata']['episodeTitle']), 'episodeNumber': '{season}.{episode}'.format(season=str(currow['metadata']['season']), episode=str(currow['metadata']['episodeNumber'])), 'description': str(currow['metadata']['shortDescription']), 'image': "{image_url}/vod/{image}/1920x1080.jpg?blurred=false".format(image_url=CONST_IMAGE_URL, image=str(currow['metadata']['pictureUrl']))})
 
     return season
 
@@ -430,9 +420,9 @@ def api_vod_seasons(type, id):
 
     program_url = '{api_url}/CONTENT/DETAIL/GROUP_OF_BUNDLES/{id}'.format(api_url=CONST_DEFAULT_API, id=id)
 
-    type = "vod_seasons_" + unicode(id)
+    type = "vod_seasons_" + str(id)
     encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = unicode(encodedBytes, "utf-8")
+    type = str(encodedBytes, "utf-8")
 
     file = "cache" + os.sep + type + ".json"
 
@@ -451,8 +441,8 @@ def api_vod_seasons(type, id):
 
     for row in data['resultObj']['containers']:
         for currow in row['containers']:
-            if check_key(currow, 'metadata') and check_key(currow['metadata'], 'season') and unicode(currow['metadata']['contentSubtype']) == 'SEASON':
-                seasons.append({'id': unicode(currow['metadata']['contentId']), 'seriesNumber': unicode(currow['metadata']['season']), 'description': unicode(currow['metadata']['shortDescription']), 'image': "{image_url}/vod/{image}/1920x1080.jpg?blurred=false".format(image_url=CONST_IMAGE_URL, image=unicode(currow['metadata']['pictureUrl']))})
+            if check_key(currow, 'metadata') and check_key(currow['metadata'], 'season') and str(currow['metadata']['contentSubtype']) == 'SEASON':
+                seasons.append({'id': str(currow['metadata']['contentId']), 'seriesNumber': str(currow['metadata']['season']), 'description': str(currow['metadata']['shortDescription']), 'image': "{image_url}/vod/{image}/1920x1080.jpg?blurred=false".format(image_url=CONST_IMAGE_URL, image=str(currow['metadata']['pictureUrl']))})
 
     return {'type': 'seasons', 'seasons': seasons}
 

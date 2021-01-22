@@ -2,7 +2,7 @@
 
 ### About
 
--Proxy for use with Dut-IPTV addons 
+-Proxy required by the Dut-IPTV addons 
 
 ### Thanks
 

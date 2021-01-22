@@ -10,17 +10,7 @@ from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_vod_by_type
 from resources.lib.constants import CONST_API_URLS, CONST_DEFAULT_CLIENTID, CONST_VOD_CAPABILITY
 from resources.lib.util import get_image, get_play_url, plugin_process_info
-
-try:
-    from urllib.parse import parse_qs, urlparse, quote_plus
-except ImportError:
-    from urlparse import parse_qs, urlparse
-    from urllib import quote_plus
-
-try:
-    unicode
-except NameError:
-    unicode = str
+from urllib.parse import parse_qs, urlparse, quote_plus
 
 def api_add_to_watchlist(id, type):
     if not api_get_session():
@@ -229,7 +219,7 @@ def api_login():
     profile_settings = load_profile(profile_id=1)
 
     try:
-        if len(unicode(profile_settings['v3'])) == 0:
+        if len(str(profile_settings['v3'])) == 0:
             profile_settings['v3'] = 0
     except:
         profile_settings['v3'] = 0
@@ -301,7 +291,7 @@ def api_login():
         pass
 
     if int(profile_settings['v3']) == 1:
-        if len(unicode(profile_settings['watchlist_id'])) == 0:
+        if len(str(profile_settings['watchlist_id'])) == 0:
             api_get_watchlist_id()
 
     return { 'code': code, 'data': data, 'result': True }
@@ -327,7 +317,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     path = None
     locator = None
 
-    if not type or not len(unicode(type)) > 0 or not id or not len(unicode(id)) > 0:
+    if not type or not len(str(type)) > 0 or not id or not len(str(id)) > 0:
         return playdata
 
     if type == 'channel':
@@ -412,14 +402,14 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
             path = urldata2['play_url']
             locator = urldata2['locator']
 
-    if not locator or not len(unicode(locator)) > 0:
+    if not locator or not len(str(locator)) > 0:
         return playdata
 
     license = CONST_API_URLS[int(profile_settings['v3'])]['widevine_url']
 
     token = api_get_play_token(locator=locator, path=path, force=1)
 
-    if not token or not len(unicode(token)) > 0:
+    if not token or not len(str(token)) > 0:
         return playdata
 
     token = 'WIDEVINETOKEN'
@@ -480,7 +470,7 @@ def api_search(query):
     vodstr = ''
 
     encodedBytes = base64.b32encode(query.encode("utf-8"))
-    queryb32 = unicode(encodedBytes, "utf-8")
+    queryb32 = str(encodedBytes, "utf-8")
 
     file = "cache" + os.sep + "{query}.json".format(query=queryb32)
 
@@ -682,7 +672,7 @@ def api_vod_seasons(type, id):
 
     if data:
         try:
-            row = data[unicode(id)]
+            row = data[str(id)]
 
             data_seasons = json.loads(row['seasons'])
 

@@ -1,5 +1,4 @@
 import _strptime
-
 import datetime, json, os, pytz, re, string, sys, time, xbmc, xbmcplugin
 
 from fuzzywuzzy import fuzz
@@ -15,16 +14,7 @@ from resources.lib.base.l5.api import api_download, api_get_channels, api_get_ep
 from resources.lib.base.l7 import plugin
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_VOD_CAPABILITY, CONST_WATCHLIST
 from resources.lib.util import plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
-
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
-
-try:
-    unicode
-except NameError:
-    unicode = str
+from urllib.parse import urlparse
 
 ADDON_HANDLE = int(sys.argv[1])
 backend = ''
@@ -295,33 +285,33 @@ def vod_series(label, type, id, **kwargs):
 
         if seasons['type'] == "seasons":
             for season in seasons['seasons']:
-                label = _.SEASON + " " + unicode(season['seriesNumber']).replace('Seizoen ', '')
+                label = _.SEASON + " " + str(season['seriesNumber']).replace('Seizoen ', '')
 
                 items.append(plugin.Item(
                     label = label,
-                    info = {'plot': unicode(season['description']), 'sorttitle': label.upper()},
+                    info = {'plot': str(season['description']), 'sorttitle': label.upper()},
                     art = {
-                        'thumb': unicode(season['image']),
-                        'fanart': unicode(season['image'])
+                        'thumb': str(season['image']),
+                        'fanart': str(season['image'])
                     },
-                    path = plugin.url_for(func_or_url=vod_season, label=label, series=id, id=unicode(season['id'])),
+                    path = plugin.url_for(func_or_url=vod_season, label=label, series=id, id=str(season['id'])),
                     context = context,
                 ))
         else:
             for episode in seasons['seasons']:
                 items.append(plugin.Item(
-                    label = unicode(episode['label']),
+                    label = str(episode['label']),
                     info = {
-                        'plot': unicode(episode['description']),
+                        'plot': str(episode['description']),
                         'duration': episode['duration'],
                         'mediatype': 'video',
-                        'sorttitle': unicode(episode['label']).upper(),
+                        'sorttitle': str(episode['label']).upper(),
                     },
                     art = {
-                        'thumb': unicode(episode['image']),
-                        'fanart': unicode(episode['image'])
+                        'thumb': str(episode['image']),
+                        'fanart': str(episode['image'])
                     },
-                    path = plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=unicode(episode['id'])),
+                    path = plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=str(episode['id'])),
                     context = context,
                     playable = True,
                 ))
@@ -340,18 +330,18 @@ def vod_season(label, series, id, **kwargs):
 
     for episode in season:
         items.append(plugin.Item(
-            label = unicode(episode['label']),
+            label = str(episode['label']),
             info = {
-                'plot': unicode(episode['description']),
+                'plot': str(episode['description']),
                 'duration': episode['duration'],
                 'mediatype': 'video',
-                'sorttitle': unicode(episode['label']).upper(),
+                'sorttitle': str(episode['label']).upper(),
             },
             art = {
-                'thumb': unicode(episode['image']),
-                'fanart': unicode(episode['image'])
+                'thumb': str(episode['image']),
+                'fanart': str(episode['image'])
             },
-            path = plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=unicode(episode['id']), data=json.dumps(episode)),
+            path = plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=str(episode['id']), data=json.dumps(episode)),
             playable = True,
         ))
 
@@ -380,23 +370,23 @@ def search_menu(**kwargs):
 
     for x in range(1, 10):
         try:
-            if check_key(profile_settings, 'search' + unicode(x)):
-                searchstr = profile_settings['search' + unicode(x)]
+            if check_key(profile_settings, 'search' + str(x)):
+                searchstr = profile_settings['search' + str(x)]
             else:
                 searchstr = ''
 
             if searchstr != '':
-                label = unicode(searchstr)
+                label = str(searchstr)
                 path = plugin.url_for(func_or_url=search, query=searchstr)
 
                 if CONST_ONLINE_SEARCH:
-                    if check_key(profile_settings, 'search_type' + unicode(x)):
-                        type = profile_settings['search_type' + unicode(x)]
+                    if check_key(profile_settings, 'search_type' + str(x)):
+                        type = profile_settings['search_type' + str(x)]
                     else:
                         type = 0
 
                     if type == 1:
-                        label = unicode(searchstr) + ' (Online)'
+                        label = str(searchstr) + ' (Online)'
                         path = plugin.url_for(func_or_url=online_search, query=searchstr)
 
                 folder.add_item(
@@ -422,25 +412,25 @@ def search(query=None, **kwargs):
         profile_settings = load_profile(profile_id=1)
 
         for x in reversed(range(2, 10)):
-            if check_key(profile_settings, 'search' + unicode(x - 1)):
-                profile_settings['search' + unicode(x)] = profile_settings['search' + unicode(x - 1)]
+            if check_key(profile_settings, 'search' + str(x - 1)):
+                profile_settings['search' + str(x)] = profile_settings['search' + str(x - 1)]
             else:
-                profile_settings['search' + unicode(x)] = ''
+                profile_settings['search' + str(x)] = ''
 
         profile_settings['search1'] = query
 
         if CONST_ONLINE_SEARCH:
             for x in reversed(range(2, 10)):
-                if check_key(profile_settings, 'search_type' + unicode(x - 1)):
-                    profile_settings['search_type' + unicode(x)] = profile_settings['search_type' + unicode(x - 1)]
+                if check_key(profile_settings, 'search_type' + str(x - 1)):
+                    profile_settings['search_type' + str(x)] = profile_settings['search_type' + str(x - 1)]
                 else:
-                    profile_settings['search_type' + unicode(x)] = 0
+                    profile_settings['search_type' + str(x)] = 0
 
             profile_settings['search_type1'] = 0
 
         save_profile(profile_id=1, profile=profile_settings)
     else:
-        query = unicode(query)
+        query = str(query)
 
     folder = plugin.Folder(title=_(_.SEARCH_FOR, query=query))
 
@@ -472,22 +462,22 @@ def online_search(query=None, **kwargs):
         profile_settings = load_profile(profile_id=1)
 
         for x in reversed(range(2, 10)):
-            if check_key(profile_settings, 'search' + unicode(x - 1)):
-                profile_settings['search' + unicode(x)] = profile_settings['search' + unicode(x - 1)]
+            if check_key(profile_settings, 'search' + str(x - 1)):
+                profile_settings['search' + str(x)] = profile_settings['search' + str(x - 1)]
             else:
-                profile_settings['search' + unicode(x)] = ''
+                profile_settings['search' + str(x)] = ''
 
-            if check_key(profile_settings, 'search_type' + unicode(x - 1)):
-                profile_settings['search_type' + unicode(x)] = profile_settings['search_type' + unicode(x - 1)]
+            if check_key(profile_settings, 'search_type' + str(x - 1)):
+                profile_settings['search_type' + str(x)] = profile_settings['search_type' + str(x - 1)]
             else:
-                profile_settings['search_type' + unicode(x)] = 0
+                profile_settings['search_type' + str(x)] = 0
 
         profile_settings['search1'] = query
         profile_settings['search_type1'] = 1
 
         save_profile(profile_id=1, profile=profile_settings)
     else:
-        query = unicode(query)
+        query = str(query)
 
     folder = plugin.Folder(title=_(_.SEARCH_FOR, query=query))
 
@@ -535,7 +525,7 @@ def channel_picker_menu(**kwargs):
 def disable_prefs_menu(type, **kwargs):
     disable_prefs(type=type, channels=api_get_channels())
 
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + unicode(ADDON_ID) + '/?_=channel_picker_menu"]}}')
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=channel_picker_menu"]}}')
 
 @plugin.route()
 def channel_picker(type, **kwargs):
@@ -548,21 +538,21 @@ def channel_picker(type, **kwargs):
 
     folder = plugin.Folder(title=title)
     prefs = load_prefs(profile_id=1)
-    type = unicode(type)
+    type = str(type)
 
     for row in rows:
-        id = unicode(row['channel'])
+        id = str(row['channel'])
 
         if not prefs or not check_key(prefs, id) or prefs[id][type] == 1:
             color = 'green'
         else:
             color = 'red'
 
-        label = _(unicode(row['label']), _bold=True, _color=color)
+        label = _(str(row['label']), _bold=True, _color=color)
 
         folder.add_item(
             label = label,
-            art = {'thumb': unicode(row['image'])},
+            art = {'thumb': str(row['image'])},
             path = plugin.url_for(func_or_url=change_channel, type=type, id=id, change=0),
             playable = False,
         )
@@ -573,12 +563,12 @@ def channel_picker(type, **kwargs):
 def change_channel(type, id, change, **kwargs):
     change = int(change)
 
-    if not id or len(unicode(id)) == 0 or not type or len(unicode(type)) == 0:
+    if not id or len(str(id)) == 0 or not type or len(str(type)) == 0:
         return False
 
     prefs = load_prefs(profile_id=1)
-    id = unicode(id)
-    type = unicode(type)
+    id = str(id)
+    type = str(type)
 
     data = api_get_channels()
 
@@ -618,7 +608,7 @@ def change_channel(type, id, change, **kwargs):
     prefs[id] = mod_pref
     save_prefs(profile_id=1, prefs=prefs)
 
-    xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{{"window":"videos","parameters":["plugin://' + unicode(ADDON_ID) + '/?_=channel_picker&type=' + type + '"]}}}}')
+    xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=channel_picker&type=' + type + '"]}}}}')
 
 @plugin.route()
 def reset_addon(**kwargs):
@@ -643,7 +633,7 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
     from_beginning = int(from_beginning)
     pvr = int(pvr)
 
-    if not type or not len(unicode(type)) > 0:
+    if not type or not len(str(type)) > 0:
         return False
 
     proxy_url = "http://127.0.0.1:11189/{provider}".format(provider=PROVIDER_NAME)
@@ -677,8 +667,8 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
         try:
             data = api_get_channels()
 
-            info['image'] = data[unicode(channel)]['icon']
-            info['image_large'] = data[unicode(channel)]['icon']
+            info['image'] = data[str(channel)]['icon']
+            info['image_large'] = data[str(channel)]['icon']
         except:
             pass
 
@@ -723,11 +713,11 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
         playdata['properties']['Live_Channel'] = playdata['channel']
 
     listitem = plugin.Item(
-        label = unicode(info['label1']),
-        label2 = unicode(info['label2']),
+        label = str(info['label1']),
+        label2 = str(info['label2']),
         art = {
-            'thumb': unicode(info['image']),
-            'fanart': unicode(info['image_large'])
+            'thumb': str(info['image']),
+            'fanart': str(info['image_large'])
         },
         info = {
             'credits': info['credits'],
@@ -735,11 +725,11 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
             'writer': info['writer'],
             'director': info['director'],
             'genre': info['genres'],
-            'plot': unicode(info['description']),
+            'plot': str(info['description']),
             'duration': info['duration'],
             'mediatype': 'video',
             'year': info['year'],
-            'sorttitle': unicode(info['label1']).upper(),
+            'sorttitle': str(info['label1']).upper(),
         },
         path = path,
         headers = CDMHEADERS,
@@ -834,22 +824,22 @@ def get_live_channels(all=False):
             path = plugin.url_for(func_or_url=play_video, type='channel', channel=row['id'], id=row['assetid'], _is_live=True)
             playable = True
 
-            id = unicode(row['id'])
+            id = str(row['id'])
 
             if all or not prefs or not check_key(prefs, id) or prefs[id]['live'] == 1:
                 context = []
 
                 if CONST_START_FROM_BEGINNING:
                     context = [
-                        (_.START_BEGINNING, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='channel', channel=id, id=unicode(row['assetid']), from_beginning=1, _is_live=True)), ),
+                        (_.START_BEGINNING, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='channel', channel=id, id=str(row['assetid']), from_beginning=1, _is_live=True)), ),
                     ]
 
                 channels.append({
-                    'label': unicode(row['name']),
+                    'label': str(row['name']),
                     'channel': id,
-                    'chno': unicode(row['channelno']),
-                    'description': unicode(row['description']),
-                    'image': unicode(row['icon']),
+                    'chno': str(row['channelno']),
+                    'description': str(row['description']),
+                    'image': str(row['icon']),
                     'path':  path,
                     'playable': playable,
                     'context': context,
@@ -868,16 +858,16 @@ def get_replay_channels(all=False):
         for currow in data:
             row = data[currow]
 
-            id = unicode(row['id'])
+            id = str(row['id'])
 
             if all or not prefs or not check_key(prefs, id) or int(prefs[id]['replay']) == 1:
                 channels.append({
-                    'label': unicode(row['name']),
+                    'label': str(row['name']),
                     'channel': id,
-                    'chno': unicode(row['channelno']),
-                    'description': unicode(row['description']),
-                    'image': unicode(row['icon']),
-                    'path': plugin.url_for(func_or_url=replaytv_by_day, image=unicode(row['icon']), description=unicode(row['description']), label=unicode(row['name']), station=id),
+                    'chno': str(row['channelno']),
+                    'description': str(row['description']),
+                    'image': str(row['icon']),
+                    'path': plugin.url_for(func_or_url=replaytv_by_day, image=str(row['icon']), description=str(row['description']), label=str(row['name']), station=id),
                     'playable': False,
                     'context': [],
                 })
@@ -899,7 +889,7 @@ def process_replaytv_list(character, start=0):
         for row in prefs:
             currow = prefs[row]
 
-            if not check_key(data, unicode(row)):
+            if not check_key(data, str(row)):
                 continue
 
             if int(currow['replay']) == 1:
@@ -928,9 +918,9 @@ def process_replaytv_list(character, start=0):
 
         item_count += 1
 
-        label = unicode(row['title'])
-        idtitle = unicode(currow)
-        icon = unicode(row['icon'])
+        label = str(row['title'])
+        idtitle = str(currow)
+        icon = str(row['icon'])
 
         items.append(plugin.Item(
             label = label,
@@ -954,7 +944,7 @@ def process_replaytv_search(search):
     nowstamp = int((now - datetime.datetime(1970, 1, 1, tzinfo=pytz.utc)).total_seconds())
     sevendaysstamp = int((sevendays - datetime.datetime(1970, 1, 1, tzinfo=pytz.utc)).total_seconds())
 
-    search = unicode(search)
+    search = str(search)
 
     data = api_get_channels()
 
@@ -965,7 +955,7 @@ def process_replaytv_search(search):
         for row in prefs:
             currow = prefs[row]
 
-            if not check_key(data, unicode(row)):
+            if not check_key(data, str(row)):
                 continue
 
             if int(currow['replay']) == 1:
@@ -981,8 +971,8 @@ def process_replaytv_search(search):
     for currow in data:
         row = data[currow]
 
-        title = unicode(row['title'])
-        icon = unicode(row['icon'])
+        title = str(row['title'])
+        icon = str(row['icon'])
 
         fuzz_set = fuzz.token_set_ratio(title, search)
         fuzz_partial = fuzz.partial_ratio(title, search)
@@ -990,7 +980,7 @@ def process_replaytv_search(search):
 
         if (fuzz_set + fuzz_partial + fuzz_sort) > 160:
             label = title + ' (ReplayTV)'
-            idtitle = unicode(currow)
+            idtitle = str(currow)
 
             items.append(plugin.Item(
                 label = label,
@@ -1041,7 +1031,7 @@ def process_replaytv_content(station, day=0, start=0):
 
         context = []
         item_count += 1
-        channel = unicode(row['channel'])
+        channel = str(row['channel'])
 
         startT = datetime.datetime.fromtimestamp(int(row['start']))
         startT = convert_datetime_timezone(startT, "Europe/Amsterdam", "Europe/Amsterdam")
@@ -1051,15 +1041,15 @@ def process_replaytv_content(station, day=0, start=0):
         if endT < (datetime.datetime.now(pytz.timezone("Europe/Amsterdam")) - datetime.timedelta(days=7)):
             continue
 
-        label = startT.strftime("%H:%M") + " - " + unicode(row['title'])
+        label = startT.strftime("%H:%M") + " - " + str(row['title'])
 
-        description = unicode(row['description'])
+        description = str(row['description'])
 
         duration = int((endT - startT).total_seconds())
 
-        program_image = unicode(row['icon'])
-        program_image_large = unicode(row['icon'])
-        program_id = unicode(row['program_id'])
+        program_image = str(row['icon'])
+        program_image_large = str(row['icon'])
+        program_id = str(row['program_id'])
 
         if CONST_WATCHLIST:
             context.append((_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=program_id, type='item')), ))
@@ -1103,10 +1093,10 @@ def process_replaytv_list_content(label, idtitle, start=0):
         for row in prefs:
             currow = prefs[row]
 
-            if not check_key(data, unicode(row)):
+            if not check_key(data, str(row)):
                 continue
 
-            channels_ar2[unicode(row)] = data[unicode(row)]['name']
+            channels_ar2[str(row)] = data[str(row)]['name']
 
             if int(currow['replay']) == 1:
                 channels_ar.append(row)
@@ -1134,7 +1124,7 @@ def process_replaytv_list_content(label, idtitle, start=0):
         context = []
         item_count += 1
 
-        channel = unicode(row['channel'])
+        channel = str(row['channel'])
 
         startT = datetime.datetime.fromtimestamp(int(row['start']))
         startT = convert_datetime_timezone(startT, "Europe/Amsterdam", "Europe/Amsterdam")
@@ -1146,18 +1136,18 @@ def process_replaytv_list_content(label, idtitle, start=0):
         else:
             itemlabel = startT.strftime("%A %d %B %Y %H:%M ").capitalize()
 
-        itemlabel += unicode(row['title'])
+        itemlabel += str(row['title'])
 
         try:
-            itemlabel += " (" + unicode(channels_ar2[channel]) + ")"
+            itemlabel += " (" + str(channels_ar2[channel]) + ")"
         except:
             pass
 
-        description = unicode(row['description'])
+        description = str(row['description'])
         duration = int((endT - startT).total_seconds())
-        program_image = unicode(row['icon'])
-        program_image_large = unicode(row['icon'])
-        program_id = unicode(row['program_id'])
+        program_image = str(row['icon'])
+        program_image_large = str(row['icon'])
+        program_id = str(row['program_id'])
 
         if CONST_WATCHLIST:
             context.append((_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=program_id, type='item')), ))
@@ -1187,7 +1177,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, o
     subscription_filter = plugin_vod_subscription_filter()
 
     start = int(start)
-    type = unicode(type)
+    type = str(type)
     type2 = data
 
     items = []
@@ -1224,8 +1214,8 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, o
         if not online == 1 and count < start + 1:
             continue
 
-        id = unicode(row['id'])
-        label = unicode(row['title'])
+        id = str(row['id'])
+        label = str(row['title'])
 
         if search and not online == 1:
             fuzz_set = fuzz.token_set_ratio(label,search)
@@ -1242,15 +1232,15 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, o
         item_count += 1
 
         properties = []
-        description = unicode(row['description'])
+        description = str(row['description'])
         duration = 0
 
-        if row['duration'] and len(unicode(row['duration'])) > 0:
+        if row['duration'] and len(str(row['duration'])) > 0:
             duration = int(row['duration'])
 
-        program_image = unicode(row['icon'])
-        program_image_large = unicode(row['icon'])
-        program_type = unicode(row['type'])
+        program_image = str(row['icon'])
+        program_image_large = str(row['icon'])
+        program_type = str(row['type'])
 
         if program_type == "show" or program_type == "Serie":
             path = plugin.url_for(func_or_url=vod_series, type=type2, label=label, id=id)

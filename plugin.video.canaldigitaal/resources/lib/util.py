@@ -11,20 +11,15 @@ from resources.lib.base.l5.api import api_get_channels
 from resources.lib.base.l6 import inputstream
 from resources.lib.constants import CONST_BASE_HEADERS
 
-try:
-    unicode
-except NameError:
-    unicode = str
-
 def plugin_ask_for_creds(creds):
-    username = unicode(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
+    username = str(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 
     if not len(username) > 0:
         gui.ok(message=_.EMPTY_USER, heading=_.LOGIN_ERROR_TITLE)
 
         return {'result': False, 'username': '', 'password': ''}
 
-    password = unicode(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
+    password = str(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
 
     if not len(password) > 0:
         gui.ok(message=_.EMPTY_PASS, heading=_.LOGIN_ERROR_TITLE)
@@ -112,10 +107,10 @@ def plugin_process_info(playdata):
             epcode = ''
 
             if check_key(playdata['info']['params'], 'seriesSeason'):
-                epcode += 'S' + unicode(playdata['info']['params']['seriesSeason'])
+                epcode += 'S' + str(playdata['info']['params']['seriesSeason'])
 
             if check_key(playdata['info']['params'], 'seriesEpisode'):
-                epcode += 'E' + unicode(playdata['info']['params']['seriesEpisode'])
+                epcode += 'E' + str(playdata['info']['params']['seriesEpisode'])
 
             if check_key(playdata['info']['params'], 'episodeTitle'):
                 info['label2'] = playdata['info']['params']['episodeTitle']
@@ -129,7 +124,7 @@ def plugin_process_info(playdata):
                 data = api_get_channels()
 
                 try:
-                    info['label2'] += " - "  + data[unicode(playdata['info']['params']['channelId'])]['name']
+                    info['label2'] += " - "  + data[str(playdata['info']['params']['channelId'])]['name']
                 except:
                     pass
 

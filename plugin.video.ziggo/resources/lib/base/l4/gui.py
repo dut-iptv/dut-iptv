@@ -3,12 +3,7 @@ from contextlib import contextmanager
 
 from resources.lib.base.l1.constants import ADDON_ICON, ADDON_ID, ADDON_NAME
 from resources.lib.base.l3.language import _
-
-try:
-    from urllib.parse import quote, urlparse
-except ImportError:
-    from urlparse import urlparse
-    from urllib import quote
+from urllib.parse import quote, urlparse
 
 def _make_heading(heading=None):
     return heading if heading else ADDON_NAME
@@ -26,17 +21,13 @@ def select(heading=None, options=None, autoclose=None, **kwargs):
     heading = _make_heading(heading)
     options = options or []
 
-    if get_kodi_version() < 17:
-        kwargs.pop('preselect', None)
-        kwargs.pop('useDetails', None)
-
     if autoclose:
         kwargs['autoclose'] = autoclose
 
     _options = []
     for option in options:
         if issubclass(type(option), Item):
-            option = option.label if get_kodi_version() < 17 else option.get_li()
+            option = option.get_li()
 
         _options.append(option)
 
@@ -77,12 +68,7 @@ class Progress(object):
         self._dialog.update(int(percent), *self._get_args(message))
 
     def _get_args(self, message):
-        if message is not None and get_kodi_version() < 19:
-            args = message.split('\n')[:3]
-            while len(args) < 3:
-                args.append(' ')
-        else:
-            args = [message]
+        args = [message]
 
         return args
 
@@ -218,10 +204,7 @@ class Item(object):
         if self.path:
             path = self.path
 
-        if get_kodi_version() < 18:
-            li = xbmcgui.ListItem(label=label, label2=label2, path=path)
-        else:
-            li = xbmcgui.ListItem(label=label, label2=label2, path=path, offscreen=True)
+        li = xbmcgui.ListItem(label=label, label2=label2, path=path, offscreen=True)
 
         if self.label:
             if not self.info.get('plot'):
@@ -272,10 +255,7 @@ class Item(object):
         mimetype = self.mimetype
 
         if self.inputstream and self.inputstream.check():
-            if get_kodi_version() < 19:
-                li.setProperty('inputstreamaddon', 'inputstream.adaptive')
-            else:
-                li.setProperty('inputstream', 'inputstream.adaptive')
+            li.setProperty('inputstream', 'inputstream.adaptive')
 
             li.setProperty('inputstream.adaptive.manifest_type', self.inputstream.manifest_type)
 

@@ -1,4 +1,4 @@
-import sys, xbmc, xbmcaddon
+import xbmcaddon, xbmcvfs
 
 ##### ADDON ####
 ADDON = xbmcaddon.Addon()
@@ -7,12 +7,8 @@ ADDON_NAME = ADDON.getAddonInfo('name')
 
 PROVIDER_NAME = ADDON_ID.replace('plugin.video.', '')
 
-ADDON_PATH = xbmc.translatePath(ADDON.getAddonInfo('path'))
-ADDON_PROFILE = xbmc.translatePath(ADDON.getAddonInfo('profile'))
-
-if sys.version_info < (3, 0):
-    ADDON_PATH = ADDON_PATH.decode("utf-8")
-    ADDON_PROFILE = ADDON_PROFILE.decode("utf-8")
+ADDON_PATH = xbmcvfs.translatePath(ADDON.getAddonInfo('path'))
+ADDON_PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 
 ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_FANART = ADDON.getAddonInfo('fanart')

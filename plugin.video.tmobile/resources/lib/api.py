@@ -10,17 +10,7 @@ from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download, api_get_channels
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_BASE_URL
 from resources.lib.util import plugin_process_info
-
-try:
-    from urllib.parse import parse_qs, urlparse, quote_plus
-except ImportError:
-    from urlparse import parse_qs, urlparse
-    from urllib import quote_plus
-
-try:
-    unicode
-except NameError:
-    unicode = str
+from urllib.parse import parse_qs, urlparse, quote_plus
 
 def api_add_to_watchlist():
     return None
@@ -224,7 +214,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     info = {}
     properties = {}
 
-    if not type or not len(unicode(type)) > 0:
+    if not type or not len(str(type)) > 0:
         return playdata
 
     militime = int(time.time() * 1000)
@@ -240,7 +230,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         data = api_get_channels()
 
         try:
-            mediaID = data[unicode(channel)]['assetid']
+            mediaID = data[str(channel)]['assetid']
         except:
             pass
 
@@ -366,7 +356,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
         session_post_data["mediaID"] = info['mediaFiles'][0]['ID']
 
-    if not len(unicode(session_post_data["mediaID"])) > 0:
+    if not len(str(session_post_data["mediaID"])) > 0:
         return playdata
 
     if type == 'vod':
@@ -408,9 +398,9 @@ def api_vod_season(series, id):
 
     season = []
 
-    type = "vod_season_" + unicode(id)
+    type = "vod_season_" + str(id)
     encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = unicode(encodedBytes, "utf-8")
+    type = str(encodedBytes, "utf-8")
 
     file = "cache" + os.sep + type + ".json"
 
@@ -422,7 +412,7 @@ def api_vod_season(series, id):
         headers = {'Content-Type': 'application/json', 'X_CSRFToken': profile_settings['csrf_token']}
 
         session_post_data = {
-            'VODID': unicode(id),
+            'VODID': str(id),
             'offset': '0',
             'count': '35',
         }
@@ -465,10 +455,10 @@ def api_vod_seasons(type, id):
 
     seasons = []
 
-    type = "vod_seasons_" + unicode(id)
+    type = "vod_seasons_" + str(id)
 
     encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = unicode(encodedBytes, "utf-8")
+    type = str(encodedBytes, "utf-8")
 
     file = "cache" + os.sep + type + ".json"
 
@@ -480,7 +470,7 @@ def api_vod_seasons(type, id):
         headers = {'Content-Type': 'application/json', 'X_CSRFToken': profile_settings['csrf_token']}
 
         session_post_data = {
-            'VODID': unicode(id),
+            'VODID': str(id),
             'offset': '0',
             'count': '50',
         }

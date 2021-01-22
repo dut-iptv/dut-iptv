@@ -1,11 +1,6 @@
 import json, xbmcaddon
 from resources.lib.base.l1.constants import ADDON_ID
 
-try:
-    unicode
-except NameError:
-    unicode = str
-
 def open():
     xbmcaddon.Addon(ADDON_ID).openSettings()
 
@@ -53,7 +48,7 @@ def setBool(key, value=True):
     set(key, 'true' if value else 'false')
 
 def get(key, default=''):
-    return unicode(xbmcaddon.Addon(ADDON_ID).getSetting(key)) or unicode(default)
+    return str(xbmcaddon.Addon(ADDON_ID).getSetting(key)) or str(default)
 
 def set(key, value=''):
     xbmcaddon.Addon(ADDON_ID).setSetting(key, str(value))

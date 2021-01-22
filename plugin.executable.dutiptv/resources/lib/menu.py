@@ -10,11 +10,6 @@ from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l7 import plugin
 from resources.lib.util import create_epg, create_playlist
 
-try:
-    unicode
-except NameError:
-    unicode = str
-
 @plugin.route('')
 def home(**kwargs):
     api_get_channels()
@@ -95,7 +90,7 @@ def primary(addons, **kwargs):
 def alternative(num, addon, addons, **kwargs):
     num = int(num)
     profile_settings = load_profile(profile_id=1)
-    profile_settings['addon' + unicode(num)] = addon
+    profile_settings['addon' + str(num)] = addon
     save_profile(profile_id=1, profile=profile_settings)
 
     folder = plugin.Folder(title=_.SELECT_SECONDARY)
@@ -123,7 +118,7 @@ def radio_select(num, **kwargs):
     profile_settings = load_profile(profile_id=1)
 
     for x in range(num, 6):
-        profile_settings['addon' + unicode(x)] = ''
+        profile_settings['addon' + str(x)] = ''
 
     save_profile(profile_id=1, profile=profile_settings)
 
@@ -138,7 +133,7 @@ def radio_select(num, **kwargs):
 
 @plugin.route()
 def channel_picker_menu(type_tv_radio, save_all=0, radio=None, **kwargs):
-    type_tv_radio = unicode(type_tv_radio)
+    type_tv_radio = str(type_tv_radio)
     save_all = int(save_all)
 
     if not radio == None:
@@ -206,7 +201,7 @@ def channel_picker_menu(type_tv_radio, save_all=0, radio=None, **kwargs):
 
 @plugin.route()
 def order_picker_menu(type_tv_radio, double=None, primary=None, **kwargs):
-    type_tv_radio = unicode(type_tv_radio)
+    type_tv_radio = str(type_tv_radio)
 
     save_all_order(type_tv_radio=type_tv_radio, double=double, primary=primary)
 
@@ -241,7 +236,7 @@ def order_picker_menu(type_tv_radio, double=None, primary=None, **kwargs):
             if int(row[type_tv_radio]) == 0:
                 continue
 
-            label = _(row['name'] + ": " + unicode(order[unicode(currow)]), _bold=True)
+            label = _(row['name'] + ": " + str(order[str(currow)]), _bold=True)
 
             folder.add_item(
                 label = label,
@@ -295,8 +290,8 @@ def save_all_prefs(type_tv_radio):
 
             for currow in type_channels:
                 row = type_channels[currow]
-                all_id = unicode(row['id'])
-                name = unicode(row['name'])
+                all_id = str(row['id'])
+                name = str(row['name'])
 
                 if not prefs or not check_key(prefs, all_id):
                     prefs[all_id] = {'radio': 1, 'name': name}
@@ -319,8 +314,8 @@ def save_all_prefs(type_tv_radio):
             addon_list = []
 
             for x in range(1, 6):
-                if len(profile_settings['addon' + unicode(x)]) > 0:
-                    addon_list.append(profile_settings['addon' + unicode(x)])
+                if len(profile_settings['addon' + str(x)]) > 0:
+                    addon_list.append(profile_settings['addon' + str(x)])
 
             prefs2 = prefs.copy()
 
@@ -341,8 +336,8 @@ def save_all_prefs(type_tv_radio):
                         del prefs[all_id]['replay_channelassetid']
 
             for x in range(1, 6):
-                if len(profile_settings['addon' + unicode(x)]) > 0:
-                    video_addon = profile_settings['addon' + unicode(x)]
+                if len(profile_settings['addon' + str(x)]) > 0:
+                    video_addon = profile_settings['addon' + str(x)]
 
                     type_channels = load_channels(type=video_addon.replace('plugin.video.', ''))
 
@@ -366,8 +361,8 @@ def save_all_prefs(type_tv_radio):
                         for currow2 in all_channels:
                             row2 = all_channels[currow2]
 
-                            if (ziggov3 == 0 and unicode(row2[video_addon + '_id']) == unicode(row['id'])) or (ziggov3 == 1 and check_key(row2, video_addon + '_idv3') and unicode(row2[video_addon + '_idv3']) == unicode(row['id'])):
-                                all_id = unicode(currow2)
+                            if (ziggov3 == 0 and str(row2[video_addon + '_id']) == str(row['id'])) or (ziggov3 == 1 and check_key(row2, video_addon + '_idv3') and str(row2[video_addon + '_idv3']) == str(row['id'])):
+                                all_id = str(currow2)
 
                         if not all_id:
                             continue
@@ -379,7 +374,7 @@ def save_all_prefs(type_tv_radio):
 
                         if addon_prefs:
                             try:
-                                if int(addon_prefs[unicode(row['id'])][type_tv_radio]) == 0:
+                                if int(addon_prefs[str(row['id'])][type_tv_radio]) == 0:
                                     disabled = True
                             except:
                                 pass
@@ -455,13 +450,13 @@ def save_all_order(type_tv_radio, double=None, primary=None):
 
         found_ar.append(currow)
 
-        if not check_key(order, unicode(currow)):
+        if not check_key(order, str(currow)):
             if not last_id:
-                order[unicode(currow)] = 1
+                order[str(currow)] = 1
             else:
-                order[unicode(currow)] = order[last_id] + 1
+                order[str(currow)] = order[last_id] + 1
 
-        last_id = unicode(currow)
+        last_id = str(currow)
 
     order2 = order.copy()
 
@@ -498,11 +493,11 @@ def save_all_order(type_tv_radio, double=None, primary=None):
 
 @plugin.route()
 def change_channel(id, type_tv_radio, **kwargs):
-    if not id or len(unicode(id)) == 0:
+    if not id or len(str(id)) == 0:
         return False
 
-    id = unicode(id)
-    type_tv_radio = unicode(type_tv_radio)
+    id = str(id)
+    type_tv_radio = str(type_tv_radio)
 
     if type_tv_radio == 'radio':
         prefs = load_radio_prefs(profile_id=1)
@@ -517,19 +512,19 @@ def change_channel(id, type_tv_radio, **kwargs):
         prefs[id] = mod_pref
         save_radio_prefs(profile_id=1, prefs=prefs)
 
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + unicode(ADDON_ID) + '/?_=channel_picker_menu&type_tv_radio=radio&save_all=0"]}}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=channel_picker_menu&type_tv_radio=radio&save_all=0"]}}')
     else:
         profile_settings = load_profile(profile_id=1)
         prefs = load_prefs(profile_id=1)
         all_channels = load_channels(type='all')
-        type_tv_radio = unicode(type_tv_radio)
+        type_tv_radio = str(type_tv_radio)
 
         select_list = []
         num = 0
 
         for x in range(1, 6):
-            if len(profile_settings['addon' + unicode(x)]) > 0:
-                video_addon = profile_settings['addon' + unicode(x)]
+            if len(profile_settings['addon' + str(x)]) > 0:
+                video_addon = profile_settings['addon' + str(x)]
 
                 type_channels = load_channels(type=video_addon.replace('plugin.video.', ''))
 
@@ -549,11 +544,11 @@ def change_channel(id, type_tv_radio, **kwargs):
 
                 if ziggov3 == 1:
                     try:
-                        type_id = unicode(row2[video_addon + '_idv3'])
+                        type_id = str(row2[video_addon + '_idv3'])
                     except:
                         type_id = ''
                 else:
-                    type_id = unicode(row2[video_addon + '_id'])
+                    type_id = str(row2[video_addon + '_id'])
 
                 if len(type_id) > 0:
                     row = type_channels[type_id]
@@ -562,13 +557,13 @@ def change_channel(id, type_tv_radio, **kwargs):
 
                     if addon_prefs:
                         try:
-                            if check_key(addon_prefs, unicode(row['id'])) and int(addon_prefs[unicode(row['id'])][type_tv_radio]) == 0:
+                            if check_key(addon_prefs, str(row['id'])) and int(addon_prefs[str(row['id'])][type_tv_radio]) == 0:
                                 disabled = True
                         except:
                             pass
 
                     if disabled == False:
-                        select_list.append(profile_settings['addon' + unicode(x)].replace('plugin.video.', ''))
+                        select_list.append(profile_settings['addon' + str(x)].replace('plugin.video.', ''))
                         num += 1
 
         select_list.append(_.DISABLED)
@@ -602,11 +597,11 @@ def change_channel(id, type_tv_radio, **kwargs):
 
                 if ziggov3 == 1:
                     try:
-                        type_id = unicode(row2[mod_pref[type_tv_radio + '_addonid'] + '_idv3'])
+                        type_id = str(row2[mod_pref[type_tv_radio + '_addonid'] + '_idv3'])
                     except:
                         type_id = ''
                 else:
-                    type_id = unicode(row2[mod_pref[type_tv_radio + '_addonid'] + '_id'])
+                    type_id = str(row2[mod_pref[type_tv_radio + '_addonid'] + '_id'])
 
                 if len(type_id) > 0:
                     row = type_channels[type_id]
@@ -621,11 +616,11 @@ def change_channel(id, type_tv_radio, **kwargs):
             prefs[id] = mod_pref
             save_prefs(profile_id=1, prefs=prefs)
 
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + unicode(ADDON_ID) + '/?_=channel_picker_menu&type_tv_radio=' + type_tv_radio + '&save_all=0"]}}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=channel_picker_menu&type_tv_radio=' + type_tv_radio + '&save_all=0"]}}')
 
 @plugin.route()
 def change_order(id, type_tv_radio, **kwargs):
-    if not id or len(unicode(id)) == 0:
+    if not id or len(str(id)) == 0:
         return False
 
     if type_tv_radio == 'live':
@@ -633,8 +628,8 @@ def change_order(id, type_tv_radio, **kwargs):
     else:
         order = load_radio_order(profile_id=1)
 
-    id = unicode(id)
-    type_tv_radio = unicode(type_tv_radio)
+    id = str(id)
+    type_tv_radio = str(type_tv_radio)
 
     selected = gui.numeric(_.SELECT_ORDER, order[id])
     double = None
@@ -642,7 +637,7 @@ def change_order(id, type_tv_radio, **kwargs):
 
     if selected and selected >= 0:
         for currow in order:
-            if id == unicode(currow):
+            if id == str(currow):
                 continue
 
             if int(order[currow]) == int(selected):
@@ -659,7 +654,7 @@ def change_order(id, type_tv_radio, **kwargs):
     if double:
         double_query = '&double={double}&primary={primary}'.format(double=double, primary=id)
 
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + unicode(ADDON_ID) + '/?_=order_picker_menu' + double_query + '&type_tv_radio=' + type_tv_radio + '"]}}')
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=order_picker_menu' + double_query + '&type_tv_radio=' + type_tv_radio + '"]}}')
 
 def setup_iptv():
     try:

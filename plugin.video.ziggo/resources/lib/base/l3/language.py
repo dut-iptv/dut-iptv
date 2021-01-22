@@ -1,11 +1,6 @@
 from resources.lib.base.l1.constants import ADDON
 from resources.lib.base.l2.log import log
 
-try:
-    unicode
-except NameError:
-    unicode = str
-
 def format_string(string, _bold=False, _label=False, _color=None, _strip=False, **kwargs):
     if kwargs:
         string = string.format(**kwargs)
@@ -30,7 +25,7 @@ def addon_string(id):
 
     if not string:
         log("LANGUAGE: Addon didn't return a string for id: {}".format(id))
-        string = unicode(id)
+        string = str(id)
 
     return string
 
@@ -41,6 +36,7 @@ class BaseLanguage(object):
     LIVE_TV = 30007
     SERIES = 30010
     MOVIES = 30011
+    FILM1 = 30012
     NEXT_PAGE = 30021
     CHANNELS = 30024
     HBO_SERIES = 30025

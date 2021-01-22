@@ -6,11 +6,6 @@ from resources.lib.base.l2.log import log
 from resources.lib.base.l3.util import check_key, fixBadZipfile, is_file_older_than_x_days, load_file, load_profile, write_file
 from resources.lib.util import clear_cache_connector
 
-try:
-    unicode
-except NameError:
-    unicode = str
-
 def api_get_channels():
     directory = os.path.dirname(ADDON_PROFILE + 'tmp' + os.sep + 'a.channels.zip')
 
@@ -33,12 +28,15 @@ def api_get_channels():
         resp = requests.get(channels_url, stream=True)
 
         if resp.status_code != 200:
+            resp.close()
             return False
 
         with open(tmp, 'wb') as f:
             for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
                 f.write(chunk)
-
+        
+        resp.close()
+        
         if os.path.isfile(tmp):
             from zipfile import ZipFile
 
@@ -75,9 +73,9 @@ def api_get_all_epg():
     profile_settings = load_profile(profile_id=1)
 
     for x in range(1, 6):
-        if check_key(profile_settings, 'addon' + unicode(x)):
-            if len(profile_settings['addon' + unicode(x)]) > 0:
-                if api_get_epg_by_addon(profile_settings['addon' + unicode(x)].replace('plugin.video.', '')) == True:
+        if check_key(profile_settings, 'addon' + str(x)):
+            if len(profile_settings['addon' + str(x)]) > 0:
+                if api_get_epg_by_addon(profile_settings['addon' + str(x)].replace('plugin.video.', '')) == True:
                     updated = True
 
     clear_cache_connector()
@@ -94,7 +92,7 @@ def api_get_epg_by_addon(addon):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    directory = os.path.dirname(ADDON_PROFILE + "cache" + os.sep + unicode(addon) + os.sep + 'epg.zip')
+    directory = os.path.dirname(ADDON_PROFILE + "cache" + os.sep + str(addon) + os.sep + 'epg.zip')
 
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -119,30 +117,33 @@ def api_get_epg_by_addon(addon):
         resp = requests.get(epg_url, stream=True)
 
         if resp.status_code != 200:
+            resp.close()
             return False
 
         with open(tmp, 'wb') as f:
             for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
                 f.write(chunk)
 
+        resp.close()
+
         if os.path.isfile(tmp):
             from zipfile import ZipFile
 
             try:
                 with ZipFile(tmp, 'r') as zipObj:
-                    zipObj.extractall(ADDON_PROFILE + "cache" + os.sep + unicode(addon) + os.sep)
+                    zipObj.extractall(ADDON_PROFILE + "cache" + os.sep + str(addon) + os.sep)
             except:
                 try:
                     fixBadZipfile(tmp)
 
                     with ZipFile(tmp, 'r') as zipObj:
-                        zipObj.extractall(ADDON_PROFILE + "cache" + os.sep + unicode(addon) + os.sep)
+                        zipObj.extractall(ADDON_PROFILE + "cache" + os.sep + str(addon) + os.sep)
                 except:
                     try:
                         from resources.lib.base.l1.zipfile import ZipFile as ZipFile2
 
                         with ZipFile2(tmp, 'r') as zipObj:
-                            zipObj.extractall(ADDON_PROFILE + "cache" + os.sep + unicode(addon) + os.sep)
+                            zipObj.extractall(ADDON_PROFILE + "cache" + os.sep + str(addon) + os.sep)
                     except:
                         return False
         else:
