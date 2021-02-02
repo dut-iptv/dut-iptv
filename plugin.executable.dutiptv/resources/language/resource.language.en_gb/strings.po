@@ -577,3 +577,23 @@ msgstr ""
 msgctxt "#330033"
 msgid "Select yes to enable Radio Channels, no to disable them."
 msgstr ""
+
+msgctxt "#330034"
+msgid "Groups"
+msgstr ""
+
+msgctxt "#330035"
+msgid "Add Group"
+msgstr ""
+
+msgctxt "#330036"
+msgid "Remove group"
+msgstr ""
+
+msgctxt "#330037"
+msgid "Select group"
+msgstr ""
+
+msgctxt "#330038"
+msgid "Select Next when you are ready to move on to group selection"
+msgstr ""

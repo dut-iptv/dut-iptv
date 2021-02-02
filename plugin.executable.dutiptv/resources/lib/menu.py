@@ -49,6 +49,8 @@ def home(**kwargs):
     else:
         folder.add_item(label=_.NO_ADDONS_ENABLED, info = {'plot': desc2}, path=plugin.url_for(func_or_url=home))
 
+    folder.add_item(label='TV ' + _.GROUPS, info = {'plot': ''}, path=plugin.url_for(func_or_url=groups_menu, type='tv'))
+    folder.add_item(label='Radio ' + _.GROUPS, info = {'plot': ''}, path=plugin.url_for(func_or_url=groups_menu, type='radio'))
     folder.add_item(label=_.RESET_SETTINGS, info = {'plot': desc3}, path=plugin.url_for(func_or_url=reset_settings))
 
     return folder
@@ -56,6 +58,9 @@ def home(**kwargs):
 #Main menu items
 @plugin.route()
 def reset_settings(**kwargs):
+    if not gui.yes_no(_.PLUGIN_RESET_YES_NO):
+        return
+
     files = ['profile.json', 'prefs.json', 'order.json', 'radio_prefs.json', 'radio_order.json']
 
     for file in files:
@@ -63,6 +68,65 @@ def reset_settings(**kwargs):
             os.remove(ADDON_PROFILE + file)
         except:
             pass
+
+@plugin.route()
+def groups_menu(type, **kwargs):
+    if type == 'tv':
+        typestr = 'TV '
+    else:
+        typestr = 'Radio '
+
+    folder = plugin.Folder(title=typestr + _.GROUPS)
+
+    groups = load_file(type + '_groups.json', ext=False, isJSON=True)
+
+    if not groups:
+        groups = []
+    else:
+        groups = list(groups)
+
+    folder.add_item(label=_(_.ADD_GROUP, _bold=True), path=plugin.url_for(func_or_url=add_group, type=type))
+
+    for entry in groups:
+        folder.add_item(label=_(entry, _bold=True), path=plugin.url_for(func_or_url=remove_group, type=type, name=entry))
+
+    return folder
+
+@plugin.route()
+def add_group(type, **kwargs):
+    groups = load_file(type + '_groups.json', ext=False, isJSON=True)
+
+    if not groups:
+        groups = []
+    else:
+        groups = list(groups)
+
+    name = gui.input(message=_.ADD_GROUP, default='').strip()
+
+    if name and len(str(name)) > 0 and name != str(type).lower():
+        groups.append(name)
+        groups = sorted(groups)
+        write_file(type + '_groups.json', data=groups, ext=False, isJSON=True)
+
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=groups_menu&type=' + str(type) + '"]}}')
+
+@plugin.route()
+def remove_group(type, name, **kwargs):
+    if not gui.yes_no(_.REMOVE_GROUP + '?'):
+        return
+
+    groups = load_file(type + '_groups.json', ext=False, isJSON=True)
+
+    if not groups:
+        groups = []
+    else:
+        groups = list(groups)
+
+    groups.remove(name)
+
+    write_file(type + '_groups.json', data=groups, ext=False, isJSON=True)
+
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=groups_menu&type=' + str(type) + '"]}}')
 
 @plugin.route()
 def primary(addons, **kwargs):
@@ -207,25 +271,13 @@ def order_picker_menu(type_tv_radio, double=None, primary=None, **kwargs):
 
     folder = plugin.Folder(title=_.SELECT_ORDER)
 
+    desc2 = _.NEXT_SETUP_GROUPS
+    folder.add_item(label=_(_.NEXT, _bold=True), info = {'plot': desc2}, path=plugin.url_for(func_or_url=group_picker_menu, type_tv_radio=type_tv_radio))
+
     if type_tv_radio == 'live':
-        profile_settings = load_profile(profile_id=1)
-
-        if int(profile_settings['radio']) == 1:
-            desc2 = _.NEXT_SETUP_RADIO
-            path = plugin.url_for(func_or_url=channel_picker_menu, type_tv_radio='radio', save_all=1)
-        else:
-            desc2 = _.NEXT_SETUP_IPTV
-            path = plugin.url_for(func_or_url=simple_iptv_menu)
-
-        folder.add_item(label=_(_.NEXT, _bold=True), info = {'plot': desc2}, path=path)
-
         prefs = load_prefs(profile_id=1)
         order = load_order(profile_id=1)
     else:
-        desc2 = _.NEXT_SETUP_IPTV
-
-        folder.add_item(label=_(_.NEXT, _bold=True), info = {'plot': desc2}, path=plugin.url_for(func_or_url=simple_iptv_menu))
-
         prefs = load_radio_prefs(profile_id=1)
         order = load_radio_order(profile_id=1)
 
@@ -241,6 +293,65 @@ def order_picker_menu(type_tv_radio, double=None, primary=None, **kwargs):
             folder.add_item(
                 label = label,
                 path = plugin.url_for(func_or_url=change_order, id=currow, type_tv_radio=type_tv_radio),
+                playable = False,
+            )
+
+    desc2 = _.NEXT_SETUP_GROUPS
+    folder.add_item(label=_(_.NEXT, _bold=True), info = {'plot': desc2}, path=plugin.url_for(func_or_url=group_picker_menu, type_tv_radio=type_tv_radio))
+
+    return folder
+
+@plugin.route()
+def group_picker_menu(type_tv_radio, **kwargs):
+    type_tv_radio = str(type_tv_radio)
+
+    folder = plugin.Folder(title=_.SELECT_GROUP)
+
+    if type_tv_radio == 'live':
+        profile_settings = load_profile(profile_id=1)
+
+        if int(profile_settings['radio']) == 1:
+            desc2 = _.NEXT_SETUP_RADIO
+            path = plugin.url_for(func_or_url=channel_picker_menu, type_tv_radio='radio', save_all=1)
+        else:
+            desc2 = _.NEXT_SETUP_IPTV
+            path = plugin.url_for(func_or_url=simple_iptv_menu)
+
+        folder.add_item(label=_(_.NEXT, _bold=True), info = {'plot': desc2}, path=path)
+
+        prefs = load_prefs(profile_id=1)
+        groups = load_file('tv_groups.json', ext=False, isJSON=True)
+    else:
+        desc2 = _.NEXT_SETUP_IPTV
+
+        folder.add_item(label=_(_.NEXT, _bold=True), info = {'plot': desc2}, path=plugin.url_for(func_or_url=simple_iptv_menu))
+
+        prefs = load_radio_prefs(profile_id=1)
+        groups = load_file('radio_groups.json', ext=False, isJSON=True)
+
+    if not groups:
+        groups = []
+    else:
+        groups = list(groups)
+
+    if prefs:
+        for currow in prefs:
+            row = prefs[currow]
+
+            if int(row[type_tv_radio]) == 0:
+                continue
+
+            if check_key(row, 'group'):
+                label = _(row['name'] + ": " + str(row['group']), _bold=True)
+            else:
+                if type_tv_radio == 'live':
+                    label = _(row['name'] + ": TV", _bold=True)
+                else:
+                    label = _(row['name'] + ": Radio", _bold=True)
+
+            folder.add_item(
+                label = label,
+                path = plugin.url_for(func_or_url=change_group, id=currow, type_tv_radio=type_tv_radio),
                 playable = False,
             )
 
@@ -617,6 +728,47 @@ def change_channel(id, type_tv_radio, **kwargs):
             save_prefs(profile_id=1, prefs=prefs)
 
         xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=channel_picker_menu&type_tv_radio=' + type_tv_radio + '&save_all=0"]}}')
+
+@plugin.route()
+def change_group(id, type_tv_radio, **kwargs):
+    if not id or len(str(id)) == 0:
+        return False
+
+    id = str(id)
+    type_tv_radio = str(type_tv_radio)
+
+    select_list = []
+    
+    if type_tv_radio == 'radio':
+        groups = load_file('radio_groups.json', ext=False, isJSON=True)
+        typestr = 'Radio'
+    else:
+        groups = load_file('tv_groups.json', ext=False, isJSON=True)
+        typestr = 'TV'
+
+    select_list.append(typestr)
+        
+    for group in groups:
+        select_list.append(group)
+    
+    selected = gui.select(_.SELECT_GROUP, select_list)
+
+    if type_tv_radio == 'radio':
+        prefs = load_radio_prefs(profile_id=1)
+    else:
+        prefs = load_prefs(profile_id=1)
+
+    try:
+        prefs[id]['group'] = select_list[selected]
+    except:
+        pass
+
+    if type_tv_radio == 'radio':
+        save_radio_prefs(profile_id=1, prefs=prefs)
+    else:
+        save_prefs(profile_id=1, prefs=prefs)
+
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=group_picker_menu&type_tv_radio=' + type_tv_radio + '"]}}')
 
 @plugin.route()
 def change_order(id, type_tv_radio, **kwargs):

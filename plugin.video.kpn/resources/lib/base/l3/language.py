@@ -162,8 +162,13 @@ class BaseLanguage(object):
     ADDON_NOT_LOGGEDIN_DESC = 330030
     ADDON_ENABLED_DESC = 330031
     ADDONS_CONTINUE_DESC = 330032
-    ADD_RADIO_DESC = 330033
-
+    ADD_RADIO_DESC = 330033    
+    GROUPS = 330034
+    ADD_GROUP = 330035
+    REMOVE_GROUP = 330036
+    SELECT_GROUP = 330037
+    NEXT_SETUP_GROUPS = 330038
+    
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)
         if not isinstance(attr, int):

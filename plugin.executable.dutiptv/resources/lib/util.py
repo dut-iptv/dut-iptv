@@ -101,6 +101,11 @@ def create_playlist():
                     image = ''
                 else:
                     image = row['channelicon']
+                    
+                if not check_key(row, 'group') or len(str(row['group'])) == 0:
+                    group = 'TV'
+                else:
+                    group = row['group']
 
                 path = str('plugin://{addonid}/?_=play_video&channel={channel}&id={asset}&type=channel&pvr=1&_l=.pvr'.format(addonid=row['live_addonid'], channel=row['live_channelid'], asset=row['live_channelassetid']))
 
@@ -117,9 +122,9 @@ def create_playlist():
                 try:
                     if replay == 1 and len(replay_id) > 0:
                         catchup = str('plugin://' + row['replay_addonid'] + '/?_=play_video&type=program&channel=' + row['replay_channelid'] + '&id={catchup-id}')
-                        playlist += u'#EXTINF:0 tvg-id="{id}" tvg-chno="{channel}" tvg-name="{name}" tvg-logo="{logo}" catchup="default" catchup-source="{catchup}" catchup-days="7" group-title="TV" radio="false",{name}\n{path}\n'.format(id=str(row['replay_channelid']), channel=ch_no, name=str(row['channelname']), logo=image, catchup=catchup, path=path)
+                        playlist += u'#EXTINF:0 tvg-id="{id}" tvg-chno="{channel}" tvg-name="{name}" tvg-logo="{logo}" catchup="default" catchup-source="{catchup}" catchup-days="7" group-title="{group}" radio="false",{name}\n{path}\n'.format(id=str(row['replay_channelid']), channel=ch_no, name=str(row['channelname']), logo=image, catchup=catchup, group=group, path=path)
                     else:
-                        playlist += u'#EXTINF:0 tvg-id="{id}" tvg-chno="{channel}" tvg-name="{name}" tvg-logo="{logo}" group-title="TV" radio="false",{name}\n{path}\n'.format(id=str(row['live_channelid']), channel=ch_no, name=str(row['channelname']), logo=image, path=path)
+                        playlist += u'#EXTINF:0 tvg-id="{id}" tvg-chno="{channel}" tvg-name="{name}" tvg-logo="{logo}" group-title="{group}" radio="false",{name}\n{path}\n'.format(id=str(row['live_channelid']), channel=ch_no, name=str(row['channelname']), logo=image, group=group, path=path)
                 except:
                     pass
         except:
@@ -147,18 +152,23 @@ def create_playlist():
                         continue
 
                     if check_key(radio[id], 'mod_name') and len(str(radio[id]['mod_name'])) > 0:
-                        label = str(radio[id]['mod_name'])
+                        label = radio[id]['mod_name']
                     else:
-                        label = str(radio[id]['name'])
+                        label = radio[id]['name']
 
-                    path = str(radio[id]['url'])
+                    path = radio[id]['url']
 
                     if check_key(radio[id], 'icon') and len(str(radio[id]['icon'])) > 0:
-                        image = str(radio[id]['icon'])
+                        image = radio[id]['icon']
                     else:
                         image = ''
+                        
+                    if not check_key(row, 'group') or len(str(row['group'])) == 0:
+                        group = 'Radio'
+                    else:
+                        group = row['group']
 
-                    playlist += u'#EXTINF:0 tvg-id="{id}" tvg-chno="{channel}" tvg-name="{name}" tvg-logo="{logo}" group-title="Radio" radio="true",{name}\n{path}\n'.format(id=id, channel=ch_no, name=label, logo=image, path=path)
+                    playlist += u'#EXTINF:0 tvg-id="{id}" tvg-chno="{channel}" tvg-name="{name}" tvg-logo="{logo}" group-title="{group}" radio="true",{name}\n{path}\n'.format(id=id, channel=ch_no, name=label, logo=image, group=group, path=path)
             except:
                 pass
 

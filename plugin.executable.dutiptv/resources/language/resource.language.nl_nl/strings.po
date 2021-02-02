@@ -587,3 +587,23 @@ msgstr "Selecteer om verder te gaan, let op dat alleen groen gekleurede addons b
 msgctxt "#330033"
 msgid "Select yes to enable Radio Channels, no to disable them."
 msgstr "Selecteer ja om Radio zenders in te schakelen, nee om ze uit te schakelen."
+
+msgctxt "#330034"
+msgid "Groups"
+msgstr "Groepen"
+
+msgctxt "#330035"
+msgid "Add Group"
+msgstr "Groep toevoegen"
+
+msgctxt "#330036"
+msgid "Remove group"
+msgstr "Groep verwijderen"
+
+msgctxt "#330037"
+msgid "Select group"
+msgstr "Groep selecteren"
+
+msgctxt "#330038"
+msgid "Select Next when you are ready to move on to group selection"
+msgstr "Selecteer volgende als je klaar bent om verder te gaan naar groepen selectie"
