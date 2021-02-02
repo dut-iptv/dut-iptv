@@ -60,18 +60,11 @@ def api_get_info(id, channel=''):
 
     info = data
 
-    info = plugin_process_info({'title': '', 'channel': channel, 'info': info})
-
-    return info
+    return plugin_process_info({'title': '', 'channel': channel, 'info': info})
 
 def api_get_session(force=0):
     force = int(force)
     profile_settings = load_profile(profile_id=1)
-
-    #if not force ==1 and check_key(profile_settings, 'last_login_time') and profile_settings['last_login_time'] > int(time.time() - 3600) and profile_settings['last_login_success'] == 1:
-    #    return True
-    #elif force == 1 and not profile_settings['last_login_success'] == 1:
-    #    return False
 
     if not check_key(profile_settings, 'access_token_age') or not check_key(profile_settings, 'access_token') or int(profile_settings['access_token_age']) < int(time.time() - 3540):
         login_result = api_login()
@@ -79,13 +72,10 @@ def api_get_session(force=0):
         if not login_result['result']:
             return False
 
-    try:
-        profile_settings = load_profile(profile_id=1)
-        profile_settings['last_login_success'] = 1
-        profile_settings['last_login_time'] = int(time.time())
-        save_profile(profile_id=1, profile=profile_settings)
-    except:
-        pass
+    profile_settings = load_profile(profile_id=1)
+    profile_settings['last_login_success'] = 1
+    profile_settings['last_login_time'] = int(time.time())
+    save_profile(profile_id=1, profile=profile_settings)
 
     return True
 
@@ -96,16 +86,17 @@ def api_login(force=False):
     creds = get_credentials()
     username = creds['username']
     password = creds['password']
-    use_old = False
     loggedin = False
 
     profile_settings = load_profile(profile_id=1)
 
     code_verifier = base64.urlsafe_b64encode(os.urandom(40)).decode('utf-8')
     code_verifier = re.sub('[^a-zA-Z0-9]+', '', code_verifier)
+
     code_challenge = hashlib.sha256(code_verifier.encode('utf-8')).digest()
     code_challenge = base64.urlsafe_b64encode(code_challenge).decode('utf-8')
     code_challenge = code_challenge.replace('=', '')
+
     state = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(32))
 
     base_authorization_url = "{id_url}/connect/authorize".format(id_url=CONST_ID_URL)
@@ -122,29 +113,35 @@ def api_login(force=False):
         if code == 302:
             redirect = download['headers']['Location']
 
+            auth_code = None
             query = urlparse(redirect).query
             redirect_params = parse_qs(query)
-            auth_code = redirect_params['code'][0]
 
-            download = api_download(url=redirect, type='get', headers=None, data=None, json_data=False, return_json=False, allow_redirects=False)
-            data = download['data']
-            code = download['code']
+            try:
+                auth_code = redirect_params['code'][0]
+            except:
+                pass
 
-            if code == 200:
-                post_data={
-                    "client_id": 'triple-web',
-                    "code": auth_code,
-                    "redirect_uri": "{app_url}/callback-silent.html".format(app_url=CONST_APP_URL),
-                    "code_verifier": code_verifier,
-                    "grant_type": "authorization_code"
-                }
-
-                download = api_download(url="{id_url}/connect/token".format(id_url=CONST_ID_URL), type='post', headers=None, data=post_data, json_data=False, return_json=True, allow_redirects=False)
+            if auth_code:
+                download = api_download(url=redirect, type='get', headers=None, data=None, json_data=False, return_json=False, allow_redirects=False)
                 data = download['data']
                 code = download['code']
 
-                if data and code == 200 and check_key(data, 'id_token') and check_key(data, 'access_token'):
-                    loggedin = True
+                if code == 200:
+                    post_data={
+                        "client_id": 'triple-web',
+                        "code": auth_code,
+                        "redirect_uri": "{app_url}/callback-silent.html".format(app_url=CONST_APP_URL),
+                        "code_verifier": code_verifier,
+                        "grant_type": "authorization_code"
+                    }
+
+                    download = api_download(url="{id_url}/connect/token".format(id_url=CONST_ID_URL), type='post', headers=None, data=post_data, json_data=False, return_json=True, allow_redirects=False)
+                    data = download['data']
+                    code = download['code']
+
+                    if data and code == 200 and check_key(data, 'id_token') and check_key(data, 'access_token'):
+                        loggedin = True
 
     if not loggedin:
         try:
@@ -152,13 +149,10 @@ def api_login(force=False):
         except:
             pass
 
-        try:
-            profile_settings['access_token'] = ''
-            profile_settings['access_token_age'] = 0
-            profile_settings['id_token'] = ''
-            save_profile(profile_id=1, profile=profile_settings)
-        except:
-            pass
+        profile_settings['access_token'] = ''
+        profile_settings['access_token_age'] = 0
+        profile_settings['id_token'] = ''
+        save_profile(profile_id=1, profile=profile_settings)
 
         authorization_url = "{base_url}?response_type=code&client_id=triple-web&scope=openid api&redirect_uri={app_url}/callback&state={state}&code_challenge={code_challenge}&code_challenge_method=S256&response_mode=query".format(base_url=base_authorization_url, app_url=CONST_APP_URL, state=state, code_challenge=code_challenge)
 
@@ -236,13 +230,10 @@ def api_login(force=False):
     if not loggedin:
         return { 'code': code, 'data': data, 'result': False }
 
-    try:
-        profile_settings['id_token'] = data['id_token']
-        profile_settings['access_token'] = data['access_token']
-        profile_settings['access_token_age'] = int(time.time())
-        save_profile(profile_id=1, profile=profile_settings)
-    except:
-        pass
+    profile_settings['id_token'] = data['id_token']
+    profile_settings['access_token'] = data['access_token']
+    profile_settings['access_token_age'] = int(time.time())
+    save_profile(profile_id=1, profile=profile_settings)
 
     return { 'code': code, 'data': data, 'result': True }
 

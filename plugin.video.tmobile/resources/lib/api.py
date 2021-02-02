@@ -83,11 +83,6 @@ def api_get_session(force=0):
     force = int(force)
     profile_settings = load_profile(profile_id=1)
 
-    #if not force ==1 and check_key(profile_settings, 'last_login_time') and profile_settings['last_login_time'] > int(time.time() - 3600) and profile_settings['last_login_success'] == 1:
-    #    return True
-    #elif force == 1 and not profile_settings['last_login_success'] == 1:
-    #    return False
-
     heartbeat_url = '{base_url}/VSP/V3/OnLineHeartbeat?from=inMSAAccess'.format(base_url=CONST_BASE_URL)
 
     headers = {'Content-Type': 'application/json', 'X_CSRFToken': profile_settings['csrf_token']}
@@ -104,13 +99,10 @@ def api_get_session(force=0):
         if not login_result['result']:
             return False
 
-    try:
-        profile_settings = load_profile(profile_id=1)
-        profile_settings['last_login_success'] = 1
-        profile_settings['last_login_time'] = int(time.time())
-        save_profile(profile_id=1, profile=profile_settings)
-    except:
-        pass
+    profile_settings = load_profile(profile_id=1)
+    profile_settings['last_login_success'] = 1
+    profile_settings['last_login_time'] = int(time.time())
+    save_profile(profile_id=1, profile=profile_settings)
 
     return True
 
@@ -188,6 +180,7 @@ def api_login():
                 if not check_key(row, 'name') and check_key(row, 'deviceModel') and check_key(row, 'status') and check_key(row, 'onlineState') and check_key(row, 'physicalDeviceID') and row['deviceModel'] == '3103_PCClient' and row['status'] == '1' and row['onlineState'] == '0':
                     profile_settings['devicekey'] = row['physicalDeviceID']
                     save_profile(profile_id=1, profile=profile_settings)
+
                     return api_login()
 
         return { 'code': code, 'data': data, 'result': False }

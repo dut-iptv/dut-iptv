@@ -525,7 +525,7 @@ def channel_picker_menu(**kwargs):
 def disable_prefs_menu(type, **kwargs):
     disable_prefs(type=type, channels=api_get_channels())
 
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=channel_picker_menu"]}}')
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://{addon}/?_=channel_picker_menu"]}}'.format(addon=ADDON_ID))
 
 @plugin.route()
 def channel_picker(type, **kwargs):
@@ -608,7 +608,7 @@ def change_channel(type, id, change, **kwargs):
     prefs[id] = mod_pref
     save_prefs(profile_id=1, prefs=prefs)
 
-    xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=channel_picker&type=' + type + '"]}}}}')
+    xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{{"window":"videos","parameters":["plugin://{addon}/?_=channel_picker&type={type}"]}}}}'.format(addon=ADDON_ID, type=type))
 
 @plugin.route()
 def reset_addon(**kwargs):
@@ -641,7 +641,7 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
     code = 0
 
     try:
-        test_proxy = api_download(url=proxy_url + "/status", type='get', headers=None, data=None, json_data=False, return_json=False)
+        test_proxy = api_download(url="{proxy_url}/status".format(proxy_url=proxy_url), type='get', headers=None, data=None, json_data=False, return_json=False)
         code = test_proxy['code']
     except:
         code = 404
@@ -1041,7 +1041,7 @@ def process_replaytv_content(station, day=0, start=0):
         if endT < (datetime.datetime.now(pytz.timezone("Europe/Amsterdam")) - datetime.timedelta(days=7)):
             continue
 
-        label = startT.strftime("%H:%M") + " - " + str(row['title'])
+        label = "{time} - {title}".format(time=startT.strftime("%H:%M"), title=row['title'])
 
         description = str(row['description'])
 
@@ -1224,7 +1224,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, o
 
             if (fuzz_set + fuzz_partial + fuzz_sort) > 160:
                 properties = {"fuzz_set": fuzz.token_set_ratio(label,search), "fuzz_sort": fuzz.token_sort_ratio(label,search), "fuzz_partial": fuzz.partial_ratio(label,search), "fuzz_total": fuzz.token_set_ratio(label,search) + fuzz.partial_ratio(label,search) + fuzz.token_sort_ratio(label,search)}
-                label = label + " (" + type + ")"
+                label += " ({type})".format(type=type)
             else:
                 continue
 

@@ -18,14 +18,14 @@ def change_icon():
                 with open(settings_file, 'wb') as f:
                     for chunk in r.iter_content(1024):
                         f.write(chunk)
+
+                r.close()
             except:
                 r.close()
                 return
         else:
             r.close()
             return
-
-        r.close()
 
     if is_file_older_than_x_days(file=settings_file, days=14):
         settingsJSON = load_file(file='settings.json', isJSON=True)
@@ -38,14 +38,14 @@ def change_icon():
                     with open(addon_icon, 'wb') as f:
                         for chunk in r.iter_content(1024):
                             f.write(chunk)
+
+                    r.close()
                 except:
                     r.close()
                     return
             else:
                 r.close()
                 return
-
-            r.close()
 
             from sqlite3 import dbapi2 as sqlite
 
@@ -67,14 +67,14 @@ def change_icon():
                 if os.path.isfile(thumb):
                     os.remove(thumb)
 
-            query = "DELETE FROM texture WHERE url LIKE '%addons%" + ADDON_ID + "%icon.png';"
+            query = "DELETE FROM texture WHERE url LIKE '%addons%{addon}%icon.png';".format(addon=ADDON_ID)
 
             db.execute(query)
             db.commit()
             db.close()
 
 def check_addon(addon):
-    if xbmc.getCondVisibility('System.HasAddon(%s)' % addon) == 1:
+    if xbmc.getCondVisibility('System.HasAddon({addon})'.format(addon=addon)) == 1:
         try:
             VIDEO_ADDON = xbmcaddon.Addon(id=addon)
 
@@ -377,7 +377,7 @@ def set_credentials(username, password):
     profile_settings = load_profile(profile_id=1)
 
     encoded = Credentials().encode_credentials(username, password)
-    
+
     try:
         username = encoded['username'].decode('utf-8')
     except:
@@ -397,7 +397,9 @@ def update_prefs(profile_id=1, channels=None):
     prefs = load_prefs(profile_id=1)
 
     if prefs:
-        for pref in prefs:
+        prefs2 = prefs.copy()
+
+        for pref in prefs2:
             if not pref in channels:
                 prefs.pop(pref)
 

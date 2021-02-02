@@ -20,7 +20,7 @@ CONST_DUT_EPG = '{base_epg}/{provider}'.format(base_epg=CONST_DUT_EPG_BASE, prov
 try:
     CONST_DUT_EPG_SETTINGS = '{base_epg}/{letter}.settings.json'.format(base_epg=CONST_DUT_EPG_BASE, letter=PROVIDER_NAME[0])
 except:
-    CONST_DUT_EPG_SETTINGS = ''
+    CONST_DUT_EPG_SETTINGS = '{base_epg}/a.settings.json'.format(base_epg=CONST_DUT_EPG_BASE)
 
 CONST_ADDONS = [
     { 'addonid': 'plugin.video.canaldigitaal', 'label': 'Canal Digitaal IPTV', 'letter': 'c' },

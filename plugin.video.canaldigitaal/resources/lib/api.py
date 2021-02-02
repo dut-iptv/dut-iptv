@@ -40,11 +40,6 @@ def api_get_session(force=0):
     force = int(force)
     profile_settings = load_profile(profile_id=1)
 
-    #if not force ==1 and check_key(profile_settings, 'last_login_time') and profile_settings['last_login_time'] > int(time.time() - 3600) and profile_settings['last_login_success'] == 1:
-    #    return True
-    #elif force == 1 and not profile_settings['last_login_success'] == 1:
-    #    return False
-
     headers = {'Authorization': 'Bearer ' + profile_settings['session_token']}
 
     capi_url = '{api_url}/settings'.format(api_url=CONST_DEFAULT_API)
@@ -59,13 +54,10 @@ def api_get_session(force=0):
         if not login_result['result']:
             return False
 
-    try:
-        profile_settings = load_profile(profile_id=1)
-        profile_settings['last_login_success'] = 1
-        profile_settings['last_login_time'] = int(time.time())
-        save_profile(profile_id=1, profile=profile_settings)
-    except:
-        pass
+    profile_settings = load_profile(profile_id=1)
+    profile_settings['last_login_success'] = 1
+    profile_settings['last_login_time'] = int(time.time())
+    save_profile(profile_id=1, profile=profile_settings)
 
     return True
 
@@ -195,11 +187,8 @@ def api_login():
     if not code or not code == 200 or not data or not check_key(data, 'token'):
         return { 'code': code, 'data': data, 'result': False }
 
-    try:
-        profile_settings['session_token'] = data['token']
-        save_profile(profile_id=1, profile=profile_settings)
-    except:
-        pass
+    profile_settings['session_token'] = data['token']
+    save_profile(profile_id=1, profile=profile_settings)
 
     return { 'code': code, 'data': data, 'result': True }
 
@@ -390,15 +379,78 @@ def api_vod_season(series, id):
     if not api_get_session():
         return None
 
+    profile_settings = load_profile(profile_id=1)
+
     season = []
     episodes = []
+
+    headers = {'Authorization': 'Bearer ' + profile_settings['session_token']}
+
+    program_url = '{api_url}/assets?query={id}'.format(api_url=CONST_DEFAULT_API, id=id)
+
+    type = "vod_season_" + str(id)
+    encodedBytes = base64.b32encode(type.encode("utf-8"))
+    type = str(encodedBytes, "utf-8")
+
+    file = "cache" + os.sep + type + ".json"
+
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+        data = load_file(file=file, isJSON=True)
+    else:
+        download = api_download(url=program_url, type='get', headers=headers, data=None, json_data=True, return_json=True)
+        data = download['data']
+        code = download['code']
+
+        if code and code == 200 and data and check_key(data, 'assets'):
+            write_file(file=file, data=data, isJSON=True)
+
+    if not data or not check_key(data, 'assets'):
+        return None
+
+    for row in data['assets']:
+        episodes.append(str(row['params']['seriesEpisode']))
+
+        label = '{season}.{episode} - {title}'.format(season=str(row['params']['seriesSeason']), episode=str(row['params']['seriesEpisode']), title=str(row['title']))
+
+        season.append({'label': label, 'id': str(row['id']), 'assetid': '', 'duration': row['params']['duration'], 'title': str(row['title']), 'episodeNumber': '{season}.{episode}'.format(season=str(row['params']['seriesSeason']), episode=str(row['params']['seriesEpisode'])), 'description': '', 'image': str(row['images'][0]['url'])})
+
     return season
 
 def api_vod_seasons(type, id):
     if not api_get_session():
         return None
 
+    profile_settings = load_profile(profile_id=1)
+
     seasons = []
+
+    headers = {'Authorization': 'Bearer ' + profile_settings['session_token']}
+
+    program_url = '{api_url}/collections/related,tve?group=default&sort=default&asset={id}'.format(api_url=CONST_DEFAULT_API, id=id)
+
+    type = "vod_seasons_" + str(id)
+    encodedBytes = base64.b32encode(type.encode("utf-8"))
+    type = str(encodedBytes, "utf-8")
+
+    file = "cache" + os.sep + type + ".json"
+
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+        data = load_file(file=file, isJSON=True)
+    else:
+        download = api_download(url=program_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+        data = download['data']
+        code = download['code']
+
+        if code and code == 200 and data and check_key(data, 'collection'):
+            write_file(file=file, data=data, isJSON=True)
+
+    if not data or not check_key(data, 'collection'):
+        return None
+
+    for row in data['collection']:
+        if row['label'] == 'sg.ui.season.subst':
+            seasons.append({'id': str(row['query']), 'seriesNumber': str(row['labelParams'][0]), 'description': '', 'image': ''})
+
     return {'type': 'seasons', 'seasons': seasons}
 
 def api_vod_subscription():

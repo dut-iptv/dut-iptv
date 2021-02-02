@@ -25,10 +25,7 @@ class Session(requests.Session):
         self.headers.update(self._headers)
 
         if self._cookies_key:
-            try:
-                cookies = load_file(file='stream_cookies', isJSON=True)
-            except:
-                pass
+            cookies = load_file(file='stream_cookies', isJSON=True)
 
             if not cookies:
                 cookies = {}
@@ -59,9 +56,6 @@ class Session(requests.Session):
                     raise
 
     def save_cookies(self):
-        if not self._cookies_key:
-            raise Exception('A cookies key needs to be set to save cookies')
-
         write_file(file='stream_cookies', data=self.cookies.get_dict(), isJSON=True)
 
     def clear_cookies(self):

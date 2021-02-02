@@ -93,12 +93,9 @@ def api_get_play_token(locator=None, path=None, force=0):
         force = 1
 
     if not check_key(profile_settings, 'drm_token_age') or not check_key(profile_settings, 'drm_locator') or locator != profile_settings['drm_locator'] or profile_settings['drm_token_age'] < int(time.time() - 90) or force == 1:
-        try:
-            profile_settings['tokenrun'] = 1
-            profile_settings['tokenruntime'] = int(time.time())
-            save_profile(profile_id=1, profile=profile_settings)
-        except:
-            pass
+        profile_settings['tokenrun'] = 1
+        profile_settings['tokenruntime'] = int(time.time())
+        save_profile(profile_id=1, profile=profile_settings)
 
         if int(profile_settings['v3']) == 1 and 'sdash' in path:
             jsondata = {"contentLocator": locator, "drmScheme": "sdash:BR-AVC-DASH"}
@@ -110,23 +107,17 @@ def api_get_play_token(locator=None, path=None, force=0):
         code = download['code']
 
         if not code or not code == 200 or not data or not check_key(data, 'token'):
-            try:
-                profile_settings['tokenrun'] = 0
-                save_profile(profile_id=1, profile=profile_settings)
-            except:
-                pass
+            profile_settings['tokenrun'] = 0
+            save_profile(profile_id=1, profile=profile_settings)
 
             return None
 
-        try:
-            profile_settings['tokenrun'] = 0
-            profile_settings['drm_token'] = data['token']
-            write_file(file='widevine_token', data=data['token'], isJSON=False)
-            profile_settings['drm_token_age'] = int(time.time())
-            profile_settings['drm_locator'] = locator
-            save_profile(profile_id=1, profile=profile_settings)
-        except:
-            pass
+        profile_settings['tokenrun'] = 0
+        profile_settings['drm_token'] = data['token']
+        write_file(file='widevine_token', data=data['token'], isJSON=False)
+        profile_settings['drm_token_age'] = int(time.time())
+        profile_settings['drm_locator'] = locator
+        save_profile(profile_id=1, profile=profile_settings)
 
         return data['token']
     else:
@@ -135,11 +126,6 @@ def api_get_play_token(locator=None, path=None, force=0):
 def api_get_session(force=0):
     force = int(force)
     profile_settings = load_profile(profile_id=1)
-
-    #if not force ==1 and check_key(profile_settings, 'last_login_time') and profile_settings['last_login_time'] > int(time.time() - 3600) and profile_settings['last_login_success'] == 1:
-    #    return True
-    #elif force == 1 and not profile_settings['last_login_success'] == 1:
-    #    return False
 
     devices_url = CONST_API_URLS[int(profile_settings['v3'])]['devices_url']
 
@@ -153,13 +139,10 @@ def api_get_session(force=0):
         if not login_result['result']:
             return False
 
-    try:
-        profile_settings = load_profile(profile_id=1)
-        profile_settings['last_login_success'] = 1
-        profile_settings['last_login_time'] = int(time.time())
-        save_profile(profile_id=1, profile=profile_settings)
-    except:
-        pass
+    profile_settings = load_profile(profile_id=1)
+    profile_settings['last_login_success'] = 1
+    profile_settings['last_login_time'] = int(time.time())
+    save_profile(profile_id=1, profile=profile_settings)
 
     return True
 
@@ -178,11 +161,8 @@ def api_get_watchlist_id():
     if not code or not code == 200 or not data or not check_key(data, 'watchlistId'):
         return False
 
-    try:
-        profile_settings['watchlist_id'] = data['watchlistId']
-        save_profile(profile_id=1, profile=profile_settings)
-    except:
-        pass
+    profile_settings['watchlist_id'] = data['watchlistId']
+    save_profile(profile_id=1, profile=profile_settings)
 
     return True
 
@@ -224,14 +204,11 @@ def api_login():
     except:
         profile_settings['v3'] = 0
 
-    try:
-        profile_settings['access_token'] = ''
-        profile_settings['ziggo_profile_id'] = ''
-        profile_settings['household_id'] = ''
-        profile_settings['watchlist_id'] = ''
-        save_profile(profile_id=1, profile=profile_settings)
-    except:
-        pass
+    profile_settings['access_token'] = ''
+    profile_settings['ziggo_profile_id'] = ''
+    profile_settings['household_id'] = ''
+    profile_settings['watchlist_id'] = ''
+    save_profile(profile_id=1, profile=profile_settings)
 
     HEADERS = {
         'User-Agent':  DEFAULT_USER_AGENT,
@@ -282,13 +259,10 @@ def api_login():
         ziggo_profile_id = data['customer']['sharedProfileId']
         household_id = data['customer']['householdId']
 
-    try:
-        profile_settings['access_token'] = data['oespToken']
-        profile_settings['ziggo_profile_id'] = ziggo_profile_id
-        profile_settings['household_id'] = household_id
-        save_profile(profile_id=1, profile=profile_settings)
-    except:
-        pass
+    profile_settings['access_token'] = data['oespToken']
+    profile_settings['ziggo_profile_id'] = ziggo_profile_id
+    profile_settings['household_id'] = household_id
+    save_profile(profile_id=1, profile=profile_settings)
 
     if int(profile_settings['v3']) == 1:
         if len(str(profile_settings['watchlist_id'])) == 0:

@@ -13,7 +13,11 @@ def loop():
     if res == True:
         create_playlist()
         create_epg()
-        xbmcaddon.Addon('pvr.iptvsimple').setSettingInt("m3uPathType", 0)
+
+        try:
+            xbmcaddon.Addon('pvr.iptvsimple').setSettingInt("m3uPathType", 0)
+        except:
+            pass
 
 def main():
     loop()

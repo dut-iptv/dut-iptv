@@ -155,11 +155,6 @@ def api_get_session(force=0):
     force = int(force)
     profile_settings = load_profile(profile_id=1)
 
-    #if not force ==1 and check_key(profile_settings, 'last_login_time') and profile_settings['last_login_time'] > int(time.time() - 3600) and profile_settings['last_login_success'] == 1:
-    #    return True
-    #elif force == 1 and (not check_key(profile_settings, 'last_login_time') or not profile_settings['last_login_success'] == 1):
-    #    return False
-
     devices_url = '{api_url}/USER/DEVICES'.format(api_url=CONST_DEFAULT_API)
 
     download = api_download(url=devices_url, type='get', headers=None, data=None, json_data=False, return_json=True)
@@ -172,13 +167,10 @@ def api_get_session(force=0):
         if not login_result['result']:
             return False
 
-    try:
-        profile_settings = load_profile(profile_id=1)
-        profile_settings['last_login_success'] = 1
-        profile_settings['last_login_time'] = int(time.time())
-        save_profile(profile_id=1, profile=profile_settings)
-    except:
-        pass
+    profile_settings = load_profile(profile_id=1)
+    profile_settings['last_login_success'] = 1
+    profile_settings['last_login_time'] = int(time.time())
+    save_profile(profile_id=1, profile=profile_settings)
 
     return True
 
