@@ -122,7 +122,7 @@ def _reset(**kwargs):
     _close()
 
     try:
-        xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"{}","enabled":false}}}}'.format(ADDON_ID))
+        xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + ADDON_ID + '","enabled":false}}}}')
 
         shutil.rmtree(ADDON_PROFILE)
 
@@ -144,7 +144,7 @@ def _reset(**kwargs):
     except:
         pass
 
-    xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"{}","enabled":true}}}}'.format(ADDON_ID))
+    xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + ADDON_ID + '","enabled":true}}}}')
 
     gui.notification(_.PLUGIN_RESET_OK)
     signals.emit(signals.AFTER_RESET)

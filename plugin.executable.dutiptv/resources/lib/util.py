@@ -8,7 +8,7 @@ from resources.lib.base.l3.util import clear_cache, check_key, is_file_older_tha
 def clear_cache_connector():
     clear_cache()
 
-    addonlist = ['canaldigitaal', 'kpn', 'nlziet', 'tmobile', 'ziggo']
+    addonlist = ['betelenet', 'canaldigitaal', 'kpn', 'nlziet', 'tmobile', 'ziggo']
 
     for addon in addonlist:
         try:

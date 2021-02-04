@@ -7,6 +7,15 @@ PROXY_PROFILE = xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
 
 CONST_ALLOWED_HEADERS = {}
 
+CONST_ALLOWED_HEADERS['betelenet'] = {
+    'user-agent',
+    'x-oesp-content-locator',
+    'x-oesp-token',
+    'x-client-id',
+    'x-oesp-username',
+    'x-oesp-drm-schemeiduri'
+}
+
 CONST_ALLOWED_HEADERS['ziggo'] = {
     'user-agent',
     'x-oesp-content-locator',
@@ -18,34 +27,47 @@ CONST_ALLOWED_HEADERS['ziggo'] = {
 
 CONST_BASE_HEADERS = {}
 
-CONST_BASE_HEADERS['canaldigitaal'] = {
-    'Accept': 'application/json, text/plain, */*',
-    'Connection': 'keep-alive',
+CONST_BASE_HEADERS['betelenet'] = {
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'en-US,en;q=0.9,nl;q=0.8',
+    'Cache-Control': 'no-cache',
+    'DNT': '1',
+    'Origin': 'https://www.telenettv.be',
     'Pragma': 'no-cache',
+    'Referer': 'https://www.telenettv.be/',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'cross-site',
+}
+
+CONST_BASE_HEADERS['canaldigitaal'] = {
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'en-US,en;q: 0.9,nl;q: 0.8',
     'Cache-Control': 'no-cache',
     'DNT': '1',
     'Origin': 'https://livetv.canaldigitaal.nl',
+    'Pragma': 'no-cache',
+    'Referer': 'https://livetv.canaldigitaal.nl/',
     'Sec-Fetch-Site': 'same-origin',
     'Sec-Fetch-Mode': 'cors',
     'Sec-Fetch-Dest': 'empty',
-    'Referer': 'https://livetv.canaldigitaal.nl/',
-    'Accept-Encoding': 'gzip, deflate',
-    'Accept-Language': 'en-US,en;q: 0.9,nl;q: 0.8',
 }
 
 CONST_BASE_HEADERS['kpn'] = {
-    'Pragma': 'no-cache',
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'en-US,en;q: 0.9,nl;q: 0.8',
+    'AVSSite': 'http://www.itvonline.nl',
     'Cache-Control': 'no-cache',
     'DNT': '1',
-    'AVSSite': 'http://www.itvonline.nl',
-    'Accept': '*/*',
     'Origin': 'https://tv.kpn.com',
+    'Pragma': 'no-cache',
+    'Referer': 'https://tv.kpn.com/',
     'Sec-Fetch-Site': 'same-site',
     'Sec-Fetch-Mode': 'cors',
     'Sec-Fetch-Dest': 'empty',
-    'Referer': 'https://tv.kpn.com/',
-    'Accept-Encoding': 'gzip, deflate',
-    'Accept-Language': 'en-US,en;q: 0.9,nl;q: 0.8',
 }
 
 CONST_BASE_HEADERS['nlziet'] = {
@@ -64,12 +86,27 @@ CONST_BASE_HEADERS['nlziet'] = {
 
 CONST_BASE_HEADERS['tmobile'] = {
     'Accept': '*/*',
-    'Accept-Language': 'nl',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'en-US,en;q=0.9,nl;q=0.8',
     'Cache-Control': 'no-cache',
     'DNT': '1',
     'Origin': 'https://t-mobiletv.nl',
     'Pragma': 'no-cache',
-    'Referer': 'https://t-mobiletv.nl/inloggen/index.html',
+    'Referer': 'https://t-mobiletv.nl/',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+}
+
+CONST_BASE_HEADERS['videoland'] = {
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'en-US,en;q=0.9,nl;q=0.8',
+    'Cache-Control': 'no-cache',
+    'DNT': '1',
+    'Origin': 'https://www.videoland.com',
+    'Pragma': 'no-cache',
+    'Referer': 'https://www.videoland.com/',
     'Sec-Fetch-Dest': 'empty',
     'Sec-Fetch-Mode': 'cors',
     'Sec-Fetch-Site': 'same-origin',
@@ -116,7 +153,9 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
             self.send_header('X-TEST', 'OK')
             self.end_headers()
         else:
-            if "/canaldigitaal/" in self.path:
+            if "/betelenet/" in self.path:
+                addon_name = 'betelenet'
+            elif "/canaldigitaal/" in self.path:
                 addon_name = 'canaldigitaal'
             elif "/kpn/" in self.path:
                 addon_name = 'kpn'
@@ -124,6 +163,8 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
                 addon_name = 'nlziet'
             elif "/tmobile/" in self.path:
                 addon_name = 'tmobile'
+            elif "/videoland/" in self.path:
+                addon_name = 'videoland'
             elif "/ziggo/" in self.path:
                 addon_name = 'ziggo'
 
@@ -705,7 +746,7 @@ def load_file(file, isJSON=False):
             return f.read()
 
 def proxy_get_match(path, addon_name):
-    if addon_name == 'ziggo':
+    if addon_name == 'betelenet' or addon_name == 'ziggo':
         if "manifest.mpd" in path or "Manifest" in path:
             return True
     else:
@@ -715,11 +756,11 @@ def proxy_get_match(path, addon_name):
     return False
 
 def proxy_get_session(proxy, addon_name):
-    if addon_name == 'ziggo':
-        HEADERS = CONST_BASE_HEADERS['ziggo']
+    if addon_name == 'betelenet' or addon_name == 'ziggo':
+        HEADERS = CONST_BASE_HEADERS[addon_name]
 
         for header in proxy.headers:
-            if proxy.headers[header] is not None and header in CONST_ALLOWED_HEADERS['ziggo']:
+            if proxy.headers[header] is not None and header in CONST_ALLOWED_HEADERS[addon_name]:
                 HEADERS[header] = proxy.headers[header]
 
         return Session(addon_name=addon_name, headers=HEADERS)
@@ -730,7 +771,7 @@ def proxy_get_session(proxy, addon_name):
 def proxy_get_url(proxy, addon_name, ADDON_PROFILE):
     global stream_url
 
-    if addon_name == 'ziggo':
+    if addon_name == 'betelenet' or addon_name == 'ziggo':
         return stream_url[addon_name] + str(proxy.path).replace('WIDEVINETOKEN', load_file(file=ADDON_PROFILE + 'widevine_token', isJSON=False))
     else:
         return stream_url[addon_name] + str(proxy.path)

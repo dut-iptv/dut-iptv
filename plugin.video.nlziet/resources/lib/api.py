@@ -114,10 +114,12 @@ def api_login(force=False):
             redirect = download['headers']['Location']
 
             auth_code = None
-            query = urlparse(redirect).query
-            redirect_params = parse_qs(query)
+            query = None
+            redirect_params = None
 
             try:
+                query = urlparse(redirect).query
+                redirect_params = parse_qs(query)
                 auth_code = redirect_params['code'][0]
             except:
                 pass
@@ -202,30 +204,37 @@ def api_login(force=False):
 
                         if code == 302:
                             redirect = download['headers']['Location']
+                            auth_code = None
+                            query = None
+                            redirect_params = None
 
-                            query = urlparse(redirect).query
-                            redirect_params = parse_qs(query)
-                            auth_code = redirect_params['code'][0]
+                            try:
+                                query = urlparse(redirect).query
+                                redirect_params = parse_qs(query)
+                                auth_code = redirect_params['code'][0]
+                            except:
+                                pass
 
-                            download = api_download(url=redirect, type='get', headers=None, data=None, json_data=False, return_json=False, allow_redirects=False)
-                            data = download['data']
-                            code = download['code']
-
-                            if code == 200:
-                                post_data={
-                                    "client_id": 'triple-web',
-                                    "code": auth_code,
-                                    "redirect_uri": "{app_url}/callback".format(app_url=CONST_APP_URL),
-                                    "code_verifier": code_verifier,
-                                    "grant_type": "authorization_code"
-                                }
-
-                                download = api_download(url="{id_url}/connect/token".format(id_url=CONST_ID_URL), type='post', headers=None, data=post_data, json_data=False, return_json=True, allow_redirects=False)
+                            if auth_code:
+                                download = api_download(url=redirect, type='get', headers=None, data=None, json_data=False, return_json=False, allow_redirects=False)
                                 data = download['data']
                                 code = download['code']
 
-                                if data and check_key(data, 'id_token') and check_key(data, 'access_token'):
-                                    loggedin = True
+                                if code == 200:
+                                    post_data={
+                                        "client_id": 'triple-web',
+                                        "code": auth_code,
+                                        "redirect_uri": "{app_url}/callback".format(app_url=CONST_APP_URL),
+                                        "code_verifier": code_verifier,
+                                        "grant_type": "authorization_code"
+                                    }
+
+                                    download = api_download(url="{id_url}/connect/token".format(id_url=CONST_ID_URL), type='post', headers=None, data=post_data, json_data=False, return_json=True, allow_redirects=False)
+                                    data = download['data']
+                                    code = download['code']
+
+                                    if data and check_key(data, 'id_token') and check_key(data, 'access_token'):
+                                        loggedin = True
 
     if not loggedin:
         return { 'code': code, 'data': data, 'result': False }

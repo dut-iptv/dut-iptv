@@ -525,7 +525,7 @@ def channel_picker_menu(**kwargs):
 def disable_prefs_menu(type, **kwargs):
     disable_prefs(type=type, channels=api_get_channels())
 
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://{addon}/?_=channel_picker_menu"]}}'.format(addon=ADDON_ID))
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + ADDON_ID + '/?_=channel_picker_menu"]}}')
 
 @plugin.route()
 def channel_picker(type, **kwargs):
@@ -608,7 +608,7 @@ def change_channel(type, id, change, **kwargs):
     prefs[id] = mod_pref
     save_prefs(profile_id=1, prefs=prefs)
 
-    xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{{"window":"videos","parameters":["plugin://{addon}/?_=channel_picker&type={type}"]}}}}'.format(addon=ADDON_ID, type=type))
+    xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{{"window":"videos","parameters":["plugin://' + ADDON_ID + '/?_=channel_picker&type=' + type + '"]}}}}')
 
 @plugin.route()
 def reset_addon(**kwargs):

@@ -168,6 +168,7 @@ class BaseLanguage(object):
     REMOVE_GROUP = 330036
     SELECT_GROUP = 330037
     NEXT_SETUP_GROUPS = 330038
+    ALACARTE = 330039
     
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)

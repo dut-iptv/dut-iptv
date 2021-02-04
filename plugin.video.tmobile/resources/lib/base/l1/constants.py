@@ -23,6 +23,7 @@ except:
     CONST_DUT_EPG_SETTINGS = '{base_epg}/a.settings.json'.format(base_epg=CONST_DUT_EPG_BASE)
 
 CONST_ADDONS = [
+    { 'addonid': 'plugin.video.betelenet', 'label': 'Telenet TV', 'letter': 'b' },
     { 'addonid': 'plugin.video.canaldigitaal', 'label': 'Canal Digitaal IPTV', 'letter': 'c' },
     { 'addonid': 'plugin.video.kpn', 'label': 'KPN ITV', 'letter': 'k' },
     { 'addonid': 'plugin.video.nlziet', 'label': 'NLZiet', 'letter': 'n' },

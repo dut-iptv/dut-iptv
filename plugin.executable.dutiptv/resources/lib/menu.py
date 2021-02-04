@@ -133,12 +133,20 @@ def primary(addons, **kwargs):
     folder = plugin.Folder(title=_.SELECT_PRIMARY)
 
     addons = json.loads(addons)
+    addons2 = []
+
+    for entry in addons:
+        if entry['addonid'] != 'plugin.video.betelenet':
+            addons2.append(entry)
 
     desc = _.SELECT_PRIMARY_DESC
     desc2 = _.SKIP_DESC
 
     for entry in addons:
-        folder.add_item(label=_(entry['label'], _bold=True), info = {'plot': desc}, path=plugin.url_for(func_or_url=alternative, num=1, addon=entry['addonid'], addons=json.dumps(addons)))
+        if entry['addonid'] == 'plugin.video.betelenet':
+            folder.add_item(label=_(entry['label'], _bold=True), info = {'plot': desc}, path=plugin.url_for(func_or_url=alternative, num=1, addon=entry['addonid'], addons=json.dumps({})))
+        else:
+            folder.add_item(label=_(entry['label'], _bold=True), info = {'plot': desc}, path=plugin.url_for(func_or_url=alternative, num=1, addon=entry['addonid'], addons=json.dumps(addons2)))
 
     profile_settings = load_profile(profile_id=1)
 
@@ -738,7 +746,7 @@ def change_group(id, type_tv_radio, **kwargs):
     type_tv_radio = str(type_tv_radio)
 
     select_list = []
-    
+
     if type_tv_radio == 'radio':
         groups = load_file('radio_groups.json', ext=False, isJSON=True)
         typestr = 'Radio'
@@ -747,10 +755,10 @@ def change_group(id, type_tv_radio, **kwargs):
         typestr = 'TV'
 
     select_list.append(typestr)
-        
+
     for group in groups:
         select_list.append(group)
-    
+
     selected = gui.select(_.SELECT_GROUP, select_list)
 
     if type_tv_radio == 'radio':

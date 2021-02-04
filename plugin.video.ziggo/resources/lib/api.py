@@ -596,8 +596,7 @@ def api_vod_season(series, id):
     if not data or not check_key(data, 'mediaItems'):
         return None
 
-    if sys.version_info >= (3, 0):
-        data['mediaItems'] = list(data['mediaItems'])
+    data['mediaItems'] = list(data['mediaItems'])
 
     for row in data['mediaItems']:
         desc = ''

@@ -72,7 +72,7 @@ def get_ia_addon(required=False, install=True):
     try:
         if install:
             xbmc.executebuiltin('InstallAddon({})'.format(IA_ADDON_ID), True)
-            xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"{}","enabled":true}}}}'.format(IA_ADDON_ID))
+            xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + IA_ADDON_ID + '","enabled":true}}}}')
 
         return xbmcaddon.Addon(IA_ADDON_ID)
     except:

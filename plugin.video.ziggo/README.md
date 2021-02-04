@@ -20,7 +20,7 @@
 
 ### Required
 
--Subscription to any of the supported providers (not free)
+-Subscription to Ziggo providers (not free)
 
 -Kodi 18 or higher with Widevine Support (free) for versions up to 1.0.0
 
