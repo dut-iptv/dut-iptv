@@ -1,6 +1,6 @@
 # KODI Media Center language file
-# Addon Name: Ziggo GO
-# Addon id: plugin.video.ziggo
+# Addon Name: Telenet TV
+# Addon id: plugin.video.betelenet
 # Addon Provider: Anon
 msgid ""
 msgstr ""
@@ -17,12 +17,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgctxt "#30001"
-msgid "Ziggo Go Username"
-msgstr "Ziggo Go Gebruikersnaam"
+msgid "Telenet TV Username"
+msgstr "Telenet TV Gebruikersnaam"
 
 msgctxt "#30002"
-msgid "Ziggo Go Password"
-msgstr "Ziggo Go Wachtwoord"
+msgid "Telenet TV Password"
+msgstr "Telenet TV Wachtwoord"
 
 msgctxt "#30003"
 msgid "Auto setup IPTV"
@@ -85,8 +85,8 @@ msgid "Load only default channels"
 msgstr "Alleen standaard zenders laden"
 
 msgctxt "#30033"
-msgid "Error Logging in to Ziggo"
-msgstr "Fout bij het inloggen bij Ziggo"
+msgid "Error Logging in to Telenet"
+msgstr "Fout bij het inloggen bij Telenet"
 
 msgctxt "#30034"
 msgid "Check your username and password"

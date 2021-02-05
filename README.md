@@ -2,21 +2,23 @@
 
 ### About
 
--Watch CanalDigitaal/KPN/NLZiet/Telenet (BE)/Telfort/T-Mobile/XS4ALL/Ziggo Live TV and content from anywhere in the EU
+-Watch CanalDigitaal/KPN/NLZiet/Telenet (BE)/Telfort/T-Mobile/Videoland/XS4ALL/Ziggo Live TV and content from anywhere in the EU
 
 ### Features
 
 -Unofficial 3rd Party repo and plugins for Kodi
 
--Watch Live TV for supported channels in your subscription
+-Watch live TV for supported channels in your subscription
 
 -Replay programs from the last 7 days for supported channels in your subscription
 
--Search Content
+-Watch video on demand (VOD) content
 
--Supports watching TV and listening to Radio using the IPTV Simple PVR Addon
+-Search content
 
--Supports Catchup using IPTV Simple PVR Addon in Kodi 19
+-Supports watching TV and listening to radio using the IPTV Simple PVR Addon
+
+-Supports catchup using IPTV Simple PVR Addon in Kodi 19
 
 ### Required
 

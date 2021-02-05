@@ -3,21 +3,28 @@ from resources.lib.base.l3.language import _
 CONST_BASE_URL = 'https://tv.kpn.com'
 
 CONST_BASE_HEADERS = {
-    'Pragma': 'no-cache',
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'en-US,en;q=0.9,nl;q=0.8',
+    'AVSSite': 'http://www.itvonline.nl',
     'Cache-Control': 'no-cache',
     'DNT': '1',
-    'AVSSite': 'http://www.itvonline.nl',
-    'Accept': '*/*',
     'Origin': CONST_BASE_URL,
-    'Sec-Fetch-Site': 'same-site',
-    'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Dest': 'empty',
+    'Pragma': 'no-cache',
     'Referer': CONST_BASE_URL + '/',
-    'Accept-Encoding': 'gzip, deflate',
-    'Accept-Language': 'en-US,en;q: 0.9,nl;q: 0.8',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
 }
 
 CONST_DEFAULT_API = 'https://api.tv.kpn.com/101/1.2.0/A/nld/pctv/kpn'
+
+CONST_FIRST_BOOT = True
+
+CONST_HAS_LIVE = True
+
+CONST_HAS_REPLAY = True
+
 CONST_IMAGE_URL = 'https://images.tv.kpn.com'
 
 CONST_ONLINE_SEARCH = False

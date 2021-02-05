@@ -168,7 +168,7 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
             elif "/ziggo/" in self.path:
                 addon_name = 'ziggo'
 
-            self.path = self.path.replace('{addon_name}/'.format(addon_name=addon_name), '')
+            self.path = self.path.replace('{addon_name}/'.format(addon_name=addon_name), '', 1)
 
             ADDON = xbmcaddon.Addon(id="plugin.video.{addon_name}".format(addon_name=addon_name))
             ADDON_PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
@@ -193,6 +193,7 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
 
                 xml = r.text
 
+                #write_file(file=ADDON_PROFILE + 'full_url', data=URL, isJSON=False)
                 #write_file(file=ADDON_PROFILE + 'orig.mpd', data=xml, isJSON=False)
 
                 xml = sly_mpd_parse(data=xml).decode('utf-8')

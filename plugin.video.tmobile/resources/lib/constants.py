@@ -4,16 +4,23 @@ CONST_BASE_URL = 'https://t-mobiletv.nl'
 
 CONST_BASE_HEADERS = {
     'Accept': '*/*',
-    'Accept-Language': 'nl',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'en-US,en;q=0.9,nl;q=0.8',
     'Cache-Control': 'no-cache',
     'DNT': '1',
     'Origin': CONST_BASE_URL,
     'Pragma': 'no-cache',
-    'Referer': CONST_BASE_URL + '/inloggen/index.html',
+    'Referer': CONST_BASE_URL + '/',
     'Sec-Fetch-Dest': 'empty',
     'Sec-Fetch-Mode': 'cors',
     'Sec-Fetch-Site': 'same-origin',
 }
+
+CONST_FIRST_BOOT = True
+
+CONST_HAS_LIVE = True
+
+CONST_HAS_REPLAY = True
 
 CONST_ONLINE_SEARCH = False
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="repository.anon.iptv" name="Dutch IPTV Repository" version="1.3.0" provider-name="Anon">
+<addon id="repository.anon.iptv" name="Dutch IPTV Repository" version="1.4.0" provider-name="Anon">
   <requires>
     <import addon="xbmc.addon" version="12.0.0"/>
   </requires>
@@ -34,10 +34,10 @@
     </dir>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en">Dutch IPTV (CanalDigitaal, NLZiet, KPN, Telenet (BE), Telfort, T-Mobile, XS4All, Ziggo) repository</summary>
-    <description lang="en">Dutch IPTV (CanalDigitaal, NLZiet, KPN, Telenet (BE), Telfort, T-Mobile, XS4All, Ziggo) repository</description>
-    <summary lang="nl">Repository voor Nederlandse IPTV (CanalDigitaal, NLZiet, KPN, Telenet (BE), Telfort, T-Mobile, XS4All, Ziggo)</summary>
-    <description lang="nl">Repository voor Nederlandse IPTV (CanalDigitaal, NLZiet, KPN, Telenet (BE), Telfort, T-Mobile, XS4All, Ziggo)</description>
+    <summary lang="en">Dutch IPTV (CanalDigitaal, NLZiet, KPN, Telenet (BE), Telfort, T-Mobile, Videoland, XS4All, Ziggo) repository</summary>
+    <description lang="en">Dutch IPTV (CanalDigitaal, NLZiet, KPN, Telenet (BE), Telfort, T-Mobile, Videoland, XS4All, Ziggo) repository</description>
+    <summary lang="nl">Repository voor Nederlandse IPTV (CanalDigitaal, NLZiet, KPN, Telenet (BE), Telfort, T-Mobile, Videoland, XS4All, Ziggo)</summary>
+    <description lang="nl">Repository voor Nederlandse IPTV (CanalDigitaal, NLZiet, KPN, Telenet (BE), Telfort, T-Mobile, Videoland, XS4All, Ziggo)</description>
     <platform>all</platform>
   </extension>
 </addon>

@@ -3,10 +3,6 @@
     <section id="player" label="32034">
         <category id="general" label="32034">
             <group id="1" label="32034">
-                <setting id="save_password" type="boolean" label="30017">
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
                 <setting id="minimalChannels" type="boolean" label="30032">
                     <default>true</default>
                     <control type="toggle"/>

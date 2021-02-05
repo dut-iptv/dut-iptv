@@ -2,21 +2,23 @@
 
 ### About
 
--Watch Telenet Live TV and content from anywhere in the EU
+-Watch Telenet live TV and content from anywhere in the EU
 
 ### Features
 
 -Unofficial 3rd Party Telenet plugin for Kodi
 
--Watch Live TV for supported channels in your subscription
+-Watch live TV for supported channels in your subscription
 
 -Replay programs from the last 7 days for supported channels in your subscription
 
--Search Content
+-Watch video on demand (VOD) content
 
--Supports watching TV and listening to Radio using the IPTV Simple PVR Addon (through the separate Dut-IPTV Simple IPTV Connector addon)
+-Search content
 
--Supports Catchup using IPTV Simple PVR Addon in Kodi 19 (through the separate Dut-IPTV Simple IPTV Connector addon)
+-Supports watching TV and listening to radio using the IPTV Simple PVR Addon (through the separate Dut-IPTV Simple IPTV Connector addon)
+
+-Supports catchup using IPTV Simple PVR Addon in Kodi 19 (through the separate Dut-IPTV Simple IPTV Connector addon)
 
 ### Required
 

@@ -12,7 +12,7 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_list, api_get_list_by_first, api_get_vod_by_type
 from resources.lib.base.l7 import plugin
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_VOD_CAPABILITY, CONST_WATCHLIST
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_FIRST_BOOT, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_VOD_CAPABILITY, CONST_WATCHLIST
 from resources.lib.util import plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
 from urllib.parse import urlparse
 
@@ -22,15 +22,20 @@ backend = ''
 @plugin.route('')
 def home(**kwargs):
     clear_old()
-    check_first()
+
+    if CONST_FIRST_BOOT:
+        check_first()
 
     profile_settings = load_profile(profile_id=1)
 
     folder = plugin.Folder()
 
     if profile_settings and check_key(profile_settings, 'pswd') and len(profile_settings['pswd']) > 0:
-        folder.add_item(label=_(_.LIVE_TV, _bold=True),  path=plugin.url_for(func_or_url=live_tv))
-        folder.add_item(label=_(_.CHANNELS, _bold=True), path=plugin.url_for(func_or_url=replaytv))
+        if CONST_HAS_LIVE:
+            folder.add_item(label=_(_.LIVE_TV, _bold=True),  path=plugin.url_for(func_or_url=live_tv))
+        
+        if CONST_HAS_REPLAY:
+            folder.add_item(label=_(_.CHANNELS, _bold=True), path=plugin.url_for(func_or_url=replaytv))
 
         if settings.getBool('showMoviesSeries'):
             for vod_entry in CONST_VOD_CAPABILITY:
@@ -434,8 +439,9 @@ def search(query=None, **kwargs):
 
     folder = plugin.Folder(title=_(_.SEARCH_FOR, query=query))
 
-    processed = process_replaytv_search(search=query)
-    items += processed['items']
+    if CONST_HAS_REPLAY:
+        processed = process_replaytv_search(search=query)
+        items += processed['items']
 
     if settings.getBool('showMoviesSeries'):
         for vod_entry in CONST_VOD_CAPABILITY:
@@ -495,7 +501,9 @@ def online_search(query=None, **kwargs):
 def settings_menu(**kwargs):
     folder = plugin.Folder(title=_.SETTINGS)
 
-    folder.add_item(label=_.CHANNEL_PICKER, path=plugin.url_for(func_or_url=channel_picker_menu))
+    if CONST_HAS_LIVE or CONST_HAS_REPLAY:
+        folder.add_item(label=_.CHANNEL_PICKER, path=plugin.url_for(func_or_url=channel_picker_menu))
+    
     folder.add_item(label=_.SET_KODI, path=plugin.url_for(func_or_url=plugin._set_settings_kodi))
     folder.add_item(label=_.INSTALL_WV_DRM, path=plugin.url_for(func_or_url=plugin._ia_install))
     folder.add_item(label=_.RESET_SESSION, path=plugin.url_for(func_or_url=login, ask=0))
@@ -510,8 +518,12 @@ def settings_menu(**kwargs):
 def channel_picker_menu(**kwargs):
     folder = plugin.Folder(title=_.CHANNEL_PICKER)
 
-    folder.add_item(label=_.LIVE_TV, path=plugin.url_for(func_or_url=channel_picker, type='live'))
-    folder.add_item(label=_.CHANNELS, path=plugin.url_for(func_or_url=channel_picker, type='replay'))
+    if CONST_HAS_LIVE:
+        folder.add_item(label=_.LIVE_TV, path=plugin.url_for(func_or_url=channel_picker, type='live'))
+    
+    if CONST_HAS_REPLAY:
+        folder.add_item(label=_.CHANNELS, path=plugin.url_for(func_or_url=channel_picker, type='replay'))
+    
     folder.add_item(label=_.DISABLE_EROTICA, path=plugin.url_for(func_or_url=disable_prefs_menu, type='erotica'))
     folder.add_item(label=_.DISABLE_MINIMAL, path=plugin.url_for(func_or_url=disable_prefs_menu, type='minimal'))
     folder.add_item(label=_.DISABLE_REGIONAL2, path=plugin.url_for(func_or_url=disable_prefs_menu, type='regional'))
@@ -1242,7 +1254,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, o
         program_image_large = str(row['icon'])
         program_type = str(row['type'])
 
-        if program_type == "show" or program_type == "Serie":
+        if program_type == "show" or program_type == "Serie" or program_type == "series":
             path = plugin.url_for(func_or_url=vod_series, type=type2, label=label, id=id)
             info = {'plot': description, 'sorttitle': label.upper()}
             playable = False

@@ -18,6 +18,13 @@ CONST_BASE_HEADERS = {
 }
 
 CONST_BASE_URL = 'https://www.nlziet.nl'
+
+CONST_FIRST_BOOT = True
+
+CONST_HAS_LIVE = True
+
+CONST_HAS_REPLAY = True
+
 CONST_ID_URL = 'https://id.nlziet.nl'
 CONST_IMAGE_URL = 'https://nlzietprodstorage.blob.core.windows.net'
 
