@@ -585,3 +585,23 @@ msgstr ""
 msgctxt "#330032"
 msgid "Select to continue, note that only green colored addons are available in the next steps."
 msgstr ""
+
+msgctxt "#330040"
+msgid "All programs"
+msgstr ""
+
+msgctxt "#330041"
+msgid "All programs"
+msgstr ""
+
+msgctxt "#330042"
+msgid "Programs by genre"
+msgstr ""
+
+msgctxt "#330043"
+msgid "Programs by genre"
+msgstr ""
+
+msgctxt "#330044"
+msgid "Programs by genre"
+msgstr ""

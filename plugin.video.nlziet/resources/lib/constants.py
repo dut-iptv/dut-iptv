@@ -33,12 +33,12 @@ CONST_ONLINE_SEARCH = False
 CONST_START_FROM_BEGINNING = True
 
 CONST_VOD_CAPABILITY = [
-    { 'file': 'series', 'label': _.SERIES, 'start': 0, 'online': 0, 'split': 1 },
-    { 'file': 'tipfeed', 'label': _.RECOMMENDED, 'start': 0, 'online': 1, 'split': 0 },
-    { 'file': 'watchahead', 'label': _.WATCHAHEAD, 'start': 0, 'online': 1, 'split': 0 },
-    { 'file': 'movies', 'label': _.MOVIES, 'start': 0, 'online': 1, 'split': 0 },
-    { 'file': 'seriesbinge', 'label': _.SERIESBINGE, 'start': 0, 'online': 1, 'split': 0 },
-    { 'file': 'mostviewed', 'label': _.MOSTVIEWED, 'start': 0, 'online': 1, 'split': 0 },
+    { 'file': 'series', 'label': _.SERIES, 'start': 0, 'online': 0, 'search': 1, 'az': 1 },
+    { 'file': 'tipfeed', 'label': _.RECOMMENDED, 'start': 0, 'online': 1, 'search': 1, 'az': 0 },
+    { 'file': 'watchahead', 'label': _.WATCHAHEAD, 'start': 0, 'online': 1, 'search': 1, 'az': 0 },
+    { 'file': 'movies', 'label': _.MOVIES, 'start': 0, 'online': 1, 'search': 1, 'az': 0 },
+    { 'file': 'seriesbinge', 'label': _.SERIESBINGE, 'start': 0, 'online': 1, 'search': 1, 'az': 0 },
+    { 'file': 'mostviewed', 'label': _.MOSTVIEWED, 'start': 0, 'online': 1, 'search': 1, 'az': 0 },
 ]
 
 CONST_WATCHLIST = False

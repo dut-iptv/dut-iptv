@@ -75,12 +75,12 @@ CONST_ONLINE_SEARCH = False
 CONST_START_FROM_BEGINNING = True
 
 CONST_VOD_CAPABILITY = [
-    { 'file': 'series', 'label': _.SERIES, 'start': 0, 'online': 0, 'split': 0 },
-    { 'file': 'movies', 'label': _.MOVIES, 'start': 0, 'online': 0, 'split': 0 },
-    { 'file': 'hboseries', 'label': _.HBO_SERIES, 'start': 0, 'online': 0, 'split': 0 },
-    { 'file': 'hbomovies', 'label': _.HBO_MOVIES, 'start': 0, 'online': 0, 'split': 0 },
-    { 'file': 'kidsseries', 'label': _.KIDS_SERIES, 'start': 0, 'online': 0, 'split': 0 },
-    { 'file': 'kidsmovies', 'label': _.KIDS_MOVIES, 'start': 0, 'online': 0, 'split': 0 },
+    { 'file': 'series', 'label': _.SERIES, 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'movies', 'label': _.MOVIES, 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'hboseries', 'label': _.HBO_SERIES, 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'hbomovies', 'label': _.HBO_MOVIES, 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'kidsseries', 'label': _.KIDS_SERIES, 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'kidsmovies', 'label': _.KIDS_MOVIES, 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
 ]
 
 CONST_WATCHLIST = False

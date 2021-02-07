@@ -623,3 +623,23 @@ msgstr "Deze addon is geinstalleerd en ingelogd, selecteer volgende om verder te
 msgctxt "#330032"
 msgid "Select to continue, note that only green colored addons are available in the next steps."
 msgstr "Selecteer om verder te gaan, let op dat alleen groen gekleurede addons beschikbaar zijn in de volgende stappen."
+
+msgctxt "#330040"
+msgid "All programs"
+msgstr "Alle programma's"
+
+msgctxt "#330041"
+msgid "All programs"
+msgstr "Alle programma's"
+
+msgctxt "#330042"
+msgid "Programs by genre"
+msgstr "Progamma's per genre"
+
+msgctxt "#330043"
+msgid "Programs by genre"
+msgstr "Progamma's per genre"
+
+msgctxt "#330044"
+msgid "Programs by genre"
+msgstr "Progamma's per genre"

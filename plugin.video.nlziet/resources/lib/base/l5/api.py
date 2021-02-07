@@ -153,6 +153,32 @@ def api_get_epg_by_idtitle(idtitle, start, end, channels):
 
     return data2
 
+def api_get_genre_list(type):
+    if not os.path.isdir(ADDON_PROFILE + 'tmp'):
+        os.makedirs(ADDON_PROFILE + 'tmp')
+
+    type = type + 'genres'
+
+    encodedBytes = base64.b32encode(type.encode("utf-8"))
+    type = str(encodedBytes, "utf-8")
+
+    genres_url = '{dut_epg_url}/{type}.json'.format(dut_epg_url=CONST_DUT_EPG, type=type)
+    file = "cache" + os.sep + "{type}.json".format(type=type)
+
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=7):
+        data = load_file(file=file, isJSON=True)
+    else:
+        download = api_download(url=genres_url, type='get', headers=None, data=None, json_data=True, return_json=True)
+        data = download['data']
+        code = download['code']
+
+        if code and code == 200 and data:
+            write_file(file=file, data=data, isJSON=True)
+        else:
+            return None
+
+    return data
+
 def api_get_list(start, end, channels):
     if not os.path.isdir(ADDON_PROFILE + 'tmp'):
         os.makedirs(ADDON_PROFILE + 'tmp')
@@ -336,7 +362,7 @@ def api_get_list_by_first(first, start, end, channels):
 
     return data2
 
-def api_get_vod_by_type(type, character, subscription_filter):
+def api_get_vod_by_type(type, character, genre, subscription_filter):
     if not os.path.isdir(ADDON_PROFILE + 'tmp'):
         os.makedirs(ADDON_PROFILE + 'tmp')
 
@@ -407,6 +433,10 @@ def api_get_vod_by_type(type, character, subscription_filter):
         row = data[currow]
 
         id = row['id']
+
+        if genre and row['category']:
+            if not genre in row['category']:
+                continue
 
         if character:
             if not row['first'] == character:

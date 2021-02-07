@@ -169,6 +169,11 @@ class BaseLanguage(object):
     SELECT_GROUP = 330037
     NEXT_SETUP_GROUPS = 330038
     ALACARTE = 330039
+    ALLTITLES = 330040
+    ALLTITLESDESC = 330041
+    TITLESBYGENRE = 330042
+    TITLESBYGENREDESC = 330043
+    PROGSGENRE = 330044
     
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)
