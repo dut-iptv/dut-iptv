@@ -35,4 +35,4 @@ CONST_VOD_CAPABILITY = [
     { 'file': 'kidsmovies', 'label': _.KIDS_MOVIES, 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
 ]
 
-CONST_WATCHLIST = False
+CONST_WATCHLIST = True

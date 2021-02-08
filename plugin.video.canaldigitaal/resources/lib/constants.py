@@ -47,9 +47,9 @@ CONST_ONLINE_SEARCH = False
 CONST_VOD_CAPABILITY = [
     { 'file': 'cnlseriesnl', 'label': 'Canal+ ' + _.SERIES, 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
     { 'file': 'film1', 'label': 'Film1', 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
-    { 'file': 'cnlvodnl', 'label': 'Canal Video On Demand', 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
-    { 'file': 'bbcsnl', 'label': 'BBC', 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
-    { 'file': 'lovnaten', 'label': 'Love Nature', 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'cnlvodnl', 'label': 'Canal Video On Demand', 'start': 0, 'online': 0, 'search': 1, 'az': 1 },
+    { 'file': 'bbcsnl', 'label': 'BBC', 'start': 0, 'online': 0, 'search': 1, 'az': 1 },
+    { 'file': 'lovnaten', 'label': 'Love Nature', 'start': 0, 'online': 0, 'search': 1, 'az': 1 },
 ]
 
 CONST_WATCHLIST = False

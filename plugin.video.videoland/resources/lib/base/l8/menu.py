@@ -238,24 +238,24 @@ def vod(file, label, start=0, character=None, genre=None, online=0, az=0, **kwar
 
     if az == 1 or az == 2:
         folder = plugin.Folder(title=_.PROGSAZ)
-        
+
         if az == 2:
             label = _.TITLESBYGENRE
-            
+
             folder.add_item(
                 label = label,
                 info = {'plot': _.TITLESBYGENREDESC},
                 path = plugin.url_for(func_or_url=vod, file=file, label=label, start=start, online=online, az=3),
             )
-        
+
         label = _.ALLTITLES
-        
+
         folder.add_item(
             label = label,
             info = {'plot': _.ALLTITLESDESC},
             path = plugin.url_for(func_or_url=vod, file=file, label=label, start=start, online=online, az=0),
         )
-                
+
         label = _.OTHERTITLES
 
         folder.add_item(
@@ -276,9 +276,9 @@ def vod(file, label, start=0, character=None, genre=None, online=0, az=0, **kwar
         return folder
     elif az == 3:
         folder = plugin.Folder(title=_.PROGSGENRE)
-        
+
         data = api_get_genre_list(type=file)
-        
+
         if data:
             for genre in data:
                 label = genre
@@ -810,14 +810,14 @@ def renew_token(**kwargs):
         return None
 
 @plugin.route()
-def api_add_to_watchlist(id, type, **kwargs):
+def add_to_watchlist(id, type, **kwargs):
     if api_add_to_watchlist(id=id, type=type):
         gui.notification(_.ADDED_TO_WATCHLIST)
     else:
         gui.notification(_.ADD_TO_WATCHLIST_FAILED)
 
 @plugin.route()
-def api_remove_from_watchlist(id, **kwargs):
+def remove_from_watchlist(id, **kwargs):
     if api_remove_from_watchlist(id=id):
         gui.refresh()
         gui.notification(_.REMOVED_FROM_WATCHLIST)
@@ -834,7 +834,29 @@ def watchlist(**kwargs):
         processed = plugin_process_watchlist(data=data)
 
         if processed:
-            folder.add_items(processed)
+            items = []
+
+            for ref in processed:
+                currow = processed[ref]
+
+                items.append(plugin.Item(
+                    label = currow['label1'],
+                    info = {
+                        'plot': currow['description'],
+                        'duration': currow['duration'],
+                        'mediatype': currow['mediatype'],
+                        'sorttitle': currow['label1'].upper(),
+                    },
+                    art = {
+                        'thumb': currow['image'],
+                        'fanart': currow['image_large']
+                    },
+                    path = currow['path'],
+                    playable = currow['playable'],
+                    context = currow['context']
+                ))
+
+            folder.add_items(items)
 
     return folder
 
@@ -853,7 +875,29 @@ def watchlist_listing(label, id, search=0, **kwargs):
         processed = plugin_process_watchlist_listing(data=data, id=id)
 
         if processed:
-            folder.add_items(processed)
+            items = []
+
+            for ref in processed:
+                currow = processed[ref]
+
+                items.append(plugin.Item(
+                    label = currow['label1'],
+                    info = {
+                        'plot': currow['description'],
+                        'duration': currow['duration'],
+                        'mediatype': currow['mediatype'],
+                        'sorttitle': currow['label1'].upper(),
+                    },
+                    art = {
+                        'thumb': currow['image'],
+                        'fanart': currow['image_large']
+                    },
+                    path = currow['path'],
+                    playable = currow['playable'],
+                    context = currow['context']
+                ))
+
+            folder.add_items(items)
 
     return folder
 

@@ -193,16 +193,17 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
 
                 xml = r.text
 
-                #write_file(file=ADDON_PROFILE + 'full_url', data=URL, isJSON=False)
-                #write_file(file=ADDON_PROFILE + 'orig.mpd', data=xml, isJSON=False)
+                if 'mpd' in xml.lower():
+                    #write_file(file=ADDON_PROFILE + 'full_url', data=URL, isJSON=False)
+                    #write_file(file=ADDON_PROFILE + 'orig.mpd', data=xml, isJSON=False)
 
-                xml = sly_mpd_parse(data=xml).decode('utf-8')
+                    xml = sly_mpd_parse(data=xml).decode('utf-8')
 
-                #write_file(file=ADDON_PROFILE + 'after_sly_mpd_parse.mpd', data=xml, isJSON=False)
+                    #write_file(file=ADDON_PROFILE + 'after_sly_mpd_parse.mpd', data=xml, isJSON=False)
 
-                xml = mpd_parse(data=xml, addon_name=addon_name, URL=URL).decode('utf-8')
+                    xml = mpd_parse(data=xml, addon_name=addon_name, URL=URL).decode('utf-8')
 
-                #write_file(file=ADDON_PROFILE + 'after_mpd_parse.mpd', data=xml, isJSON=False)
+                    #write_file(file=ADDON_PROFILE + 'after_mpd_parse.mpd', data=xml, isJSON=False)
 
                 self.send_response(r.status_code)
 

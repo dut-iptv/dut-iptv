@@ -12,8 +12,23 @@ from resources.lib.constants import CONST_BASE_HEADERS, CONST_BASE_URL, CONST_GI
 from resources.lib.util import plugin_process_info
 from urllib.parse import parse_qs, urlparse, quote_plus
 
-def api_add_to_watchlist():
-    return None
+def api_add_to_watchlist(id, type):
+    if not api_get_session():
+        return None
+        
+    headers = {
+        'videoland-platform': 'videoland',
+    }
+
+    watchlist_url = '{base_url}/api/v3/watchlist/{id}'.format(base_url=CONST_BASE_URL, id=id)
+
+    download = api_download(url=watchlist_url, type='post', headers=headers, data=None, json_data=False, return_json=False)
+    code = download['code']
+
+    if not code or not code == 200:
+        return False
+
+    return True
 
 def api_get_info(id, channel=''):
     profile_settings = load_profile(profile_id=1)
@@ -50,6 +65,24 @@ def api_get_session(force=0):
     return True
 
 def api_list_watchlist():
+    if not api_get_session():
+        return None
+
+    profile_settings = load_profile(profile_id=1)
+
+    headers = {
+        'videoland-platform': 'videoland',
+    }
+
+    watchlist_url = '{base_url}/api/v3/watchlist?profileId={profile_id}'.format(base_url=CONST_BASE_URL, profile_id=profile_settings['profile_id'])
+
+    download = api_download(url=watchlist_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+    data = download['data']
+    code = download['code']
+
+    if code and code == 200 and data and check_key(data, 'count'):
+        return data
+
     return None
 
 def api_login():
@@ -205,10 +238,10 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         return playdata
 
     path = data['stream']['dash']
-    
+
     if check_key(data, 'drm'):
         license = data['drm']
-        
+
     profile_settings['ticket_id'] = data['ticket_id']
     profile_settings['token'] = data['stream']['token']
     save_profile(profile_id=1, profile=profile_settings)
@@ -217,8 +250,23 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     return playdata
 
-def api_remove_from_watchlist():
-    return None
+def api_remove_from_watchlist(id):
+    if not api_get_session():
+        return None
+
+    headers = {
+        'videoland-platform': 'videoland',
+    }
+
+    remove_url = '{base_url}/api/v3/watchlist/{id}'.format(base_url=CONST_BASE_URL, id=id)
+
+    download = api_download(url=remove_url, type='delete', headers=headers, data=None, json_data=False, return_json=False)
+    code = download['code']
+
+    if not code or not code == 200:
+        return False
+
+    return True
 
 def api_search():
     return None
@@ -303,6 +351,7 @@ def api_vod_seasons(type, id):
 
     file = "cache" + os.sep + type + ".json"
 
+    ref = id
     id = id[1:]
 
     if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
@@ -328,7 +377,7 @@ def api_vod_seasons(type, id):
         row = data['details'][currow]
 
         if check_key(row, 'type') and row['type'] == 'season':
-            seasons.append({'id': str(id) + '###' + str(row['id']), 'seriesNumber': row['title'], 'description': data['description'], 'image': data['poster'].replace('[format]', '960x1433')})
+            seasons.append({'id': str(id) + '###' + str(row['id']), 'seriesNumber': row['title'], 'description': data['description'], 'image': data['poster'].replace('[format]', '960x1433'), 'watchlist': ref})
 
     return {'type': 'seasons', 'seasons': seasons}
 

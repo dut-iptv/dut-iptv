@@ -1,7 +1,7 @@
 import _strptime
 import datetime, re, xbmc
 
-from resources.lib.base.l1.constants import DEFAULT_USER_AGENT
+from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
@@ -9,6 +9,8 @@ from resources.lib.base.l3.util import check_key, convert_datetime_timezone, dat
 from resources.lib.base.l4 import gui
 from resources.lib.base.l5.api import api_get_channels
 from resources.lib.base.l6 import inputstream
+
+from urllib.parse import urlencode
 
 def plugin_ask_for_creds(creds):
     username = str(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
@@ -106,7 +108,62 @@ def plugin_vod_subscription_filter():
     return None
 
 def plugin_process_watchlist(data):
-    items = []
+    items = {}
+    
+    if check_key(data, 'details'):
+        for row in data['details']:
+            currow = data['details'][row]
+            
+            info = plugin_process_info({'info': currow})
+
+            context = []
+            
+            params = []
+            params.append(('_', 'remove_from_watchlist'))
+            params.append(('id', currow['ref']))
+
+            context.append((_.REMOVE_FROM_WATCHLIST, 'RunPlugin({context_url})'.format(context_url='plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))), ))
+
+            type = 'vod'
+            
+            if currow['type'] == 'series':
+                params = []
+                params.append(('_', 'vod_series'))
+                params.append(('type', 'series'))
+                params.append(('label', currow['title']))
+                params.append(('id', currow['ref']))
+            
+                path = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))
+                playable = False
+                mediatype = ''
+            elif currow['type'] == 'movie':
+                params = []
+                params.append(('_', 'play_video'))
+                params.append(('type', type))
+                params.append(('channel', None))
+                params.append(('id', currow['ref']))
+                params.append(('title', None))
+                
+                path = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))
+                playable = True
+                mediatype = 'video'
+            else:
+                continue
+
+            items[str(currow['ref'])] = {
+                'label1': info['label1'],
+                'description': info['description'],
+                'duration': info['duration'],
+                'mediatype': mediatype,
+                'image': info['image'],
+                'image_large': info['image_large'],
+                'path': path,
+                'playable': playable,
+                'context': context
+            }
+            
+    log('DEBUG1111: ITEMS')
+    log(items)
 
     return items
 
@@ -114,3 +171,29 @@ def plugin_process_watchlist_listing(data, id=None):
     items = []
 
     return items
+    
+def encode_obj(in_obj):
+    def encode_list(in_list):
+        out_list = []
+        for el in in_list:
+            out_list.append(encode_obj(el))
+        return out_list
+
+    def encode_dict(in_dict):
+        out_dict = {}
+
+        for k, v in in_dict.items():
+            out_dict[k] = encode_obj(v)
+
+        return out_dict
+
+    if isinstance(in_obj, str):
+        return in_obj.encode('utf-8')
+    elif isinstance(in_obj, list):
+        return encode_list(in_obj)
+    elif isinstance(in_obj, tuple):
+        return tuple(encode_list(in_obj))
+    elif isinstance(in_obj, dict):
+        return encode_dict(in_obj)
+
+    return in_obj

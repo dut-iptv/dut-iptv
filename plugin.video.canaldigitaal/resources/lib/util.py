@@ -99,7 +99,8 @@ def plugin_process_info(playdata):
 
             if check_key(playdata['info']['params'], 'genres'):
                 for genre in playdata['info']['params']['genres']:
-                    info['genres'].append(genre['title'])
+                    if check_key(genre, 'title'):
+                        info['genres'].append(genre['title'])
 
             if check_key(playdata['info']['params'], 'duration'):
                 info['duration'] = playdata['info']['params']['duration']

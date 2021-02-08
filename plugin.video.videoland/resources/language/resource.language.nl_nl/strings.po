@@ -336,6 +336,34 @@ msgctxt "#32082"
 msgid "Reset Session"
 msgstr "Sessie resetten"
 
+msgctxt "#32083"
+msgid "Add to Watchlist"
+msgstr "Toevoegen aan Watchlist"
+
+msgctxt "#32084"
+msgid "Remove from Watchlist"
+msgstr "Verwijderen van Watchlist"
+
+msgctxt "#32085"
+msgid "Watchlist"
+msgstr "Watchlist"
+
+msgctxt "#32086"
+msgid "Added to Watchlist"
+msgstr "Toegevoegd aan Watchlist"
+
+msgctxt "#32087"
+msgid "Add to Watchlist failed"
+msgstr "Toevoegen aan Watchlist mislukt"
+
+msgctxt "#32088"
+msgid "Removed from Watchlist"
+msgstr "Verwijderd uit Watchlist"
+
+msgctxt "#32089"
+msgid "Remove from Watchlist failed"
+msgstr "Verwijderen uit Watchlist mislukt"
+
 msgctxt "#32090"
 msgid "Enable Radio in Simple IPTV"
 msgstr "Radio in Simple IPTV inschakelen"
