@@ -600,8 +600,20 @@ def mpd_parse(data, addon_name, URL):
             parent = adap_set.parentNode
             parent.removeChild(adap_set)
         elif type == 'audio' and ADDON.getSettingBool('force_ac3'):
-            if 'codecs' in adap_set.attributes.keys() and 'ac-3' in adap_set.getAttribute('codecs').lower():
-                ac3_found = True
+            for stream in adap_set.getElementsByTagName("Representation"):
+                attrib = {}
+
+                for key in adap_set.attributes.keys():
+                    attrib[key] = adap_set.getAttribute(key)
+
+                for key in stream.attributes.keys():
+                    attrib[key] = stream.getAttribute(key)
+            
+                try:
+                    if attrib['codecs'].lower() == 'ac-3':
+                        ac3_found = True
+                except:
+                    pass
         elif type == 'video' and ADDON.getSettingBool('force_highest_bandwidth'):
             highest_bandwidth = 0
             is_video = False
@@ -662,12 +674,21 @@ def mpd_parse(data, addon_name, URL):
 
     if ac3_found == True:
         for adap_set in root.getElementsByTagName('AdaptationSet'):
-            if not 'contentType' in adap_set.attributes.keys() or not 'codecs' in adap_set.attributes.keys():
-                continue
+            for stream in adap_set.getElementsByTagName("Representation"):
+                attrib = {}
 
-            if adap_set.getAttribute('contentType').lower() == 'audio' and not 'ac-3' in adap_set.getAttribute('codecs').lower():
-                parent = adap_set.parentNode
-                parent.removeChild(adap_set)
+                for key in adap_set.attributes.keys():
+                    attrib[key] = adap_set.getAttribute(key)
+
+                for key in stream.attributes.keys():
+                    attrib[key] = stream.getAttribute(key)
+
+                try:
+                    if attrib['contentType'].lower() == 'audio' and not attrib['codecs'].lower() == 'ac-3':
+                        parent = adap_set.parentNode
+                        parent.removeChild(adap_set)
+                except:
+                    pass
 
     if addon_name == "kpn" and 'npo1' in URL.lower():
         last_segment = 0

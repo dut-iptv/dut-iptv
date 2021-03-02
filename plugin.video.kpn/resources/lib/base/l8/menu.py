@@ -699,7 +699,7 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
         gui.ok(message=_.PROXY_NOT_SET)
         return False
 
-    if CONST_START_FROM_BEGINNING and not from_beginning == 1 and settings.getBool(key='ask_start_from_beginning') and gui.yes_no(message=_.START_FROM_BEGINNING, heading=playdata['title']):
+    if CONST_START_FROM_BEGINNING and not from_beginning == 1 and settings.getBool(key='ask_start_from_beginning') and gui.yes_no(message=_.START_FROM_BEGINNING):
         from_beginning = 1
 
     playdata = api_play_url(type=type, channel=channel, id=id, video_data=data, from_beginning=from_beginning, pvr=pvr)

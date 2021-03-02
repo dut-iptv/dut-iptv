@@ -429,7 +429,7 @@ def api_search(query):
             pass
     else:
         for entry in CONST_VOD_CAPABILITY:
-            data2 = api_get_vod_by_type(type=entry['file'], character=None, subscription_filter=None)
+            data2 = api_get_vod_by_type(type=entry['file'], character=None, genre=None, subscription_filter=None)
 
             for currow in data2:
                 row = data2[currow]
@@ -587,7 +587,7 @@ def api_vod_season(series, id):
 def api_vod_seasons(type, id):
     seasons = []
 
-    data = api_get_vod_by_type(type=type, character=None, subscription_filter=None)
+    data = api_get_vod_by_type(type=type, character=None, genre=None, subscription_filter=None)
 
     if data:
         try:
