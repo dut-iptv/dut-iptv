@@ -98,17 +98,6 @@ def api_get_epg_by_addon(addon):
         os.makedirs(directory)
 
     epg_url = '{dut_epg_url}/{type}.epg.zip'.format(dut_epg_url=CONST_DUT_EPG_BASE, type=type)
-
-    if addon == 'ziggo':
-        VIDEO_ADDON_PROFILE = ADDON_PROFILE.replace(ADDON_ID, 'plugin.video.ziggo')
-        profile = load_file(VIDEO_ADDON_PROFILE + 'profile.json', ext=True, isJSON=True)
-
-        try:
-            if int(profile['v3']) == 1:
-                epg_url = '{dut_epg_url}/{type}.epg.v3.zip'.format(dut_epg_url=CONST_DUT_EPG_BASE, type=type)
-        except:
-            pass
-
     tmp = ADDON_PROFILE + 'tmp' + os.sep + '{type}.epg.zip'.format(type=type)
 
     if not is_file_older_than_x_days(file=tmp, days=0.5):

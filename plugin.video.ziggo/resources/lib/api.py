@@ -19,7 +19,7 @@ def api_add_to_watchlist(id, type):
     profile_settings = load_profile(profile_id=1)
 
     if type == "item":
-        mediaitems_url = '{listings_url}/{id}'.format(listings_url=CONST_API_URLS[int(profile_settings['v3'])]['listings_url'], id=id)
+        mediaitems_url = '{listings_url}/{id}'.format(listings_url=CONST_API_URLS['listings_url'], id=id)
         download = api_download(url=mediaitems_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']
@@ -29,10 +29,7 @@ def api_add_to_watchlist(id, type):
 
         id = data['mediaGroupId']
 
-    if int(profile_settings['v3']) == 1:
-        watchlist_url = '{watchlist_url}/{watchlist_id}/entries/{id}?sharedProfile=true'.format(watchlist_url=CONST_API_URLS[int(profile_settings['v3'])]['watchlist_url'], watchlist_id=profile_settings['watchlist_id'], id=id)
-    else:
-        watchlist_url = '{watchlist_url}/entries'.format(watchlist_url=CONST_API_URLS[int(profile_settings['v3'])]['watchlist_url'])
+    watchlist_url = '{watchlist_url}/{watchlist_id}/entries/{id}?sharedProfile=true'.format(watchlist_url=CONST_API_URLS['watchlist_url'], watchlist_id=profile_settings['watchlist_id'], id=id)
 
     download = api_download(url=watchlist_url, type='post', headers=api_get_headers(), data={"mediaGroup": {'id': id}}, json_data=True, return_json=False)
     data = download['data']
@@ -56,7 +53,7 @@ def api_get_headers():
         'X-OESP-Username': username,
     }
 
-    if int(profile_settings['v3']) == 1:
+    if check_key(profile_settings, 'ziggo_profile_id') and len(str(profile_settings['ziggo_profile_id'])) > 0:
         HEADERS['X-OESP-Profile-Id'] = profile_settings['ziggo_profile_id']
 
     return HEADERS
@@ -65,7 +62,7 @@ def api_get_info(id, channel=''):
     profile_settings = load_profile(profile_id=1)
 
     info = {}
-    base_listing_url = CONST_API_URLS[int(profile_settings['v3'])]['listings_url']
+    base_listing_url = CONST_API_URLS['listings_url']
 
     listing_url = '{listings_url}?byEndTime={time}~&byStationId={channel}&range=1-1&sort=startTime'.format(listings_url=base_listing_url, time=int(time.time() * 1000), channel=id)
     download = api_download(url=listing_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
@@ -97,12 +94,12 @@ def api_get_play_token(locator=None, path=None, force=0):
         profile_settings['tokenruntime'] = int(time.time())
         save_profile(profile_id=1, profile=profile_settings)
 
-        if int(profile_settings['v3']) == 1 and 'sdash' in path:
+        if 'sdash' in path:
             jsondata = {"contentLocator": locator, "drmScheme": "sdash:BR-AVC-DASH"}
         else:
             jsondata = {"contentLocator": locator}
 
-        download = api_download(url=CONST_API_URLS[int(profile_settings['v3'])]['token_url'], type='post', headers=api_get_headers(), data=jsondata, json_data=True, return_json=True)
+        download = api_download(url=CONST_API_URLS['token_url'], type='post', headers=api_get_headers(), data=jsondata, json_data=True, return_json=True)
         data = download['data']
         code = download['code']
 
@@ -127,7 +124,7 @@ def api_get_session(force=0):
     force = int(force)
     profile_settings = load_profile(profile_id=1)
 
-    devices_url = CONST_API_URLS[int(profile_settings['v3'])]['devices_url']
+    devices_url = CONST_API_URLS['devices_url']
 
     download = api_download(url=devices_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
@@ -152,7 +149,7 @@ def api_get_watchlist_id():
 
     profile_settings = load_profile(profile_id=1)
 
-    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&maxResults=1&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_API_URLS[int(profile_settings['v3'])]['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
+    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&maxResults=1&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_API_URLS['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
 
     download = api_download(url=watchlist_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
@@ -172,10 +169,7 @@ def api_list_watchlist():
 
     profile_settings = load_profile(profile_id=1)
 
-    if int(profile_settings['v3']) == 1:
-        watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_API_URLS[int(profile_settings['v3'])]['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
-    else:
-        watchlist_url = CONST_API_URLS[int(profile_settings['v3'])]['watchlist_url']
+    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_API_URLS['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
 
     download = api_download(url=watchlist_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
@@ -198,12 +192,6 @@ def api_login():
 
     profile_settings = load_profile(profile_id=1)
 
-    try:
-        if len(str(profile_settings['v3'])) == 0:
-            profile_settings['v3'] = 0
-    except:
-        profile_settings['v3'] = 0
-
     profile_settings['access_token'] = ''
     profile_settings['ziggo_profile_id'] = ''
     profile_settings['household_id'] = ''
@@ -215,33 +203,12 @@ def api_login():
         'X-Client-Id': CONST_DEFAULT_CLIENTID + "||" + DEFAULT_USER_AGENT,
     }
 
-    download = api_download(url=CONST_API_URLS[int(profile_settings['v3'])]['session_url'], type='post', headers=HEADERS, data={"username": username, "password": password}, json_data=True, return_json=True)
+    download = api_download(url=CONST_API_URLS['session_url'], type='post', headers=HEADERS, data={"username": username, "password": password}, json_data=True, return_json=True)
     data = download['data']
     code = download['code']
-
-    switch_backoffice = False
-
+    
     if code and data and check_key(data, 'reason') and data['reason'] == 'wrong backoffice':
-        if int(profile_settings['v3']) == 0:
-            profile_settings['v3'] = 1
-        else:
-            profile_settings['v3'] = 0
-
-        try:
-            save_profile(profile_id=1, profile=profile_settings)
-        except:
-            pass
-
-        try:
-            os.remove(ADDON_PROFILE + "prefs.json")
-        except:
-            pass
-
-        switch_backoffice = True
-
-        download = api_download(url=CONST_API_URLS[int(profile_settings['v3'])]['session_url'], type='post', headers=HEADERS, data={"username": username, "password": password}, json_data=True, return_json=True)
-        data = download['data']
-        code = download['code']
+        return { 'code': code, 'data': data, 'result': False }
 
     if not code or not data or not check_key(data, 'oespToken'):
         if not code:
@@ -255,18 +222,23 @@ def api_login():
     ziggo_profile_id = ''
     household_id = ''
 
-    if int(profile_settings['v3']) == 1:
+    try:
         ziggo_profile_id = data['customer']['sharedProfileId']
+    except:
+        pass
+    
+    try:
         household_id = data['customer']['householdId']
+    except:
+        pass
 
     profile_settings['access_token'] = data['oespToken']
     profile_settings['ziggo_profile_id'] = ziggo_profile_id
     profile_settings['household_id'] = household_id
     save_profile(profile_id=1, profile=profile_settings)
 
-    if int(profile_settings['v3']) == 1:
-        if len(str(profile_settings['watchlist_id'])) == 0:
-            api_get_watchlist_id()
+    if len(str(profile_settings['watchlist_id'])) == 0:
+        api_get_watchlist_id()
 
     return { 'code': code, 'data': data, 'result': True }
 
@@ -285,7 +257,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     info = {}
     properties = {}
-    base_listing_url = CONST_API_URLS[int(profile_settings['v3'])]['listings_url']
+    base_listing_url = CONST_API_URLS['listings_url']
     urldata = None
     urldata2 = None
     path = None
@@ -327,7 +299,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
         info = data['program']
     elif type == 'vod':
-        mediaitems_url = '{mediaitems_url}/{id}'.format(mediaitems_url=CONST_API_URLS[int(profile_settings['v3'])]['mediaitems_url'], id=id)
+        mediaitems_url = '{mediaitems_url}/{id}'.format(mediaitems_url=CONST_API_URLS['mediaitems_url'], id=id)
         download = api_download(url=mediaitems_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']
@@ -340,7 +312,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     if check_key(info, 'videoStreams'):
         urldata2 = get_play_url(content=info['videoStreams'])
 
-    if not type == 'channel' and (not urldata2 or not check_key(urldata2, 'play_url') or not check_key(urldata2, 'locator') or urldata2['play_url'] == 'http://Playout/using/Session/Service') and int(profile_settings['v3']) == 1:
+    if not type == 'channel' and (not urldata2 or not check_key(urldata2, 'play_url') or not check_key(urldata2, 'locator') or urldata2['play_url'] == 'http://Playout/using/Session/Service'):
         urldata2 = {}
 
         if type == 'program':
@@ -350,7 +322,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         else:
             return playdata
 
-        playout_url = '{base_url}/playout/{playout_str}/{id}?abrType=BR-AVC-DASH'.format(base_url=CONST_API_URLS[int(profile_settings['v3'])]['base_url'], playout_str=playout_str, id=id)
+        playout_url = '{base_url}/playout/{playout_str}/{id}?abrType=BR-AVC-DASH'.format(base_url=CONST_API_URLS['base_url'], playout_str=playout_str, id=id)
         download = api_download(url=playout_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']
@@ -379,7 +351,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     if not locator or not len(str(locator)) > 0:
         return playdata
 
-    license = CONST_API_URLS[int(profile_settings['v3'])]['widevine_url']
+    license = CONST_API_URLS['widevine_url']
 
     token = api_get_play_token(locator=locator, path=path, force=1)
 
@@ -396,10 +368,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
             spliturl = path.split('sdash/', 1)
 
             if len(spliturl) == 2:
-                if int(profile_settings['v3']) == 1:
-                    path = '{urlpart1}sdash;vxttoken={token}/{urlpart2}'.format(urlpart1=spliturl[0], token=token, urlpart2=spliturl[1])
-                else:
-                    path = '{urlpart1}sdash;vxttoken={token}/{urlpart2}?device=Orion-Replay-DASH'.format(urlpart1=spliturl[0], token=token, urlpart2=spliturl[1])
+                path = '{urlpart1}sdash;vxttoken={token}/{urlpart2}'.format(urlpart1=spliturl[0], token=token, urlpart2=spliturl[1])
         else:
             spliturl = path.rsplit('/', 1)
 
@@ -416,10 +385,7 @@ def api_remove_from_watchlist(id):
 
     profile_settings = load_profile(profile_id=1)
 
-    if int(profile_settings['v3']) == 1:
-        remove_url = '{watchlist_url}/{watchlist_id}/entries/{id}?sharedProfile=true'.format(watchlist_url=CONST_API_URLS[int(profile_settings['v3'])]['watchlist_url'], watchlist_id=profile_settings['watchlist_id'], id=id)
-    else:
-        remove_url = '{watchlist_url}/entries/{id}'.format(watchlist_url=CONST_API_URLS[int(profile_settings['v3'])]['watchlist_url'], id=id)
+    remove_url = '{watchlist_url}/{watchlist_id}/entries/{id}?sharedProfile=true'.format(watchlist_url=CONST_API_URLS['watchlist_url'], watchlist_id=profile_settings['watchlist_id'], id=id)
 
     download = api_download(url=remove_url, type='delete', headers=api_get_headers(), data=None, json_data=False, return_json=False)
     code = download['code']
@@ -433,10 +399,7 @@ def api_search(query):
     if not api_get_session():
         return None
 
-    profile_settings = load_profile(profile_id=1)
-
-    if int(profile_settings['v3']) == 1:
-        return False
+    return False
 
     end = int(time.time() * 1000)
     start = end - (7 * 24 * 60 * 60 * 1000)
@@ -448,15 +411,7 @@ def api_search(query):
 
     file = "cache" + os.sep + "{query}.json".format(query=queryb32)
 
-    try:
-        profile_settings = load_profile(profile_id=1)
-
-        if int(profile_settings['v3']) == 1:
-            file = "cache" + os.sep + "{query}.v3.json".format(query=queryb32)
-    except:
-        pass
-
-    search_url = '{search_url}?byBroadcastStartTimeRange={start}~{end}&numItems=25&byEntitled=true&personalised=true&q={query}'.format(search_url=CONST_API_URLS[int(profile_settings['v3'])]['search_url'], start=start, end=end, query=quote_plus(query))
+    search_url = '{search_url}?byBroadcastStartTimeRange={start}~{end}&numItems=25&byEntitled=true&personalised=true&q={query}'.format(search_url=CONST_API_URLS['search_url'], start=start, end=end, query=quote_plus(query))
 
     if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
         data = load_file(file=file, isJSON=True)
@@ -588,7 +543,7 @@ def api_vod_season(series, id):
 
     profile_settings = load_profile(profile_id=1)
 
-    season_url = '{mediaitems_url}?byMediaType=Episode%7CFeatureFilm&byParentId={id}&includeAdult=true&range=1-1000&sort=seriesEpisodeNumber|ASC'.format(mediaitems_url=CONST_API_URLS[int(profile_settings['v3'])]['mediaitems_url'], id=id)
+    season_url = '{mediaitems_url}?byMediaType=Episode%7CFeatureFilm&byParentId={id}&includeAdult=true&range=1-1000&sort=seriesEpisodeNumber|ASC'.format(mediaitems_url=CONST_API_URLS['mediaitems_url'], id=id)
     download = api_download(url=season_url, type='get', headers=None, data=None, json_data=False, return_json=True)
     data = download['data']
     code = download['code']
@@ -669,7 +624,7 @@ def api_watchlist_listing(id):
     end = int(time.time() * 1000)
     start = end - (7 * 24 * 60 * 60 * 1000)
 
-    mediaitems_url = '{media_items_url}?&byMediaGroupId={id}&byStartTime={start}~{end}&range=1-250&sort=startTime%7Cdesc'.format(media_items_url=CONST_API_URLS[int(profile_settings['v3'])]['listings_url'], id=id, start=start, end=end)
+    mediaitems_url = '{media_items_url}?&byMediaGroupId={id}&byStartTime={start}~{end}&range=1-250&sort=startTime%7Cdesc'.format(media_items_url=CONST_API_URLS['listings_url'], id=id, start=start, end=end)
     download = api_download(url=mediaitems_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
     code = download['code']
@@ -685,4 +640,4 @@ def api_clean_after_playback():
     headers = api_get_headers()
     headers['Content-type'] = 'application/json'
 
-    download = api_download(url=CONST_API_URLS[int(profile_settings['v3'])]['clearstreams_url'], type='post', headers=headers, data='{}', json_data=False, return_json=False)
+    download = api_download(url=CONST_API_URLS['clearstreams_url'], type='post', headers=headers, data='{}', json_data=False, return_json=False)

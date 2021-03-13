@@ -15,14 +15,7 @@ from urllib.parse import urlencode
 def check_entitlements():
     from resources.lib.api import api_get_play_token
 
-    profile_settings = load_profile(profile_id=1)
-
-    v3 = int(profile_settings['v3'])
-
-    if v3 == 0:
-        media_groups_url = '{mediagroups_url}/lgi-nl-vod-myprime-movies?byHasCurrentVod=true&range=1-1&sort=playCount7%7Cdesc'.format(mediagroups_url=CONST_API_URLS[int(profile_settings['v3'])]['mediagroupsfeeds_url'])
-    else:
-        media_groups_url = '{mediagroups_url}/crid:~~2F~~2Fschange.com~~2Fdc30ecd3-4701-4993-993b-9ad4ff5fc301?byHasCurrentVod=true&range=1-1&sort=playCount7%7Cdesc'.format(mediagroups_url=CONST_API_URLS[int(profile_settings['v3'])]['mediagroupsfeeds_url'])
+    media_groups_url = '{mediagroups_url}/crid:~~2F~~2Fschange.com~~2Fdc30ecd3-4701-4993-993b-9ad4ff5fc301?byHasCurrentVod=true&range=1-1&sort=playCount7%7Cdesc'.format(mediagroups_url=CONST_API_URLS['mediagroupsfeeds_url'])
 
     download = api_download(url=media_groups_url, type='get', headers=None, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -35,7 +28,7 @@ def check_entitlements():
 
     id = data['mediaGroups'][0]['id']
 
-    media_item_url = '{mediaitem_url}/{mediaitem_id}'.format(mediaitem_url=CONST_API_URLS[int(profile_settings['v3'])]['mediaitems_url'], mediaitem_id=id)
+    media_item_url = '{mediaitem_url}/{mediaitem_id}'.format(mediaitem_url=CONST_API_URLS['mediaitems_url'], mediaitem_id=id)
 
     download = api_download(url=media_item_url, type='get', headers=None, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -49,10 +42,10 @@ def check_entitlements():
     if check_key(data, 'videoStreams'):
         urldata = get_play_url(content=data['videoStreams'])
 
-    if (not urldata or not check_key(urldata, 'play_url') or not check_key(urldata, 'locator') or urldata['play_url'] == 'http://Playout/using/Session/Service') and v3:
+    if (not urldata or not check_key(urldata, 'play_url') or not check_key(urldata, 'locator') or urldata['play_url'] == 'http://Playout/using/Session/Service'):
             urldata = {}
 
-            playout_url = '{base_url}/playout/vod/{id}?abrType=BR-AVC-DASH'.format(base_url=CONST_API_URLS[int(profile_settings['v3'])]['base_url'], id=id)
+            playout_url = '{base_url}/playout/vod/{id}?abrType=BR-AVC-DASH'.format(base_url=CONST_API_URLS['base_url'], id=id)
             download = api_download(url=playout_url, type='get', headers=None, data=None, json_data=False, return_json=True)
             data = download['data']
             code = download['code']
@@ -149,9 +142,7 @@ def get_image(prefix, content):
     return image_url
 
 def get_play_url(content):
-    profile_settings = load_profile(profile_id=1)
-
-    if int(profile_settings['v3']) == 1 and check_key(content, 'url') and check_key(content, 'contentLocator'):
+    if check_key(content, 'url') and check_key(content, 'contentLocator'):
         return {'play_url': content['url'], 'locator': content['contentLocator']}
     else:
         for stream in content:

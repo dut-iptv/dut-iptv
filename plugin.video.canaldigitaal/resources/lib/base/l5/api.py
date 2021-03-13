@@ -40,15 +40,6 @@ def api_get_channels():
     channels_url = '{dut_epg_url}/channels.json'.format(dut_epg_url=CONST_DUT_EPG)
     file = "cache" + os.sep + "channels.json"
 
-    try:
-        profile_settings = load_profile(profile_id=1)
-
-        if int(profile_settings['v3']) == 1:
-            channels_url = '{dut_epg_url}/channels.v3.json'.format(dut_epg_url=CONST_DUT_EPG)
-            file = "cache" + os.sep + "channels.v3.json"
-    except:
-        pass
-
     if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=1):
         data = load_file(file=file, isJSON=True)
     else:
@@ -82,15 +73,6 @@ def api_get_epg_by_date_channel(date, channel):
     epg_url = '{dut_epg_url}/{type}.json'.format(dut_epg_url=CONST_DUT_EPG, type=type)
     file = "cache" + os.sep + "{type}.json".format(type=type)
 
-    try:
-        profile_settings = load_profile(profile_id=1)
-
-        if int(profile_settings['v3']) == 1:
-            epg_url = '{dut_epg_url}/{type}.v3.json'.format(dut_epg_url=CONST_DUT_EPG, type=type)
-            file = "cache" + os.sep + "{type}.v3.json".format(type=type)
-    except:
-        pass
-
     if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
         data = load_file(file=file, isJSON=True)
     else:
@@ -113,15 +95,6 @@ def api_get_epg_by_idtitle(idtitle, start, end, channels):
 
     epg_url = '{dut_epg_url}/{type}.json'.format(dut_epg_url=CONST_DUT_EPG, type=type)
     file = "cache" + os.sep + "{type}.json".format(type=type)
-
-    try:
-        profile_settings = load_profile(profile_id=1)
-
-        if int(profile_settings['v3']) == 1:
-            epg_url = '{dut_epg_url}/{type}.v3.json'.format(dut_epg_url=CONST_DUT_EPG, type=type)
-            file = "cache" + os.sep + "{type}.v3.json".format(type=type)
-    except:
-        pass
 
     if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
         data = load_file(file=file, isJSON=True)
@@ -186,16 +159,6 @@ def api_get_list(start, end, channels):
     list_url = '{dut_epg_url}/list.zip'.format(dut_epg_url=CONST_DUT_EPG)
     tmp = ADDON_PROFILE + 'tmp' + os.sep + 'list.zip'
     file = "cache" + os.sep + "list.json"
-
-    try:
-        profile_settings = load_profile(profile_id=1)
-
-        if int(profile_settings['v3']) == 1:
-            list_url = '{dut_epg_url}/list.v3.zip'.format(dut_epg_url=CONST_DUT_EPG)
-            tmp = ADDON_PROFILE + 'tmp' + os.sep + 'list.v3.zip'
-            file = "cache" + os.sep + "list.v3.json"
-    except:
-        pass
 
     if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
         data3 = load_file(file=file, isJSON=True)
@@ -278,16 +241,6 @@ def api_get_list_by_first(first, start, end, channels):
     list_url = '{dut_epg_url}/list.zip'.format(dut_epg_url=CONST_DUT_EPG)
     tmp = ADDON_PROFILE + 'tmp' + os.sep + 'list.zip'
     file = "cache" + os.sep + "list.json"
-
-    try:
-        profile_settings = load_profile(profile_id=1)
-
-        if int(profile_settings['v3']) == 1:
-            list_url = '{dut_epg_url}/list.v3.zip'.format(dut_epg_url=CONST_DUT_EPG)
-            tmp = ADDON_PROFILE + 'tmp' + os.sep + 'list.v3.zip'
-            file = "cache" + os.sep + "list.v3.json"
-    except:
-        pass
 
     if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
         data = load_file(file=file, isJSON=True)
@@ -372,16 +325,6 @@ def api_get_vod_by_type(type, character, genre, subscription_filter):
     vod_url = '{dut_epg_url}/{type}.zip'.format(dut_epg_url=CONST_DUT_EPG, type=type)
     file = "cache" + os.sep + "{type}.json".format(type=type)
     tmp = ADDON_PROFILE + 'tmp' + os.sep + "{type}.zip".format(type=type)
-
-    try:
-        profile_settings = load_profile(profile_id=1)
-
-        if int(profile_settings['v3']) == 1:
-            vod_url = '{dut_epg_url}/{type}.v3.zip'.format(dut_epg_url=CONST_DUT_EPG, type=type)
-            file = "cache" + os.sep + "{type}.v3.json".format(type=type)
-            tmp = ADDON_PROFILE + 'tmp' + os.sep + "{type}.v3.zip".format(type=type)
-    except:
-        pass
 
     if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
         data = load_file(file=file, isJSON=True)

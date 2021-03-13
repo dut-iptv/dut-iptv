@@ -289,16 +289,6 @@ def is_file_older_than_x_minutes(file, minutes=1):
         return False
 
 def load_channels(type):
-    if type == 'ziggo':
-        VIDEO_ADDON_PROFILE = ADDON_PROFILE.replace(ADDON_ID, 'plugin.video.ziggo')
-        profile = load_file(VIDEO_ADDON_PROFILE + 'profile.json', ext=True, isJSON=True)
-
-        try:
-            if int(profile['v3']) == 1:
-                return load_file(file='cache' + os.sep + type[0] + '.channels.v3.json', ext=False, isJSON=True)
-        except:
-            pass
-
     return load_file(file='cache' + os.sep + type[0] + '.channels.json', ext=False, isJSON=True)
 
 def load_file(file, ext=False, isJSON=False):

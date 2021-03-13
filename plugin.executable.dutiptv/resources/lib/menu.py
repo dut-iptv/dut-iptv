@@ -462,15 +462,6 @@ def save_all_prefs(type_tv_radio):
 
                     VIDEO_ADDON_PROFILE = ADDON_PROFILE.replace(ADDON_ID, video_addon)
                     addon_prefs = load_file(VIDEO_ADDON_PROFILE + 'prefs.json', ext=True, isJSON=True)
-                    addon_profile = load_file(VIDEO_ADDON_PROFILE + 'profile.json', ext=True, isJSON=True)
-
-                    ziggov3 = 0
-
-                    try:
-                        if int(addon_profile['v3']) == 1:
-                            ziggov3 = 1
-                    except:
-                        pass
 
                     for currow in type_channels:
                         row = type_channels[currow]
@@ -480,7 +471,7 @@ def save_all_prefs(type_tv_radio):
                         for currow2 in all_channels:
                             row2 = all_channels[currow2]
 
-                            if (ziggov3 == 0 and str(row2[video_addon + '_id']) == str(row['id'])) or (ziggov3 == 1 and check_key(row2, video_addon + '_idv3') and str(row2[video_addon + '_idv3']) == str(row['id'])):
+                            if str(row2[video_addon + '_id']) == str(row['id']):
                                 all_id = str(currow2)
 
                         if not all_id:
@@ -649,25 +640,10 @@ def change_channel(id, type_tv_radio, **kwargs):
 
                 VIDEO_ADDON_PROFILE = ADDON_PROFILE.replace(ADDON_ID, video_addon)
                 addon_prefs = load_file(VIDEO_ADDON_PROFILE + 'prefs.json', ext=True, isJSON=True)
-                addon_profile = load_file(VIDEO_ADDON_PROFILE + 'profile.json', ext=True, isJSON=True)
-
-                ziggov3 = 0
-
-                try:
-                    if int(addon_profile['v3']) == 1:
-                        ziggov3 = 1
-                except:
-                    pass
 
                 row2 = all_channels[id]
 
-                if ziggov3 == 1:
-                    try:
-                        type_id = str(row2[video_addon + '_idv3'])
-                    except:
-                        type_id = ''
-                else:
-                    type_id = str(row2[video_addon + '_id'])
+                type_id = str(row2[video_addon + '_id'])
 
                 if len(type_id) > 0:
                     row = type_channels[type_id]
@@ -714,13 +690,7 @@ def change_channel(id, type_tv_radio, **kwargs):
                 type_channels = load_channels(type=select_list[selected])
                 row2 = all_channels[id]
 
-                if ziggov3 == 1:
-                    try:
-                        type_id = str(row2[mod_pref[type_tv_radio + '_addonid'] + '_idv3'])
-                    except:
-                        type_id = ''
-                else:
-                    type_id = str(row2[mod_pref[type_tv_radio + '_addonid'] + '_id'])
+                type_id = str(row2[mod_pref[type_tv_radio + '_addonid'] + '_id'])
 
                 if len(type_id) > 0:
                     row = type_channels[type_id]
