@@ -2,7 +2,7 @@
 
 ### About
 
--Watch CanalDigitaal/KPN/NLZiet/Telenet (BE)/Telfort/T-Mobile/Videoland/XS4ALL/Ziggo Live TV and content from anywhere in the EU
+-Watch CanalDigitaal/F1 TV/KPN/NLZiet/Telenet (BE)/Telfort/T-Mobile/Videoland/XS4ALL/Ziggo Live TV and content from anywhere in the EU
 
 ### Features
 
