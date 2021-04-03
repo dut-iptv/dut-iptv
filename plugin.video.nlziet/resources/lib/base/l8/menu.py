@@ -12,7 +12,7 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
 from resources.lib.base.l7 import plugin
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_FIRST_BOOT, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_VOD_CAPABILITY, CONST_WATCHLIST
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_FIRST_BOOT, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_HAS_SEARCH, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_USE_PROXY, CONST_VOD_CAPABILITY, CONST_WATCHLIST
 from resources.lib.util import plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
 from urllib.parse import urlparse
 
@@ -39,12 +39,13 @@ def home(**kwargs):
 
         if settings.getBool('showMoviesSeries'):
             for vod_entry in CONST_VOD_CAPABILITY:
-                folder.add_item(label=_(vod_entry['label'], _bold=True), path=plugin.url_for(func_or_url=vod, file=vod_entry['file'], label=vod_entry['label'], start=vod_entry['start'], online=vod_entry['online'], az=vod_entry['az']))
+                folder.add_item(label=_(vod_entry['label'], _bold=True), path=plugin.url_for(func_or_url=vod, file=vod_entry['file'], label=vod_entry['label'], start=vod_entry['start'], online=vod_entry['online'], az=vod_entry['az'], menu=vod_entry['menu']))
 
         if CONST_WATCHLIST:
             folder.add_item(label=_(_.WATCHLIST, _bold=True), path=plugin.url_for(func_or_url=watchlist))
 
-        folder.add_item(label=_(_.SEARCH, _bold=True), path=plugin.url_for(func_or_url=search_menu))
+        if CONST_HAS_SEARCH:
+            folder.add_item(label=_(_.SEARCH, _bold=True), path=plugin.url_for(func_or_url=search_menu))
 
     folder.add_item(label=_(_.LOGIN, _bold=True), path=plugin.url_for(func_or_url=login))
     folder.add_item(label=_.SETTINGS, path=plugin.url_for(func_or_url=settings_menu))
@@ -231,10 +232,11 @@ def replaytv_content(label, day, station='', start=0, **kwargs):
     return folder
 
 @plugin.route()
-def vod(file, label, start=0, character=None, genre=None, online=0, az=0, **kwargs):
+def vod(file, label, start=0, character=None, genre=None, online=0, az=0, menu=0, **kwargs):
     start = int(start)
     online = int(online)
     az = int(az)
+    menu = int(menu)
 
     if az == 1 or az == 2:
         folder = plugin.Folder(title=_.PROGSAZ)
@@ -245,7 +247,7 @@ def vod(file, label, start=0, character=None, genre=None, online=0, az=0, **kwar
             folder.add_item(
                 label = label,
                 info = {'plot': _.TITLESBYGENREDESC},
-                path = plugin.url_for(func_or_url=vod, file=file, label=label, start=start, online=online, az=3),
+                path = plugin.url_for(func_or_url=vod, file=file, label=label, start=start, online=online, az=3, menu=menu),
             )
 
         label = _.ALLTITLES
@@ -253,7 +255,7 @@ def vod(file, label, start=0, character=None, genre=None, online=0, az=0, **kwar
         folder.add_item(
             label = label,
             info = {'plot': _.ALLTITLESDESC},
-            path = plugin.url_for(func_or_url=vod, file=file, label=label, start=start, online=online, az=0),
+            path = plugin.url_for(func_or_url=vod, file=file, label=label, start=start, online=online, az=0, menu=menu),
         )
 
         label = _.OTHERTITLES
@@ -261,7 +263,7 @@ def vod(file, label, start=0, character=None, genre=None, online=0, az=0, **kwar
         folder.add_item(
             label = label,
             info = {'plot': _.OTHERTITLESDESC},
-            path = plugin.url_for(func_or_url=vod, file=file, label=label, start=start, character='other', online=online, az=0),
+            path = plugin.url_for(func_or_url=vod, file=file, label=label, start=start, character='other', online=online, az=0, menu=menu),
         )
 
         for character in string.ascii_uppercase:
@@ -270,7 +272,7 @@ def vod(file, label, start=0, character=None, genre=None, online=0, az=0, **kwar
             folder.add_item(
                 label = label,
                 info = {'plot': _.TITLESWITHDESC + character},
-                path = plugin.url_for(func_or_url=vod, file=file, label=label, start=start, character=character, online=online, az=0),
+                path = plugin.url_for(func_or_url=vod, file=file, label=label, start=start, character=character, online=online, az=0, menu=menu),
             )
 
         return folder
@@ -293,17 +295,23 @@ def vod(file, label, start=0, character=None, genre=None, online=0, az=0, **kwar
     else:
         folder = plugin.Folder(title=label)
 
-        processed = process_vod_content(data=file, start=start, type=label, character=character, genre=genre, online=online)
+        if menu == 1:
+            processed = process_vod_menu_content(data=file, start=start, type=label, character=character, genre=genre, online=online)
 
-        if check_key(processed, 'items'):
-            folder.add_items(processed['items'])
+            if check_key(processed, 'items'):
+                folder.add_items(processed['items'])
+        else:
+            processed = process_vod_content(data=file, start=start, type=label, character=character, genre=genre, online=online)
 
-        if check_key(processed, 'total') and check_key(processed, 'count2') and processed['total'] > processed['count2']:
-            folder.add_item(
-                label = _(_.NEXT_PAGE, _bold=True),
-                properties = {'SpecialSort': 'bottom'},
-                path = plugin.url_for(func_or_url=vod, file=file, label=label, start=processed['count2'], character=character, genre=genre, online=online, az=az),
-            )
+            if check_key(processed, 'items'):
+                folder.add_items(processed['items'])
+
+            if check_key(processed, 'total') and check_key(processed, 'count2') and processed['total'] > processed['count2']:
+                folder.add_item(
+                    label = _(_.NEXT_PAGE, _bold=True),
+                    properties = {'SpecialSort': 'bottom'},
+                    path = plugin.url_for(func_or_url=vod, file=file, label=label, start=processed['count2'], character=character, genre=genre, online=online, az=az, menu=menu),
+                )
 
         return folder
 
@@ -687,17 +695,18 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
 
     proxy_url = "http://127.0.0.1:11189/{provider}".format(provider=PROVIDER_NAME)
 
-    code = 0
+    if CONST_USE_PROXY:
+        code = 0
 
-    try:
-        test_proxy = api_download(url="{proxy_url}/status".format(proxy_url=proxy_url), type='get', headers=None, data=None, json_data=False, return_json=False)
-        code = test_proxy['code']
-    except:
-        code = 404
+        try:
+            test_proxy = api_download(url="{proxy_url}/status".format(proxy_url=proxy_url), type='get', headers=None, data=None, json_data=False, return_json=False)
+            code = test_proxy['code']
+        except:
+            code = 404
 
-    if not code or not code == 200:
-        gui.ok(message=_.PROXY_NOT_SET)
-        return False
+        if not code or not code == 200:
+            gui.ok(message=_.PROXY_NOT_SET)
+            return False
 
     if CONST_START_FROM_BEGINNING and not from_beginning == 1 and settings.getBool(key='ask_start_from_beginning') and gui.yes_no(message=_.START_FROM_BEGINNING):
         from_beginning = 1
@@ -741,15 +750,16 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
     else:
         remove_stream_start()
 
-    real_url = "{hostscheme}://{netloc}".format(hostscheme=urlparse(path).scheme, netloc=urlparse(path).netloc)
+    if CONST_USE_PROXY:
+        real_url = "{hostscheme}://{netloc}".format(hostscheme=urlparse(path).scheme, netloc=urlparse(path).netloc)
+        path = path.replace(real_url, proxy_url)
+        write_file(file='stream_hostname', data=real_url, isJSON=False)
 
-    path = path.replace(real_url, proxy_url)
     playdata['path'] = path
     playdata['license'] = license
 
     item_inputstream, CDMHEADERS = plugin_process_playdata(playdata)
 
-    write_file(file='stream_hostname', data=real_url, isJSON=False)
     write_file(file='stream_duration', data=info['duration'], isJSON=False)
 
     if pvr == 1:
@@ -797,17 +807,17 @@ def renew_token(**kwargs):
 
     mod_path = plugin_renew_token(data)
 
-    listitem = plugin.Item(
-        path = mod_path,
-    )
+    #listitem = plugin.Item(
+    #    path = mod_path,
+    #)
 
-    newItem = listitem.get_li()
+    #newItem = listitem.get_li()
 
-    xbmcplugin.addDirectoryItem(ADDON_HANDLE, mod_path, newItem)
-    xbmcplugin.endOfDirectory(ADDON_HANDLE, cacheToDisc=False)
+    #xbmcplugin.addDirectoryItem(ADDON_HANDLE, mod_path, newItem)
+    #xbmcplugin.endOfDirectory(ADDON_HANDLE, cacheToDisc=False)
 
-    if xbmc.Monitor().waitForAbort(0.1):
-        return None
+    #if xbmc.Monitor().waitForAbort(0.1):
+    #    return None
 
 @plugin.route()
 def add_to_watchlist(id, type, **kwargs):
@@ -1270,6 +1280,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
     subscription_filter = plugin_vod_subscription_filter()
 
     start = int(start)
+    online = int(online)
     type = str(type)
     type2 = data
 
@@ -1288,7 +1299,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
         else:
             data = api_vod_download(type=data, start=start)
     else:
-        data = api_get_vod_by_type(type=data, character=character, genre=genre, subscription_filter=subscription_filter)
+        data = api_get_vod_by_type(type=data, character=character, genre=genre, subscription_filter=subscription_filter, menu=0)
 
     if not data:
         return {'items': items, 'count': item_count, 'count2': count, 'total': 0}
@@ -1330,6 +1341,8 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
 
         if row['duration'] and len(str(row['duration'])) > 0:
             duration = int(row['duration'])
+            
+        log(row['icon'])
 
         program_image = str(row['icon'])
         program_image_large = str(row['icon'])
@@ -1337,6 +1350,10 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
 
         if program_type == "show" or program_type == "Serie" or program_type == "series":
             path = plugin.url_for(func_or_url=vod_series, type=type2, label=label, id=id)
+            info = {'plot': description, 'sorttitle': label.upper()}
+            playable = False
+        elif program_type == "event":
+            path = plugin.url_for(func_or_url=vod_season, label=label, series=0, id=id)
             info = {'plot': description, 'sorttitle': label.upper()}
             playable = False
         elif program_type == "Epg":
@@ -1364,6 +1381,72 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
             path = path,
             playable = playable,
             context = context
+        ))
+
+    if not online == 1:
+        total = len(data)
+    else:
+        total = int(len(data) + start)
+
+    returnar = {'items': items, 'count': item_count, 'count2': count, 'total': total}
+
+    return returnar
+
+def process_vod_menu_content(data, start=0, search=None, type=None, character=None, genre=None, online=0):
+    subscription_filter = plugin_vod_subscription_filter()
+
+    start = int(start)
+    type = str(type)
+    type2 = data
+
+    items = []
+
+    if not online == 1:
+        count = 0
+    else:
+        count = start
+
+    item_count = 0
+
+    if online == 1:
+        if search:
+            data = api_search(query=search)
+        else:
+            data = api_vod_download(type=data, start=start)
+    else:
+        data = api_get_vod_by_type(type=data, character=character, genre=genre, subscription_filter=subscription_filter, menu=1)
+
+    if not data:
+        return {'items': items, 'count': item_count, 'count2': count, 'total': 0}
+
+    for currow in data['menu']:
+        if not online == 1:
+            row = data['menu'][currow]
+        else:
+            row = currow
+
+        id = str(currow)
+        label = str(row['label'])
+        menu_type = str(row['type'])
+        program_image = str(row['image'])
+
+        if menu_type == 'content':
+            path = plugin.url_for(func_or_url=vod, file=id, label=label, start=0, character=character, online=online, az=0, menu=0)
+            playable = False
+        elif menu_type == 'menu':
+            path = plugin.url_for(func_or_url=vod, file=id, label=label, start=0, character=character, online=online, az=0, menu=1)
+            playable = False
+        else:
+            continue
+
+        items.append(plugin.Item(
+            label = label,
+            art = {
+                'thumb': program_image,
+                'fanart': program_image
+            },
+            path = path,
+            playable = playable,
         ))
 
     if not online == 1:

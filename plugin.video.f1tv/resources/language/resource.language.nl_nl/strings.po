@@ -1,0 +1,629 @@
+# KODI Media Center language file
+# Addon Name: F1 TV
+# Addon id: plugin.video.f1tv
+# Addon Provider: Anon
+msgid ""
+msgstr ""
+"Project-Id-Version:\n"
+"Report-Msgid-Bugs-To:\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator:\n"
+"Language-Team:\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: nl_NL\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30001"
+msgid "Subscription no."
+msgstr "Abonnementsnummer"
+
+msgctxt "#30002"
+msgid "Pincode"
+msgstr "Pincode"
+
+msgctxt "#30003"
+msgid "Auto setup IPTV"
+msgstr "Automatisch IPTV Instellen"
+
+msgctxt "#30005"
+msgid "Auto setup Kodi Language/PVR"
+msgstr "Automatisch Kodi Taal/PVR Instellen"
+
+msgctxt "#30007"
+msgid "Live TV"
+msgstr "Live TV"
+
+msgctxt "#30010"
+msgid "TV Shows"
+msgstr "Series"
+
+msgctxt "#30011"
+msgid "Movies"
+msgstr "Films"
+
+msgctxt "#30017"
+msgid "Save Pincode"
+msgstr "Pincode opslaan"
+
+msgctxt "#30021"
+msgid "Next Page"
+msgstr "Volgende pagina"
+
+msgctxt "#30024"
+msgid "Replay TV"
+msgstr "Replay TV"
+
+msgctxt "#30027"
+msgid "Kids TV Shows"
+msgstr "Kinder Series"
+
+msgctxt "#30028"
+msgid "Show Video On Demand (VOD)"
+msgstr "Toon Video On Demand (VOD)"
+
+msgctxt "#30029"
+msgid "Kids Movies"
+msgstr "Kinder Films"
+
+msgctxt "#30031"
+msgid "Season"
+msgstr "Seizoen"
+
+msgctxt "#30032"
+msgid "Load only default channels"
+msgstr "Alleen standaard zenders laden"
+
+msgctxt "#30033"
+msgid "Error Logging in"
+msgstr "Fout bij het inloggen"
+
+msgctxt "#30034"
+msgid "Check your subscription number and pincode"
+msgstr "Controleer je abonnementsnummer en pincode"
+
+msgctxt "#30035"
+msgid "Subscription number can't be empty"
+msgstr "Abonnementsnummer mag niet leeg zijn"
+
+msgctxt "#30036"
+msgid "ITV Pincode can't be empty"
+msgstr "ITV Pincode mag niet leeg zijn"
+
+msgctxt "#30037"
+msgid "Force Surround Sound"
+msgstr "Forceer Surround Audio"
+
+msgctxt "#32000"
+msgid "You need to login to access this content"
+msgstr "Je moet inloggen om toegang tot deze content te krijgen"
+
+msgctxt "#32001"
+msgid "No default route found"
+msgstr "Geen standaard route gevonden"
+
+msgctxt "#32002"
+msgid "Are you sure you want to reset this add-on?\n"
+"This will reset all settings and clear all data"
+msgstr "Weet je zeker dat je deze add-on wil resetten?\n"
+"Dit zal alle instellen resetten en alle data legen"
+
+msgctxt "#32003"
+msgid "Reset Complete"
+msgstr "Reset geslaagd"
+
+msgctxt "#32006"
+msgid "Could not find a function for url: {raw_url} => {parsed_url}"
+msgstr "Kon geen functie vinden voor url: {raw_url} => {parsed_url}"
+
+msgctxt "#32007"
+msgid "Could not find a url for function: {function_name}"
+msgstr "Kon geen url vinden voor functie: {function_name}"
+
+msgctxt "#32008"
+msgid "Inpustream Adaptive add-on required for Widevine playback"
+msgstr "Inpustream Adaptive add-on is vereist voor het afspelen van Widevine"
+
+msgctxt "#32009"
+msgid "Kodi Windows Store (UWP) version does not support Widevine playback.\n"
+"Use the Kodi .exe installer from the Kodi website instead."
+msgstr "Kodi Windows Store (UWP) versie ondersteunt het afspelen van Widevine niet.\n"
+"Gebruik het Kodi .exe installatiebestand van de Kodi website."
+
+msgctxt "#32010"
+msgid "Kodi 18 or higher required for Widevine playback on {system}"
+msgstr "Kodi 18 of nieuwer is vereist voor het afspelen van Widevine op {system}"
+
+msgctxt "#32011"
+msgid "ARM 64bit does not support Widevine playback\n"
+"An OS with a 32-bit userspace is required.\n"
+"Try coreelec.org"
+msgstr "ARM 64bit ondersteunt het afspelen van Widevine niet\n"
+"Een besturingssysteem met een 32-bit userspace is vereist.\n"
+"Probeer coreelec.org"
+
+msgctxt "#32012"
+msgid "This system ({system}{arch} Kodi v{kodi_version}) does not yet support Widevine playback"
+msgstr "Dit systeem ({system}{arch} Kodi v{kodi_version}) ondersteunt het afspelen van Widevine niet"
+
+msgctxt "#32014"
+msgid "Downloading required file\n"
+"{url}"
+msgstr "Downloaden van vereist bestand\n"
+"{url}"
+
+msgctxt "#32015"
+msgid "Widevine CDM"
+msgstr "Widevine CDM"
+
+msgctxt "#32016"
+msgid "There was an unexpected error installing the Widevine CDM\n"
+"Please restart KODI and try again"
+msgstr "Er was een onverwachte fout bij het installeren van Widevine CDM\n"
+"Herstart KODI en probeer het opnieuw"
+
+msgctxt "#32019"
+msgid "Reset Add-on"
+msgstr "Reset Add-on"
+
+msgctxt "#32020"
+msgid "{addon} - Error"
+msgstr "{addon} - Fout"
+
+msgctxt "#32021"
+msgid "Install Widevine CDM"
+msgstr "Installeer Widevine CDM"
+
+msgctxt "#32022"
+msgid "Widevine CDM Installed OK\n"
+"If videos do not play, please restart KODI and try again"
+msgstr "Widevine CDM Succesvol geinstalleerd\n"
+"Als videos niet afspelen, herstart KODI en probeer het opnieuw"
+
+msgctxt "#32024"
+msgid "Change login information"
+msgstr "Wijzig login gegevens"
+
+msgctxt "#32025"
+msgid "Logout"
+msgstr "Uitloggen"
+
+msgctxt "#32026"
+msgid "Settings"
+msgstr "Instellingen"
+
+msgctxt "#32027"
+msgid "Are you sure you want to logout?"
+msgstr "Weet je zeker dat je wil uitloggen?"
+
+msgctxt "#32029"
+msgid "Search"
+msgstr "Zoeken"
+
+msgctxt "#32030"
+msgid "Search: {query}"
+msgstr "Zoeken: {query}"
+
+msgctxt "#32032"
+msgid "{addon} - Unexpected Error"
+msgstr "{addon} - Onverwachte fout"
+
+msgctxt "#32033"
+msgid "Failed to download required file: {filename}"
+msgstr "Downloaden van vereist bestand mislukt: {filename}"
+
+msgctxt "#32034"
+msgid "General"
+msgstr "Algemeen"
+
+msgctxt "#32038"
+msgid "New Widevine CDM available!\n"
+"Using an old version may cause playback issues\n"
+"Download and override existing CDM?"
+msgstr "Nieuwe Widevine CDM beschikbaar!\n"
+"Een oude versie gebruiken kan probelem met het afspelen veroorzaken\n"
+"Downloaden en overschrijven van de bestaande CDM?"
+
+msgctxt "#32040"
+msgid "MD5 checksum failed for file: {filename}\n"
+"{local_md5} != {remote_md5}"
+msgstr "MD5 checksum mislukt voor bestand: {filename}\n"
+"{local_md5} != {remote_md5}"
+
+msgctxt "#32041"
+msgid "No Items"
+msgstr "Geen items"
+
+msgctxt "#32052"
+msgid "Unknown Error"
+msgstr "Onbekende fout"
+
+msgctxt "#32054"
+msgid "Error playing item"
+msgstr "Fout bij afspelen"
+
+msgctxt "#32055"
+msgid "Error accessing stream, maybe your account is not authorized"
+msgstr "Fout bij verkijgen toegang tot stream, mogelijk heb je geen authorisatie"
+
+msgctxt "#32056"
+msgid "No ReplayTV information available"
+msgstr "Geen ReplayTV informatie beschikbaar"
+
+msgctxt "#32057"
+msgid "Disable the \"Only load standard channels\" setting to retrieve the data for this channel (in the next 24h)"
+msgstr "Schakel de optie \"Alleen standaard zenders laden\" uit om de data van deze zender (binnen 24u) op te halen"
+
+msgctxt "#32058"
+msgid "Stream not found"
+msgstr "Stream niet gevonden"
+
+msgctxt "#32059"
+msgid "Stream for this program is not (yet) available"
+msgstr "Stream voor dit programma is (nog) niet beschikbaar"
+
+msgctxt "#32063"
+msgid "Done, reboot required"
+msgstr "Klaar, herstart vereist"
+
+msgctxt "#32064"
+msgid "Programs A-Z"
+msgstr "Programma's A-Z"
+
+msgctxt "#32065"
+msgid "Programs sorted by begin letter"
+msgstr "Programma's gesorteerd naar begin letter"
+
+msgctxt "#32066"
+msgid "Other titles (0-9, special characters)"
+msgstr "Overige titels (0-9, speciale tekens)"
+
+msgctxt "#32067"
+msgid "Titles with "
+msgstr "Titels met "
+
+msgctxt "#32068"
+msgid "Programs beginning with a number or special character"
+msgstr "Programma's beginnend met een cijfer of speciale tekens"
+
+msgctxt "#32069"
+msgid "Programs beginning with "
+msgstr "Programma's beginnend met "
+
+msgctxt "#32071"
+msgid "Done"
+msgstr "Klaar"
+
+msgctxt "#32072"
+msgid "Force EPG download"
+msgstr "EPG download forceren"
+
+msgctxt "#32073"
+msgid "Force settings download"
+msgstr "Instellingen download forceren"
+
+msgctxt "#32074"
+msgid "Search"
+msgstr "Zoeken"
+
+msgctxt "#32075"
+msgid "New Search"
+msgstr "Nieuwe zoekterm"
+
+msgctxt "#32076"
+msgid "Start a new search"
+msgstr "Begin een nieuwe zoekactie"
+
+msgctxt "#32079"
+msgid "Today"
+msgstr "Vandaag"
+
+msgctxt "#32080"
+msgid "Yesterday"
+msgstr "Gister"
+
+msgctxt "#32081"
+msgid "Live TV points to Simple IPTV PVR"
+msgstr "Live TV verwijst naar Simple IPTV PVR"
+
+msgctxt "#32082"
+msgid "Reset Session"
+msgstr "Sessie resetten"
+
+msgctxt "#32090"
+msgid "Enable Radio in Simple IPTV"
+msgstr "Radio in Simple IPTV inschakelen"
+
+msgctxt "#32091"
+msgid "Disable subtitles by default"
+msgstr "Ondertiteling standaard uitschakelen"
+
+msgctxt "#32092"
+msgid "Seconds to add at the end of streams"
+msgstr "Aantal seconden om toe te voegen aan het eind van streams"
+
+msgctxt "#32093"
+msgid "Start from the beginning?"
+msgstr "Vanaf het begin starten?"
+
+msgctxt "#32094"
+msgid "Login using email/password instead of customer no./PIN"
+msgstr "Inloggen met email/wachtwoord i.p.v klantnummer/PIN"
+
+msgctxt "#32099"
+msgid "Enable cache"
+msgstr "Cache inschakelen"
+
+msgctxt "#32100"
+msgid "Check your email and password"
+msgstr "Controleer je email en wachtwoord"
+
+msgctxt "#32101"
+msgid "Force maximum resolution"
+msgstr "Forceer maximale resolutie"
+
+msgctxt "#32102"
+msgid "Enable Debug Mode"
+msgstr "Debug mode inschakelen"
+
+msgctxt "#32103"
+msgid "Ask to start stream from beginning"
+msgstr "Vraag om stream vanaf begin te starten"
+
+msgctxt "#320104"
+msgid "Channel selection"
+msgstr "Zender selectie"
+
+msgctxt "#320105"
+msgid "Successfully tested"
+msgstr "Succesvol getest"
+
+msgctxt "#320106"
+msgid "Not successfully tested"
+msgstr "Niet succesvol getest"
+
+msgctxt "#320107"
+msgid "Not yet tested"
+msgstr "Nog niet getest"
+
+msgctxt "#320108"
+msgid "updates automatically based on testing"
+msgstr "update automatisch op basis van tests"
+
+msgctxt "#320109"
+msgid "updates manually"
+msgstr "update handmatig"
+
+msgctxt "#320110"
+msgid "Electronic Programming Guide (EPG, TV menu)"
+msgstr "Elektronische Programma Gids (EPG, TV menu)"
+
+msgctxt "#32111"
+msgid "Test channel availability and bandwidth"
+msgstr "Beschikbaarheid en bandbreedte van kanalen testen"
+
+msgctxt "#320112"
+msgid "Automatically set enabled/disabled based on testing"
+msgstr "Automatisch inschakelen/uitschakelen gebasseerd op tests"
+
+msgctxt "#320113"
+msgid "Test channel"
+msgstr "Test zender"
+
+msgctxt "#320114"
+msgid "Start from beginning"
+msgstr "Vanaf begin starten"
+
+msgctxt "#320115"
+msgid "Login was successfull"
+msgstr "Login geslaagd"
+
+msgctxt "#320116"
+msgid "Proxy is not correctly started, this often happens after first installing or updating, please restart Kodi and try again"
+msgstr "Proxy is niet goed gestart, dit gebeurd meestal na de 1e installatie of een update, herstart Kodi en probeer het opnieuw"
+
+msgctxt "#320117"
+msgid "F1 TV email"
+msgstr "F1 TV email"
+
+msgctxt "#320118"
+msgid "F1 TV password"
+msgstr "F1 TV wachtwoord"
+
+msgctxt "#320119"
+msgid "Email can't be empty"
+msgstr "Email mag niet leeg zijn"
+
+msgctxt "#320120"
+msgid "Password can't be empty"
+msgstr "Wachtwoord mag niet leeg zijn"
+
+msgctxt "#320122"
+msgid "Disable 18+/Porn channels"
+msgstr "18+/Porno zenders uitschakelen"
+
+msgctxt "#320123"
+msgid "Yes"
+msgstr "Ja"
+
+msgctxt "#320124"
+msgid "No"
+msgstr "Nee"
+
+msgctxt "#320125"
+msgid "Disable Regional Channels by default (can be re-enabled on an individual basis)"
+msgstr "Regionale Zenders standaard uitschakelen (kunnen worden heringeschakeld op individuele basis)"
+
+msgctxt "#320126"
+msgid "Connected through the providers internet connection (without a VPN)"
+msgstr "Verbonden via internet verbinding van de provider (zonder VPN)"
+
+msgctxt "#320127"
+msgid "You cannot enable ReplayTV for this channel, because ReplayTV for this channel is not available from this provider. If you believe this to be an error please create an Issue on the Dut-IPTV GitHub"
+msgstr "Je kan ReplayTV niet inschakelen voor deze zender, omdat ReplayTV niet beschikbaar is bij deze provider voor dit kanaal. Maak een Issue op de Dut-IPTV GitHub aan als je denkt dat dit een fout is"
+
+msgctxt "#320128"
+msgid "You cannot enable this channel, because it is not available from this provider when not connected through an internet connection from the same provider. If you are on an internet connection from this provider change your Addon settings and try again. If you believe this to be an error please create an Issue on the Dut-IPTV GitHub"
+msgstr "Je kan deze zender niet inschakelen, omdat deze zender niet beschikbaar is bij deze provider als je neit verbonden bent met het internet via dezelfde provider. Verander je Addon instellingen als je wel gebruik maakt van een internetverbinding van deze provider en probeer het opnieuw. Maak een Issue op de Dut-IPTV GitHub aan als je denkt dat dit een fout is"
+
+msgctxt "#320129"
+msgid "Disable Regional Channels"
+msgstr "Regionale zenders uitschakelen"
+
+msgctxt "#320130"
+msgid "Disable Channels that are only available through the providers internet connection (without a VPN)"
+msgstr "Zenders uitschakelen die alleen via een internet verbinding van de provider (zonder een VPN) te bekijken zijn"
+
+msgctxt "#320131"
+msgid "Disable Channels that are not available in the default subscription"
+msgstr "Zenders uitschakelen die niet in het basispakket zitten"
+
+msgctxt "#330001"
+msgid "Select order"
+msgstr "Selecteer volgorde"
+
+msgctxt "#330002"
+msgid "Disabled"
+msgstr "Uitgeschakeld"
+
+msgctxt "#330003"
+msgid "Select addon"
+msgstr "Selecteer addon"
+
+msgctxt "#330004"
+msgid "Select to setup IPTV Simple PVR and finish setup"
+msgstr "Selecteer om IPTV Simple PVR te configureren en configuratie afronden"
+
+msgctxt "#330005"
+msgid "Skip IPTV Simple PVR setup and finish setup"
+msgstr "IPTV Simple PVR configuratie overslaan en configuratie afronden"
+
+msgctxt "#330006"
+msgid "Setup IPTV Simple PVR and finish setup"
+msgstr "IPTV Simple PVR configureren en configuratie afronden"
+
+msgctxt "#330007"
+msgid "Skip and finish setup"
+msgstr "Overslaan en configuratie afronden"
+
+msgctxt "#330008"
+msgid "Setup IPTV Simple PVR"
+msgstr "IPTV Simple PVR Instellingen"
+
+msgctxt "#330009"
+msgid "Next"
+msgstr "Volgende"
+
+msgctxt "#330010"
+msgid "Select Next when you are ready to move on to setup IPTV Simple PVR"
+msgstr "Selecteer volgende als je klaar bent om verder te gaan naar de IPTV Simple PVR instellingen"
+
+msgctxt "#330011"
+msgid "Select Next when you are ready to move on to Radio setup"
+msgstr "Selecteer volgende als je klaar bent om verder te gaan naar de radio instellingen"
+
+msgctxt "#330012"
+msgid "Select Radio Channels"
+msgstr "Selecteer Radio Zenders"
+
+msgctxt "#330013"
+msgid "Select Next when you are ready to move on to setup the channel order"
+msgstr "Selecteer volgende als je klaar bent om verder te gaan naar de volgorde instellingen"
+
+msgctxt "#330014"
+msgid "Select Replay TV Channels"
+msgstr "Selecteer Replay TV Zenders"
+
+msgctxt "#330015"
+msgid "Select Next when you are ready to move on to setup the Replay TV Channels"
+msgstr "Selecteer volgende als je klaar bent om verder te gaan naar de instellingen van de Replay TV zenders"
+
+msgctxt "#330016"
+msgid "Select Live TV Channels"
+msgstr "Selecteer Live TV Zenders"
+
+msgctxt "#330017"
+msgid "Add Radio Channels?"
+msgstr "Radio zenders toevoegen?"
+
+msgctxt "#330018"
+msgid "Done"
+msgstr "Klaar"
+
+msgctxt "#330019"
+msgid "Select secondary addons"
+msgstr "Selecteer secundaire addons"
+
+msgctxt "#330020"
+msgid "Select one or more secondary addons (in order) or select \'Done\' when ready."
+msgstr "Selecteer een of meerdere secundaire addons (op volgorde) of selecteer \'Klaar\' wanneer je gereed bent."
+
+msgctxt "#330021"
+msgid "Skip"
+msgstr "Overslaan"
+
+msgctxt "#330022"
+msgid "Select primary addon"
+msgstr "Selecteer primaire addon"
+
+msgctxt "#330023"
+msgid "Select your primary addon, usually the provider with the best quality or smallest delay for Live TV."
+msgstr "Selecteer je primaire addon, dit is meestal de provider met de beste kwaliteit of de kortste vertraging bij Live TV."
+
+msgctxt "#330024"
+msgid "Retain current addon selection and skip to channel selection."
+msgstr "Behoud de huidige addon selectie en ga naar zender selectie"
+
+msgctxt "#330025"
+msgid "Reset settings"
+msgstr "Reset instellingen"
+
+msgctxt "#330026"
+msgid "None of the video addons are installed, enabled and logged in"
+msgstr "Geen van de video addons in geinstalleerd, ingeschakeld en ingelogd"
+
+msgctxt "#330027"
+msgid "This addon is not installed, select Next to continue or install and login to additional addons before continue on."
+msgstr "Deze addon is niet geinstalleerd, selecteer volgende om verder te gaan of installeer en login bij extra addons voordat je verder gaat."
+
+msgctxt "#330028"
+msgid "Please install and login in using one of the mentioned addons before continuing in this addon"
+msgstr "Installeer en login bij een van de genoemde addons voordat je verdergaat in deze addon"
+
+msgctxt "#330029"
+msgid "Select to remove all preferences from this addon"
+msgstr "Kies om alle voorkeuren in deze addon te verwijderen"
+
+msgctxt "#330030"
+msgid "This addon is installed but not logged in, select Next to continue or install and login to additional addons before continue on."
+msgstr "Deze addon is geinstalleerd, maar niet ingelogd, selecteer volgende om verder te gaan of installeer en login bij extra addons voordat je verder gaat."
+
+msgctxt "#330031"
+msgid "This addon is installed and logged in, select Next to continue or install and login to additional addons before continue on."
+msgstr "Deze addon is geinstalleerd en ingelogd, selecteer volgende om verder te gaan of installeer en login bij extra addons voordat je verder gaat."
+
+msgctxt "#330032"
+msgid "Select to continue, note that only green colored addons are available in the next steps."
+msgstr "Selecteer om verder te gaan, let op dat alleen groen gekleurede addons beschikbaar zijn in de volgende stappen."
+
+msgctxt "#330040"
+msgid "All programs"
+msgstr "Alle programma's"
+
+msgctxt "#330041"
+msgid "All programs"
+msgstr "Alle programma's"
+
+msgctxt "#330042"
+msgid "Programs by genre"
+msgstr "Progamma's per genre"
+
+msgctxt "#330043"
+msgid "Programs by genre"
+msgstr "Progamma's per genre"
+
+msgctxt "#330044"
+msgid "Programs by genre"
+msgstr "Progamma's per genre"

@@ -221,8 +221,6 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     if code and code == 200 and data:
         if typestr == 'episode':
-            log('E' + str(id))
-
             if check_key(data, 'details') and check_key(data['details'], 'E' + str(id)):
                 info = data['details']['E' + str(id)]
         else:

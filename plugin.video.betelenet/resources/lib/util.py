@@ -15,7 +15,7 @@ from urllib.parse import urlencode
 def check_entitlements():
     from resources.lib.api import api_get_play_token
 
-    media_groups_url = '{mediagroups_url}/crid:~~2F~~2Fschange.com~~2F63494ff3-70b4-4ce6-866a-9645f2b76d3e?byHasCurrentVod=true&range=1-1&sort=playCount7%7Cdesc'.format(mediagroups_url=CONST_API_URLS[0]['mediagroupsfeeds_url'])
+    media_groups_url = '{mediagroups_url}/crid:~~2F~~2Fschange.com~~2F63494ff3-70b4-4ce6-866a-9645f2b76d3e?byHasCurrentVod=true&range=1-1&sort=playCount7%7Cdesc'.format(mediagroups_url=CONST_API_URLS['mediagroupsfeeds_url'])
 
     download = api_download(url=media_groups_url, type='get', headers=None, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -28,7 +28,7 @@ def check_entitlements():
 
     id = data['mediaGroups'][0]['id']
 
-    media_item_url = '{mediaitem_url}/{mediaitem_id}'.format(mediaitem_url=CONST_API_URLS[0]['mediaitems_url'], mediaitem_id=id)
+    media_item_url = '{mediaitem_url}/{mediaitem_id}'.format(mediaitem_url=CONST_API_URLS['mediaitems_url'], mediaitem_id=id)
 
     download = api_download(url=media_item_url, type='get', headers=None, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -45,7 +45,7 @@ def check_entitlements():
     if (not urldata or not check_key(urldata, 'play_url') or not check_key(urldata, 'locator') or urldata['play_url'] == 'http://Playout/using/Session/Service'):
             urldata = {}
 
-            playout_url = '{base_url}/playout/vod/{id}?abrType=BR-AVC-DASH'.format(base_url=CONST_API_URLS[0]['base_url'], id=id)
+            playout_url = '{base_url}/playout/vod/{id}?abrType=BR-AVC-DASH'.format(base_url=CONST_API_URLS['base_url'], id=id)
             download = api_download(url=playout_url, type='get', headers=None, data=None, json_data=False, return_json=True)
             data = download['data']
             code = download['code']
@@ -142,7 +142,7 @@ def get_image(prefix, content):
     return image_url
 
 def get_play_url(content):
-    profile_settings = load_profile(profile_id=1)
+                                                 
 
     if check_key(content, 'url') and check_key(content, 'contentLocator'):
         return {'play_url': content['url'], 'locator': content['contentLocator']}
@@ -280,7 +280,8 @@ def plugin_process_playdata(playdata):
 
     CDMHEADERS = {
         'User-Agent': DEFAULT_USER_AGENT,
-        'X-Client-Id': CONST_DEFAULT_CLIENTID + '||' + DEFAULT_USER_AGENT,
+        #'X-Client-Id': CONST_DEFAULT_CLIENTID + '||' + DEFAULT_USER_AGENT,
+        'X-OESP-License-Token-Type': 'velocix',
         'X-OESP-Token': profile_settings['access_token'],
         'X-OESP-Username': creds['username'],
         'X-OESP-License-Token': profile_settings['drm_token'],
@@ -299,10 +300,13 @@ def plugin_process_playdata(playdata):
         params.append(('path', playdata['path']))
         params.append(('locator', playdata['locator']))
 
+    write_file(file='token_renew', data='plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params))), isJSON=False)
+
     item_inputstream = inputstream.Widevine(
         license_key = playdata['license'],
-        media_renewal_url = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params))),
-        media_renewal_time = 60,
+        #media_renewal_url = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params))),
+        #media_renewal_time = 60,
+        #manifest_update_parameter = 'full',
     )
 
     return item_inputstream, CDMHEADERS

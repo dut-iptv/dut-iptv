@@ -4,8 +4,9 @@ from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_PROFILE, CONST_DUT_EPG_BASE, CONST_DUT_EPG, SESSION_CHUNKSIZE
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
-from resources.lib.base.l3.util import change_icon, clear_cache, fixBadZipfile, is_file_older_than_x_days, load_file, load_profile, update_prefs, write_file
+from resources.lib.base.l3.util import change_icon, check_key, clear_cache, fixBadZipfile, is_file_older_than_x_days, load_file, load_profile, update_prefs, write_file
 from resources.lib.base.l4.session import Session
+from resources.lib.constants import CONST_MOD_CACHE
 
 def api_download(url, type, headers=None, data=None, json_data=True, return_json=True, allow_redirects=True, auth=None):
     session = Session(cookies_key='cookies')
@@ -40,7 +41,12 @@ def api_get_channels():
     channels_url = '{dut_epg_url}/channels.json'.format(dut_epg_url=CONST_DUT_EPG)
     file = "cache" + os.sep + "channels.json"
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=1):
+    if check_key(CONST_MOD_CACHE, 'channels'):
+        days = CONST_MOD_CACHE['channels']
+    else:
+        days = 1
+
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=days):
         data = load_file(file=file, isJSON=True)
     else:
         download = api_download(url=channels_url, type='get', headers=None, data=None, json_data=True, return_json=True)
@@ -67,13 +73,18 @@ def api_get_channels():
 def api_get_epg_by_date_channel(date, channel):
     type = '{date}_{channel}'.format(date=date, channel=channel)
 
+    if check_key(CONST_MOD_CACHE, str(type)):
+        days = CONST_MOD_CACHE[str(type)]
+    else:
+        days = 0.5
+
     encodedBytes = base64.b32encode(type.encode("utf-8"))
     type = str(encodedBytes, "utf-8")
 
     epg_url = '{dut_epg_url}/{type}.json'.format(dut_epg_url=CONST_DUT_EPG, type=type)
     file = "cache" + os.sep + "{type}.json".format(type=type)
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=days):
         data = load_file(file=file, isJSON=True)
     else:
         download = api_download(url=epg_url, type='get', headers=None, data=None, json_data=True, return_json=True)
@@ -90,13 +101,18 @@ def api_get_epg_by_date_channel(date, channel):
 def api_get_epg_by_idtitle(idtitle, start, end, channels):
     type = '{idtitle}'.format(idtitle=idtitle)
 
+    if check_key(CONST_MOD_CACHE, str(type)):
+        days = CONST_MOD_CACHE[str(type)]
+    else:
+        days = 0.5
+
     encodedBytes = base64.b32encode(type.encode("utf-8"))
     type = str(encodedBytes, "utf-8")
 
     epg_url = '{dut_epg_url}/{type}.json'.format(dut_epg_url=CONST_DUT_EPG, type=type)
     file = "cache" + os.sep + "{type}.json".format(type=type)
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=days):
         data = load_file(file=file, isJSON=True)
     else:
         download = api_download(url=epg_url, type='get', headers=None, data=None, json_data=True, return_json=True)
@@ -138,7 +154,7 @@ def api_get_genre_list(type):
     genres_url = '{dut_epg_url}/{type}.json'.format(dut_epg_url=CONST_DUT_EPG, type=type)
     file = "cache" + os.sep + "{type}.json".format(type=type)
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=7):
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
         data = load_file(file=file, isJSON=True)
     else:
         download = api_download(url=genres_url, type='get', headers=None, data=None, json_data=True, return_json=True)
@@ -160,7 +176,12 @@ def api_get_list(start, end, channels):
     tmp = ADDON_PROFILE + 'tmp' + os.sep + 'list.zip'
     file = "cache" + os.sep + "list.json"
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+    if check_key(CONST_MOD_CACHE, 'list'):
+        days = CONST_MOD_CACHE['list']
+    else:
+        days = 0.5
+
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=days):
         data3 = load_file(file=file, isJSON=True)
     else:
         resp = Session().get(list_url, stream=True)
@@ -242,7 +263,12 @@ def api_get_list_by_first(first, start, end, channels):
     tmp = ADDON_PROFILE + 'tmp' + os.sep + 'list.zip'
     file = "cache" + os.sep + "list.json"
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+    if check_key(CONST_MOD_CACHE, 'list'):
+        days = CONST_MOD_CACHE['list']
+    else:
+        days = 0.5
+
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=days):
         data = load_file(file=file, isJSON=True)
     else:
         resp = Session().get(list_url, stream=True)
@@ -315,9 +341,16 @@ def api_get_list_by_first(first, start, end, channels):
 
     return data2
 
-def api_get_vod_by_type(type, character, genre, subscription_filter):
+def api_get_vod_by_type(type, character, genre, subscription_filter, menu=0):
+    menu = int(menu)
+
     if not os.path.isdir(ADDON_PROFILE + 'tmp'):
         os.makedirs(ADDON_PROFILE + 'tmp')
+
+    if check_key(CONST_MOD_CACHE, str(type)):
+        days = CONST_MOD_CACHE[str(type)]
+    else:
+        days = 0.5
 
     encodedBytes = base64.b32encode(type.encode("utf-8"))
     type = str(encodedBytes, "utf-8")
@@ -326,7 +359,7 @@ def api_get_vod_by_type(type, character, genre, subscription_filter):
     file = "cache" + os.sep + "{type}.json".format(type=type)
     tmp = ADDON_PROFILE + 'tmp' + os.sep + "{type}.zip".format(type=type)
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=days):
         data = load_file(file=file, isJSON=True)
     else:
         resp = Session().get(vod_url, stream=True)
@@ -369,6 +402,9 @@ def api_get_vod_by_type(type, character, genre, subscription_filter):
                 return None
         else:
             return None
+
+    if menu == 1:
+        return data
 
     data2 = OrderedDict()
 

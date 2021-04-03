@@ -1,5 +1,9 @@
 from resources.lib.base.l3.language import _
 
+CONST_BASE_DOMAIN = ''
+CONST_BASE_DOMAIN_MOD = False
+CONST_BASE_IP = ''
+
 CONST_BASE_URL = 'https://livetv.canaldigitaal.nl'
 CONST_DEFAULT_API = 'https://tvapi.solocoo.tv/v1'
 CONST_LOGIN_URL = 'https://login.canaldigitaal.nl'
@@ -40,16 +44,22 @@ CONST_HAS_LIVE = True
 
 CONST_HAS_REPLAY = True
 
+CONST_HAS_SEARCH = True
+
+CONST_MOD_CACHE = {}
+
 CONST_START_FROM_BEGINNING = True
 
 CONST_ONLINE_SEARCH = False
 
+CONST_USE_PROXY = True
+
 CONST_VOD_CAPABILITY = [
-    { 'file': 'cnlseriesnl', 'label': 'Canal+ ' + _.SERIES, 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
-    { 'file': 'film1', 'label': 'Film1', 'start': 0, 'online': 0, 'search': 1, 'az': 2 },
-    { 'file': 'cnlvodnl', 'label': 'Canal Video On Demand', 'start': 0, 'online': 0, 'search': 1, 'az': 1 },
-    { 'file': 'bbcsnl', 'label': 'BBC', 'start': 0, 'online': 0, 'search': 1, 'az': 1 },
-    { 'file': 'lovnaten', 'label': 'Love Nature', 'start': 0, 'online': 0, 'search': 1, 'az': 1 },
+    { 'file': 'cnlseriesnl', 'label': 'Canal+ ' + _.SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'film1', 'label': 'Film1', 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'cnlvodnl', 'label': 'Canal Video On Demand', 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 1 },
+    { 'file': 'bbcsnl', 'label': 'BBC', 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 1 },
+    { 'file': 'lovnaten', 'label': 'Love Nature', 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 1 },
 ]
 
 CONST_WATCHLIST = False

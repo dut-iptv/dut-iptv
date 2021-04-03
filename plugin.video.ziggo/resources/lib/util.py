@@ -15,7 +15,7 @@ from urllib.parse import urlencode
 def check_entitlements():
     from resources.lib.api import api_get_play_token
 
-    media_groups_url = '{mediagroups_url}/crid:~~2F~~2Fschange.com~~2Fdc30ecd3-4701-4993-993b-9ad4ff5fc301?byHasCurrentVod=true&range=1-1&sort=playCount7%7Cdesc'.format(mediagroups_url=CONST_API_URLS['mediagroupsfeeds_url'])
+    media_groups_url = '{mediagroups_url}/crid%3A~~2F~~2Fschange.com~~2F64e9e221-aebf-4620-b248-8681feada6e8?byHasCurrentVod=true&range=1-1&sort=playCount7%7Cdesc'.format(mediagroups_url=CONST_API_URLS['mediagroupsfeeds_url'])
 
     download = api_download(url=media_groups_url, type='get', headers=None, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -278,7 +278,8 @@ def plugin_process_playdata(playdata):
 
     CDMHEADERS = {
         'User-Agent': DEFAULT_USER_AGENT,
-        'X-Client-Id': CONST_DEFAULT_CLIENTID + '||' + DEFAULT_USER_AGENT,
+        #'X-Client-Id': CONST_DEFAULT_CLIENTID + '||' + DEFAULT_USER_AGENT,
+        'X-OESP-License-Token-Type': 'velocix',
         'X-OESP-Token': profile_settings['access_token'],
         'X-OESP-Username': creds['username'],
         'X-OESP-License-Token': profile_settings['drm_token'],
@@ -297,10 +298,13 @@ def plugin_process_playdata(playdata):
         params.append(('path', playdata['path']))
         params.append(('locator', playdata['locator']))
 
+    write_file(file='token_renew', data='plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params))), isJSON=False)
+
     item_inputstream = inputstream.Widevine(
         license_key = playdata['license'],
-        media_renewal_url = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params))),
-        media_renewal_time = 60,
+        #media_renewal_url = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params))),
+        #media_renewal_time = 60,
+        #manifest_update_parameter = 'full',
     )
 
     return item_inputstream, CDMHEADERS

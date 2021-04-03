@@ -1,9 +1,24 @@
-import requests
+import socket, requests
 
 from resources.lib.base.l1.constants import DEFAULT_USER_AGENT, SESSION_CHUNKSIZE
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.util import load_file, write_file
-from resources.lib.constants import CONST_BASE_HEADERS
+from resources.lib.constants import CONST_BASE_DOMAIN, CONST_BASE_DOMAIN_MOD, CONST_BASE_HEADERS, CONST_BASE_IP
+
+dns_cache = {}
+
+def override_dns(domain, ip):
+    dns_cache[domain] = ip
+
+prv_getaddrinfo = socket.getaddrinfo
+
+def new_getaddrinfo(*args):
+    if args[0] in dns_cache:
+        return prv_getaddrinfo(dns_cache[args[0]], *args[1:])
+    else:
+        return prv_getaddrinfo(*args)
+        
+socket.getaddrinfo = new_getaddrinfo
 
 class Session(requests.Session):
     def __init__(self, headers=None, cookies_key=None, save_cookies=True, base_url='{}', timeout=None, attempts=None):
@@ -45,6 +60,9 @@ class Session(requests.Session):
             #log.debug('Attempt {}/{}: {} {} {}'.format(i, attempts, method, url, kwargs if method.lower() != 'post' else ""))
 
             try:
+                if CONST_BASE_DOMAIN_MOD:
+                    override_dns(CONST_BASE_DOMAIN, CONST_BASE_IP)
+                    
                 data = super(Session, self).request(method, url, **kwargs)
 
                 if self._cookies_key and self._save_cookies:

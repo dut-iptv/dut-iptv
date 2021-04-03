@@ -64,17 +64,20 @@ def api_get_info(id, channel=''):
     info = {}
     base_listing_url = CONST_API_URLS['listings_url']
 
-    listing_url = '{listings_url}?byEndTime={time}~&byStationId={channel}&range=1-1&sort=startTime'.format(listings_url=base_listing_url, time=int(time.time() * 1000), channel=id)
-    download = api_download(url=listing_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
-    data = download['data']
-    code = download['code']
+    try:
+        listing_url = '{listings_url}?byEndTime={time}~&byStationId={channel}&range=1-1&sort=startTime'.format(listings_url=base_listing_url, time=int(time.time() * 1000), channel=id)
+        download = api_download(url=listing_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
+        data = download['data']
+        code = download['code']
 
-    if code and code == 200 and data and check_key(data, 'listings'):
-        for row in data['listings']:
-            if check_key(row, 'program'):
-                info = row['program']
+        if code and code == 200 and data and check_key(data, 'listings'):
+            for row in data['listings']:
+                if check_key(row, 'program'):
+                    info = row['program']
 
-    info = plugin_process_info({'title': '', 'channel': channel, 'info': info})
+        info = plugin_process_info({'title': '', 'channel': channel, 'info': info})
+    except:
+        pass
 
     return info
 
@@ -85,6 +88,9 @@ def api_get_play_token(locator=None, path=None, force=0):
     force = int(force)
 
     profile_settings = load_profile(profile_id=1)
+
+    if not locator == profile_settings['drm_locator']:
+        return None
 
     if not check_key(profile_settings, 'drm_token_age') or not check_key(profile_settings, 'tokenrun') or not check_key(profile_settings, 'tokenruntime') or profile_settings['drm_token_age'] < int(time.time() - 50) and (profile_settings['tokenrun'] == 0 or profile_settings['tokenruntime'] < int(time.time() - 30)):
         force = 1
@@ -108,8 +114,14 @@ def api_get_play_token(locator=None, path=None, force=0):
             save_profile(profile_id=1, profile=profile_settings)
 
             return None
+            
+        profile_settings = load_profile(profile_id=1)
+
+        if not locator == profile_settings['drm_locator']:
+            return False
 
         profile_settings['tokenrun'] = 0
+        profile_settings['drm_path'] = path
         profile_settings['drm_token'] = data['token']
         write_file(file='widevine_token', data=data['token'], isJSON=False)
         profile_settings['drm_token_age'] = int(time.time())
@@ -247,6 +259,8 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     if not api_get_session():
         return playdata
+        
+    api_clean_after_playback()
 
     from_beginning = int(from_beginning)
     pvr = int(pvr)
@@ -352,6 +366,10 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         return playdata
 
     license = CONST_API_URLS['widevine_url']
+    
+    profile_settings = load_profile(profile_id=1)
+    profile_settings['drm_locator'] = locator
+    save_profile(profile_id=1, profile=profile_settings)
 
     token = api_get_play_token(locator=locator, path=path, force=1)
 

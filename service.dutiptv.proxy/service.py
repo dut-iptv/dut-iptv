@@ -1,7 +1,153 @@
-import datetime, io, json, pytz, os, re, requests, sys, threading, time, xbmc, xbmcaddon, xbmcvfs, xbmcgui
+import datetime, ipaddress, io, json, pytz, os, re, requests, socket, sys, threading, time, xbmc, xbmcaddon, xbmcvfs, xbmcgui
 import http.server as ProxyServer
 
 from xml.dom.minidom import parseString
+
+dns_cache = {}
+
+def override_dns(domain, ip):
+    dns_cache[domain] = ip
+
+prv_getaddrinfo = socket.getaddrinfo
+
+def new_getaddrinfo(*args):
+    if args[0] in dns_cache:
+        return prv_getaddrinfo(dns_cache[args[0]], *args[1:])
+    else:
+        return prv_getaddrinfo(*args)
+        
+socket.getaddrinfo = new_getaddrinfo
+
+def parse_dns_string(reader, data):
+    res = ''
+    to_resue = None
+    bytes_left = 0
+
+    for ch in data:
+        if not ch:
+            break
+
+        if to_resue is not None:
+            resue_pos = chr(to_resue) + chr(ch)
+            res += reader.reuse(resue_pos)
+            break
+
+        if bytes_left:
+            res += chr(ch)
+            bytes_left -= 1
+            continue
+
+        if (ch >> 6) == 0b11 and reader is not None:
+            to_resue = ch - 0b11000000
+        else:
+            bytes_left = ch
+
+        if res:
+            res += '.'
+
+    return res
+
+
+class StreamReader:
+    def __init__(self, data):
+        self.data = data
+        self.pos = 0
+
+    def read(self, len_):
+        pos = self.pos
+        if pos >= len(self.data):
+            raise
+
+        res = self.data[pos: pos+len_]
+        self.pos += len_
+        return res
+
+    def reuse(self, pos):
+        pos = int.from_bytes(pos.encode(), 'big')
+        return parse_dns_string(None, self.data[pos:])
+
+
+def make_dns_query_domain(domain):
+    def f(s):
+        return chr(len(s)) + s
+
+    parts = domain.split('.')
+    parts = list(map(f, parts))
+    return ''.join(parts).encode()
+
+
+def make_dns_request_data(dns_query):
+    req = b'\xaa\xbb\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00'
+    req += dns_query
+    req += b'\x00\x00\x01\x00\x01'
+    return req
+
+
+def add_record_to_result(result, type_, data, reader):
+    if type_ == 'A':
+        item = str(ipaddress.IPv4Address(data))
+    else:
+        return
+
+    result.setdefault(type_, []).append(item)
+
+
+def parse_dns_response(res, dq_len, req):
+    reader = StreamReader(res)
+
+    def get_query(s):
+        return s[12:12+dq_len]
+
+    data = reader.read(len(req))
+    assert(get_query(data) == get_query(req))
+
+    def to_int(bytes_):
+        return int.from_bytes(bytes_, 'big')
+
+    result = {}
+    res_num = to_int(data[6:8])
+    for i in range(res_num):
+        reader.read(2)
+        type_num = to_int(reader.read(2))
+
+        type_ = None
+        if type_num == 1:
+            type_ = 'A'
+
+        reader.read(6)
+        data = reader.read(2)
+        data = reader.read(to_int(data))
+        add_record_to_result(result, type_, data, reader)
+
+    return result
+
+
+def dns_lookup(domain, address):
+    dns_query = make_dns_query_domain(domain)
+    dq_len = len(dns_query)
+
+    req = make_dns_request_data(dns_query)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.settimeout(2)
+
+    try:
+        sock.sendto(req, (address, 53))
+        res, _ = sock.recvfrom(1024 * 4)
+        result = parse_dns_response(res, dq_len, req)
+    except Exception:
+        return
+    finally:
+        sock.close()
+
+    return result
+
+CONST_BASE_DOMAIN = {}
+CONST_BASE_IP = {}
+
+CONST_BASE_DOMAIN['ziggo'] = 'obo-prod.oesp.ziggogo.tv'
+CONST_BASE_IP['ziggo'] = dns_lookup('obo-prod.oesp.ziggogo.tv', "1.0.0.1")['A'][0]
+CONST_BASE_DOMAIN['betelenet'] = 'obo-prod.oesp.telenettv.be'
+CONST_BASE_IP['betelenet'] = dns_lookup('obo-prod.oesp.telenettv.be', "1.0.0.1")['A'][0]
 
 PROXY_PROFILE = xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
 
@@ -130,6 +276,7 @@ DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.
 
 stream_url = {}
 now_playing = 0
+last_token = 0
 audio_segments = {}
 last_segment = 0
 last_timecode = 0
@@ -146,7 +293,7 @@ class HTTPServer(ProxyServer.HTTPServer):
 
 class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
     def do_GET(self):
-        global stream_url, now_playing, audio_segments, last_segment, last_timecode
+        global stream_url, now_playing, last_token, audio_segments, last_segment, last_timecode
 
         if "/status" in self.path:
             self.send_response(200)
@@ -176,6 +323,7 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
             if proxy_get_match(path=self.path, addon_name=addon_name):
                 stream_url[addon_name] = load_file(file=ADDON_PROFILE + 'stream_hostname', isJSON=False)
                 now_playing = int(time.time())
+                last_token = int(time.time()) + 60
 
                 URL = proxy_get_url(proxy=self, addon_name=addon_name, ADDON_PROFILE=ADDON_PROFILE)
 
@@ -237,6 +385,11 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
                     URL = fix_audio(URL)
 
                 now_playing = int(time.time())
+                
+                if (addon_name == 'betelenet' or addon_name == 'ziggo') and last_token < now_playing:
+                    token_renew = load_file(file=ADDON_PROFILE + 'token_renew', isJSON=False)
+                    xbmc.executebuiltin('RunPlugin(%s)' % (token_renew))
+                    last_token = int(time.time()) + 60
 
                 self.send_response(302)
                 self.send_header('Location', URL)
@@ -319,6 +472,7 @@ class Session(requests.Session):
         self._base_url = base_url
         self._timeout = timeout or (5, 10)
         self._attempts = attempts or 2
+        self._addon_name = addon_name
 
         ADDON = xbmcaddon.Addon(id="plugin.video." + addon_name)
 
@@ -350,6 +504,9 @@ class Session(requests.Session):
             #log.debug('Attempt {}/{}: {} {} {}'.format(i, attempts, method, url, kwargs if method.lower() != 'post' else ""))
 
             try:
+                if (self._addon_name == 'betelenet' or self._addon_name == 'ziggo'):
+                    override_dns(CONST_BASE_DOMAIN[self._addon_name], CONST_BASE_IP[self._addon_name])
+                
                 data = super(Session, self).request(method, url, **kwargs)
 
                 if self._cookies_key and self._save_cookies:

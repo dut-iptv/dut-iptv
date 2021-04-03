@@ -161,9 +161,6 @@ def plugin_process_watchlist(data):
                 'playable': playable,
                 'context': context
             }
-            
-    log('DEBUG1111: ITEMS')
-    log(items)
 
     return items
 
