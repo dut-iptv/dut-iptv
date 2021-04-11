@@ -111,7 +111,7 @@ def api_get_play_token(locator=None, path=None, force=0):
             save_profile(profile_id=1, profile=profile_settings)
 
             return None
-            
+
         profile_settings = load_profile(profile_id=1)
 
         if not locator == profile_settings['drm_locator']:
@@ -215,7 +215,7 @@ def api_login():
     download = api_download(url=CONST_API_URLS['session_url'], type='post', headers=HEADERS, data={"username": username, "password": password}, json_data=True, return_json=True)
     data = download['data']
     code = download['code']
-    
+
     if code and data and check_key(data, 'reason') and data['reason'] == 'wrong backoffice':
         return { 'code': code, 'data': data, 'result': False }
 
@@ -235,7 +235,7 @@ def api_login():
         ziggo_profile_id = data['customer']['sharedProfileId']
     except:
         pass
-    
+
     try:
         household_id = data['customer']['householdId']
     except:
@@ -251,16 +251,18 @@ def api_login():
 
     return { 'code': code, 'data': data, 'result': True }
 
-def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0):
-    playdata = {'path': '', 'license': '', 'token': '', 'locator': '', 'type': '', 'properties': {}}
+def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0, change_audio=0):
+    playdata = {'path': '', 'mpd': '', 'license': '', 'token': '', 'locator': '', 'type': '', 'properties': {}}
 
     if not api_get_session():
         return playdata
-        
+
     api_clean_after_playback()
 
     from_beginning = int(from_beginning)
     pvr = int(pvr)
+    change_audio = int(change_audio)
+
     profile_settings = load_profile(profile_id=1)
 
     if type == "channel":
@@ -363,12 +365,13 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         return playdata
 
     license = CONST_API_URLS['widevine_url']
-    
+
     profile_settings = load_profile(profile_id=1)
     profile_settings['drm_locator'] = locator
     save_profile(profile_id=1, profile=profile_settings)
 
     token = api_get_play_token(locator=locator, path=path, force=1)
+    token_orig = token
 
     if not token or not len(str(token)) > 0:
         return playdata
@@ -390,7 +393,19 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
             if len(spliturl) == 2:
                 path = '{urlpart1};vxttoken={token}/{urlpart2}'.format(urlpart1=spliturl[0], token=token, urlpart2=spliturl[1])
 
-    playdata = {'path': path, 'license': license, 'token': token, 'locator': locator, 'info': info, 'type': type, 'properties': properties}
+    mpd = ''
+
+    if change_audio == 1:
+        mpd_path = path.replace('WIDEVINETOKEN', token_orig)
+
+        download = api_download(url=mpd_path, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=False)
+        data = download['data']
+        code = download['code']
+
+        if code and code == 200:
+            mpd = data
+
+    playdata = {'path': path, 'mpd': mpd, 'license': license, 'token': token, 'locator': locator, 'info': info, 'type': type, 'properties': properties}
 
     return playdata
 

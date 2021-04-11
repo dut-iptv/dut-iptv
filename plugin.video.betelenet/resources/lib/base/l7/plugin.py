@@ -174,6 +174,9 @@ class Item(gui.Item):
         except:
             pass
 
+        if settings.getBool(key='disable_subtitle'):
+            self.properties['disable_subtitle'] = 1
+
         li = self.get_li()
         handle = _handle()
 
@@ -206,6 +209,10 @@ class Item(gui.Item):
         while player.is_active:
             if xbmc.getCondVisibility("Player.HasMedia") and player.is_started:
                 playbackStarted = True
+                
+                if 'disable_subtitle' in self.properties:
+                    player.showSubtitles(False)
+                    self.properties.pop('disable_subtitle', None)
 
                 if 'seekTime' in self.properties:
                     seekTime = True

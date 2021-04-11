@@ -12,6 +12,8 @@ ADDON_PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 
 ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_FANART = ADDON.getAddonInfo('fanart')
+ADDON_VERSION = ADDON.getAddonInfo('version')
+
 #################
 
 CONST_DUT_EPG_BASE = 'https://dut-epg.github.io'
@@ -40,3 +42,10 @@ DEFAULT_OS_VERSION = '10'
 #### SESSION ####
 SESSION_CHUNKSIZE = 4096
 #################
+
+AUDIO_LANGUAGES = {
+    'nl': 'Nederlands/Dutch',
+    'en': 'Engels/English',
+    'gos': 'Gesproken ondertiteling/Spoken subtitles',
+    'unk': 'Onbekend/Unknown'
+}

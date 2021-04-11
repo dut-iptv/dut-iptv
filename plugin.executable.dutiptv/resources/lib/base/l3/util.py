@@ -22,56 +22,48 @@ def change_icon():
                 r.close()
             except:
                 r.close()
-                return
         else:
             r.close()
-            return
 
-    if is_file_older_than_x_days(file=settings_file, days=14):
-        settingsJSON = load_file(file='settings.json', isJSON=True)
+    settingsJSON = load_file(file='settings.json', isJSON=True)
 
-        if not md5sum(addon_icon) or settingsJSON['icon']['md5'] != md5sum(addon_icon):
-            r = requests.get(settingsJSON['icon']['url'], stream=True)
+    if not md5sum(addon_icon) or settingsJSON['icon']['md5'] != md5sum(addon_icon):
+        r = requests.get(settingsJSON['icon']['url'], stream=True)
 
-            if r.status_code == 200:
-                try:
-                    with open(addon_icon, 'wb') as f:
-                        for chunk in r.iter_content(1024):
-                            f.write(chunk)
+        if r.status_code == 200:
+            try:
+                with open(addon_icon, 'wb') as f:
+                    for chunk in r.iter_content(1024):
+                        f.write(chunk)
 
-                    r.close()
-                except:
-                    r.close()
-                    return
-            else:
                 r.close()
-                return
+            except:
+                r.close()
+        else:
+            r.close()
 
-            from sqlite3 import dbapi2 as sqlite
+    from sqlite3 import dbapi2 as sqlite
 
-            texture_file = 'Textures13.db'
+    for file in glob.glob(xbmcvfs.translatePath("special://database") + os.sep + "*Textures*.db"):    
+        db = sqlite.connect(file)
+        query = "SELECT cachedurl FROM texture WHERE url LIKE '%addons%" + ADDON_ID + "%icon.png';"
 
-            for file in glob.glob(xbmcvfs.translatePath("special://database") + os.sep + "*Textures*"):
-                texture_file = file
+        rows = db.execute(query)
 
-            TEXTURE_DB = os.path.join(xbmcvfs.translatePath("special://database"), texture_file)
+        for row in rows:
+            thumb = os.path.join(xbmcvfs.translatePath("special://thumbnails"), str(row[0]))
 
-            db = sqlite.connect(TEXTURE_DB)
-            query = "SELECT cachedurl FROM texture WHERE url LIKE '%addons%" + ADDON_ID + "%icon.png';"
-
-            rows = db.execute(query)
-
-            for row in rows:
-                thumb = os.path.join(xbmcvfs.translatePath("special://thumbnails"), str(row[0]))
-
-                if os.path.isfile(thumb):
+            if os.path.isfile(thumb):
+                try:
                     os.remove(thumb)
+                except:
+                    pass
 
-            query = "DELETE FROM texture WHERE url LIKE '%addons%{addon}%icon.png';".format(addon=ADDON_ID)
+        query = "DELETE FROM texture WHERE url LIKE '%addons%{addon}%icon.png';".format(addon=ADDON_ID)
 
-            db.execute(query)
-            db.commit()
-            db.close()
+        db.execute(query)
+        db.commit()
+        db.close()
 
 def check_addon(addon):
     if xbmc.getCondVisibility('System.HasAddon({addon})'.format(addon=addon)) == 1:

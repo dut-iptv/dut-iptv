@@ -3,11 +3,11 @@ import datetime, json, os, pytz, re, string, sys, time, xbmc, xbmcplugin
 
 from fuzzywuzzy import fuzz
 from resources.lib.api import api_add_to_watchlist, api_list_watchlist, api_login, api_play_url, api_remove_from_watchlist, api_search, api_vod_download, api_vod_season, api_vod_seasons, api_watchlist_listing
-from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, PROVIDER_NAME
+from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, ADDON_VERSION, AUDIO_LANGUAGES, PROVIDER_NAME
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, clear_old, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, disable_prefs, get_credentials, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
+from resources.lib.base.l3.util import change_icon, check_key, clear_old, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, disable_prefs, get_credentials, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
@@ -15,6 +15,7 @@ from resources.lib.base.l7 import plugin
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_FIRST_BOOT, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_HAS_SEARCH, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_USE_PROXY, CONST_VOD_CAPABILITY, CONST_WATCHLIST
 from resources.lib.util import plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
 from urllib.parse import urlparse
+from xml.dom.minidom import parseString
 
 ADDON_HANDLE = int(sys.argv[1])
 backend = ''
@@ -27,6 +28,11 @@ def home(**kwargs):
         check_first()
 
     profile_settings = load_profile(profile_id=1)
+
+    if not ADDON_ID == 'plugin.executable.dutiptv' and (not check_key(profile_settings, 'version') or not ADDON_VERSION == profile_settings['version']):
+        change_icon()
+        profile_settings['version'] = ADDON_VERSION
+        save_profile(profile_id=1, profile=profile_settings)
 
     folder = plugin.Folder()
 
@@ -328,7 +334,9 @@ def vod_series(label, type, id, **kwargs):
 
     if seasons and check_key(seasons, 'seasons'):
         if CONST_WATCHLIST and check_key(seasons, 'watchlist'):
-            context.append((_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=seasons['watchlist'], type='group')), ))
+            context.append(
+                (_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=seasons['watchlist'], type='group')), )
+            )
 
         if seasons['type'] == "seasons":
             for season in seasons['seasons']:
@@ -346,6 +354,11 @@ def vod_series(label, type, id, **kwargs):
                 ))
         else:
             for episode in seasons['seasons']:
+                context2 = context.copy()
+                context2.append(
+                    (_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=str(episode['id']), change_audio=1)), ),
+                )
+            
                 items.append(plugin.Item(
                     label = str(episode['label']),
                     info = {
@@ -376,6 +389,10 @@ def vod_season(label, series, id, **kwargs):
     season = api_vod_season(series=series, id=id)
 
     for episode in season:
+        context = [
+            (_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=str(episode['id']), data=json.dumps(episode), change_audio=1)), ),
+        ]
+        
         items.append(plugin.Item(
             label = str(episode['label']),
             info = {
@@ -389,6 +406,7 @@ def vod_season(label, series, id, **kwargs):
                 'fanart': str(episode['image'])
             },
             path = plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=str(episode['id']), data=json.dumps(episode)),
+            context = context,
             playable = True,
         ))
 
@@ -685,10 +703,11 @@ def logout(**kwargs):
     gui.refresh()
 
 @plugin.route()
-def play_video(type=None, channel=None, id=None, data=None, title=None, from_beginning=0, pvr=0, **kwargs):
+def play_video(type=None, channel=None, id=None, data=None, title=None, from_beginning=0, pvr=0, change_audio=0, **kwargs):
     profile_settings = load_profile(profile_id=1)
     from_beginning = int(from_beginning)
     pvr = int(pvr)
+    change_audio = int(change_audio)
 
     if not type or not len(str(type)) > 0:
         return False
@@ -711,7 +730,7 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
     if CONST_START_FROM_BEGINNING and not from_beginning == 1 and settings.getBool(key='ask_start_from_beginning') and gui.yes_no(message=_.START_FROM_BEGINNING):
         from_beginning = 1
 
-    playdata = api_play_url(type=type, channel=channel, id=id, video_data=data, from_beginning=from_beginning, pvr=pvr)
+    playdata = api_play_url(type=type, channel=channel, id=id, video_data=data, from_beginning=from_beginning, pvr=pvr, change_audio=change_audio)
 
     if not playdata or not check_key(playdata, 'path'):
         return False
@@ -749,6 +768,44 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
                         playdata['properties']['seekTime'] = time_diff2
     else:
         remove_stream_start()
+
+    try:
+        os.remove(ADDON_PROFILE + 'stream_language')
+    except:
+        pass
+
+    if check_key(playdata, 'mpd') and len(str(playdata['mpd'])) > 0:
+        language_list = {}
+        root = parseString(playdata['mpd'].encode('utf8'))
+        mpd = root.getElementsByTagName("MPD")[0]
+        select_list = []
+
+        for adap_set in root.getElementsByTagName('AdaptationSet'):
+            if 'audio' in adap_set.getAttribute('mimeType'):
+                for stream in adap_set.getElementsByTagName("Representation"):
+                    attrib = {}
+
+                    for key in adap_set.attributes.keys():
+                        attrib[key] = adap_set.getAttribute(key)
+
+                    for key in stream.attributes.keys():
+                        attrib[key] = stream.getAttribute(key)
+
+                    if check_key(attrib, 'lang') and not check_key(language_list, attrib['lang']):
+                        if check_key(AUDIO_LANGUAGES, attrib['lang']):
+                            language_list[attrib['lang']] = AUDIO_LANGUAGES[attrib['lang']]
+                        else:
+                            language_list[attrib['lang']] = attrib['lang']
+                            
+                        select_list.append(language_list[attrib['lang']])
+
+        if len(language_list) > 1:
+            selected = gui.select('Selecteer audio taal', select_list)
+            
+            try:
+                write_file(file='stream_language', data=select_list[selected], isJSON=False)
+            except:
+                pass
 
     if CONST_USE_PROXY:
         real_url = "{hostscheme}://{netloc}".format(hostscheme=urlparse(path).scheme, netloc=urlparse(path).netloc)
@@ -936,6 +993,10 @@ def get_live_channels(all=False):
                     context = [
                         (_.START_BEGINNING, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='channel', channel=id, id=str(row['assetid']), from_beginning=1, _is_live=True)), ),
                     ]
+                    
+                context = [
+                    (_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='channel', channel=id, id=str(row['assetid']), from_beginning=0, change_audio=1, _is_live=True)), ),
+                ]
 
                 channels.append({
                     'label': str(row['name']),
@@ -1157,6 +1218,8 @@ def process_replaytv_content(station, day=0, start=0):
         if CONST_WATCHLIST:
             context.append((_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=program_id, type='item')), ))
 
+        context.append((_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='program', channel=channel, id=program_id, change_audio=1)), ))
+
         items.append(plugin.Item(
             label = label,
             info = {
@@ -1255,6 +1318,8 @@ def process_replaytv_list_content(label, idtitle, start=0):
         if CONST_WATCHLIST:
             context.append((_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=program_id, type='item')), ))
 
+        context.append((_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='program', channel=channel, id=program_id, change_audio=1)), ))
+
         items.append(plugin.Item(
             label = itemlabel,
             info = {
@@ -1293,7 +1358,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
 
     item_count = 0
 
-    if online == 1:
+    if online > 0:
         if search:
             data = api_search(query=search)
         else:
@@ -1341,12 +1406,13 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
 
         if row['duration'] and len(str(row['duration'])) > 0:
             duration = int(row['duration'])
-            
-        log(row['icon'])
 
         program_image = str(row['icon'])
         program_image_large = str(row['icon'])
         program_type = str(row['type'])
+        
+        if CONST_WATCHLIST:
+            context.append((_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=id, type='group')), ))
 
         if program_type == "show" or program_type == "Serie" or program_type == "series":
             path = plugin.url_for(func_or_url=vod_series, type=type2, label=label, id=id)
@@ -1357,18 +1423,17 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
             info = {'plot': description, 'sorttitle': label.upper()}
             playable = False
         elif program_type == "Epg":
+            context.append((_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='program', channel=None, id=id, change_audio=1)), ))
             path = plugin.url_for(func_or_url=play_video, type='program', channel=None, id=id)
             info = {'plot': description, 'duration': duration, 'mediatype': 'video', 'sorttitle': label.upper()}
             playable = True
         elif program_type == "movie" or program_type == "Vod":
+            context.append((_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=id, change_audio=1)), ))
             path = plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=id)
             info = {'plot': description, 'duration': duration, 'mediatype': 'video', 'sorttitle': label.upper()}
             playable = True
         else:
-            continue
-
-        if CONST_WATCHLIST:
-            context.append((_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=id, type='group')), ))
+            continue        
 
         items.append(plugin.Item(
             label = label,
@@ -1408,7 +1473,7 @@ def process_vod_menu_content(data, start=0, search=None, type=None, character=No
 
     item_count = 0
 
-    if online == 1:
+    if online > 0:
         if search:
             data = api_search(query=search)
         else:
@@ -1433,6 +1498,10 @@ def process_vod_menu_content(data, start=0, search=None, type=None, character=No
         if menu_type == 'content':
             path = plugin.url_for(func_or_url=vod, file=id, label=label, start=0, character=character, online=online, az=0, menu=0)
             playable = False
+        elif menu_type == 'video':
+            path = plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=id)
+            info = {'mediatype': 'video', 'sorttitle': label.upper()}
+            playable = True
         elif menu_type == 'menu':
             path = plugin.url_for(func_or_url=vod, file=id, label=label, start=0, character=character, online=online, az=0, menu=1)
             playable = False

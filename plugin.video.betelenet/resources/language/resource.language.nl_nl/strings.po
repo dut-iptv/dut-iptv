@@ -663,3 +663,7 @@ msgstr "Progamma's per genre"
 msgctxt "#330044"
 msgid "Programs by genre"
 msgstr "Progamma's per genre"
+
+msgctxt "#330045"
+msgid "Select Audio Language"
+msgstr "Selecteer Audio Taal"

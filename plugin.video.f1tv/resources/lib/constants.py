@@ -32,9 +32,9 @@ CONST_HAS_SEARCH = False
 
 CONST_IMAGE_URL = 'https://ott.formula1.com/image-resizer/image'
 
-CONST_MOD_CACHE = {
-    '1510': 0.042
-}
+CONST_MAIN_VOD_AR = ['395', '1510', '392', '2128', '2130', '493', '410', '413']
+
+CONST_MOD_CACHE = {}
 
 CONST_ONLINE_SEARCH = False
 
@@ -44,13 +44,13 @@ CONST_USE_PROXY = False
 
 CONST_VOD_CAPABILITY = [
     { 'file': 395, 'label': 'Live', 'start': 0, 'menu': 0, 'online': 1, 'search': 0, 'az': 0 },
-    { 'file': 1510, 'label': '2021 Season', 'start': 0, 'menu': 1, 'online': 0, 'search': 0, 'az': 0 },
-    { 'file': 392, 'label': '2020 Season', 'start': 0, 'menu': 1, 'online': 0, 'search': 0, 'az': 0 },
-    { 'file': 2128, 'label': '2019 Season', 'start': 0, 'menu': 1, 'online': 0, 'search': 0, 'az': 0 },
-    { 'file': 2130, 'label': '2018 Season', 'start': 0, 'menu': 1, 'online': 0, 'search': 0, 'az': 0 },
-    { 'file': 493, 'label': 'Archive', 'start': 0, 'menu': 1, 'online': 0, 'search': 0, 'az': 0 },
-    { 'file': 410, 'label': 'Shows', 'start': 0, 'menu': 1, 'online': 0, 'search': 0, 'az': 0 },
-    { 'file': 413, 'label': 'Documentaries', 'start': 0, 'menu': 1, 'online': 0, 'search': 0, 'az': 0 },
+    { 'file': 1510, 'label': '2021 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
+    { 'file': 392, 'label': '2020 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
+    { 'file': 2128, 'label': '2019 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
+    { 'file': 2130, 'label': '2018 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
+    { 'file': 493, 'label': 'Archive', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
+    { 'file': 410, 'label': 'Shows', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
+    { 'file': 413, 'label': 'Documentaries', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
 ]
 
 CONST_WATCHLIST = False

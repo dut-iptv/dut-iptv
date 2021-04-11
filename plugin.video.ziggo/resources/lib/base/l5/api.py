@@ -4,7 +4,7 @@ from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_PROFILE, CONST_DUT_EPG_BASE, CONST_DUT_EPG, SESSION_CHUNKSIZE
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
-from resources.lib.base.l3.util import change_icon, check_key, clear_cache, fixBadZipfile, is_file_older_than_x_days, load_file, load_profile, update_prefs, write_file
+from resources.lib.base.l3.util import check_key, clear_cache, fixBadZipfile, is_file_older_than_x_days, load_file, load_profile, update_prefs, write_file
 from resources.lib.base.l4.session import Session
 from resources.lib.constants import CONST_MOD_CACHE
 
@@ -59,7 +59,6 @@ def api_get_channels():
         else:
             return None
 
-        change_icon()
         clear_cache()
 
     data2 = OrderedDict()

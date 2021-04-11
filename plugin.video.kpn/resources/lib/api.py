@@ -246,7 +246,7 @@ def api_login():
 
     return { 'code': code, 'data': data, 'result': True }
 
-def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0):
+def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0, change_audio=0):
     playdata = {'path': '', 'license': '', 'token': '', 'type': '', 'info': '', 'properties': {}}
 
     if not api_get_session():
@@ -254,6 +254,8 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     from_beginning = int(from_beginning)
     pvr = int(pvr)
+    change_audio = int(change_audio)
+    
     profile_settings = load_profile(profile_id=1)
 
     license = ''
@@ -345,7 +347,17 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     else:
         path = path.split("&min_bitrate", 1)[0]
 
-    playdata = {'path': path, 'license': license, 'token': token, 'type': typestr, 'info': info, 'properties': properties}
+    mpd = ''
+
+    if change_audio == 1:
+        download = api_download(url=path, type='get', headers=None, data=None, json_data=False, return_json=False)
+        data = download['data']
+        code = download['code']
+
+        if code and code == 200:
+            mpd = data
+
+    playdata = {'path': path, 'mpd': mpd, 'license': license, 'token': token, 'type': typestr, 'info': info, 'properties': properties}
 
     return playdata
 

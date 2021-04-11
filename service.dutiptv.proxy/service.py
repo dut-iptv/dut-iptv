@@ -145,9 +145,18 @@ CONST_BASE_DOMAIN = {}
 CONST_BASE_IP = {}
 
 CONST_BASE_DOMAIN['ziggo'] = 'obo-prod.oesp.ziggogo.tv'
-CONST_BASE_IP['ziggo'] = dns_lookup('obo-prod.oesp.ziggogo.tv', "1.0.0.1")['A'][0]
+
+try:
+    CONST_BASE_IP['ziggo'] = dns_lookup('obo-prod.oesp.ziggogo.tv', "1.0.0.1")['A'][0]
+except:
+    pass
+
 CONST_BASE_DOMAIN['betelenet'] = 'obo-prod.oesp.telenettv.be'
-CONST_BASE_IP['betelenet'] = dns_lookup('obo-prod.oesp.telenettv.be', "1.0.0.1")['A'][0]
+
+try:
+    CONST_BASE_IP['betelenet'] = dns_lookup('obo-prod.oesp.telenettv.be', "1.0.0.1")['A'][0]
+except:
+    pass
 
 PROXY_PROFILE = xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))
 
@@ -270,6 +279,13 @@ CONST_BASE_HEADERS['ziggo'] = {
     'Sec-Fetch-Dest': 'empty',
     'Sec-Fetch-Mode': 'cors',
     'Sec-Fetch-Site': 'cross-site',
+}
+
+AUDIO_LANGUAGES_REV = {
+    'Nederlands/Dutch': 'nl',
+    'Engels/English': 'en',
+    'Gesproken ondertiteling/Spoken subtitles': 'gos',
+    'Onbekend/Unknown': 'unk'
 }
 
 DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36'
@@ -609,9 +625,8 @@ def sly_mpd_parse(data):
         parent.appendChild(elem)
 
     video_sets = []
-    audio_sets = []
+    other_sets = []
     trick_sets = []
-    lang_adap_sets = []
 
     for adap_set in root.getElementsByTagName('AdaptationSet'):
         highest_bandwidth = 0
@@ -624,6 +639,9 @@ def sly_mpd_parse(data):
 
         if adapt_frame_rate:
             adap_set.removeAttribute('frameRate')
+            
+        if 'video' in adap_set.getAttribute('mimeType'):
+            is_video = True
 
         for stream in adap_set.getElementsByTagName("Representation"):
             attrib = {}
@@ -642,10 +660,8 @@ def sly_mpd_parse(data):
                 if bandwidth > highest_bandwidth:
                     highest_bandwidth = bandwidth
 
-            if 'video' in attrib.get('mimeType', ''):
-                is_video = True
-
             if 'maxPlayoutRate' in attrib:
+                is_video = False
                 is_trick = True
 
         parent = adap_set.parentNode
@@ -656,19 +672,19 @@ def sly_mpd_parse(data):
         elif is_video:
             video_sets.append([highest_bandwidth, adap_set, parent])
         else:
-            audio_sets.append([highest_bandwidth, adap_set, parent])
+            other_sets.append([highest_bandwidth, adap_set, parent])
 
     video_sets.sort(key=lambda  x: x[0], reverse=True)
-    audio_sets.sort(key=lambda  x: x[0], reverse=True)
     trick_sets.sort(key=lambda  x: x[0], reverse=True)
+    other_sets.sort(key=lambda  x: x[0], reverse=True)
 
     for elem in video_sets:
         elem[2].appendChild(elem[1])
 
-    for elem in audio_sets:
+    for elem in trick_sets:
         elem[2].appendChild(elem[1])
 
-    for elem in trick_sets:
+    for elem in other_sets:
         elem[2].appendChild(elem[1])
 
     elems = root.getElementsByTagName('SegmentTemplate')
@@ -703,9 +719,6 @@ def mpd_parse(data, addon_name, URL):
 
     duration = load_file(file=ADDON_PROFILE + 'stream_duration', isJSON=False)
 
-    #if 'type' in mpd.attributes.keys() and mpd.getAttribute('type').lower() == 'dynamic' and not 'mediaPresentationDuration' in mpd.attributes.keys():
-        #mpd.setAttribute('mediaPresentationDuration', 'PT4H0M0S')
-    #elif duration and int(duration) > 0:
     if duration and int(duration) > 0 and 'mediaPresentationDuration' in mpd.attributes.keys():
         duration = int(duration)
         given_duration = 0
@@ -747,16 +760,15 @@ def mpd_parse(data, addon_name, URL):
 
             mpd.setAttribute('mediaPresentationDuration', 'PT{hour}H{minute}M{second}S'.format(hour=hour, minute=minute, second=second))
 
+    prefered_language = load_file(file=ADDON_PROFILE + 'stream_language', isJSON=False)
+    
+    try:
+        prefered_language = AUDIO_LANGUAGES_REV[prefered_language]
+    except:
+        pass
+    
     for adap_set in root.getElementsByTagName('AdaptationSet'):
-        if not 'contentType' in adap_set.attributes.keys():
-            continue
-
-        type = adap_set.getAttribute('contentType').lower()
-
-        if type == 'text' and ADDON.getSettingBool('disable_subtitle'):
-            parent = adap_set.parentNode
-            parent.removeChild(adap_set)
-        elif type == 'audio' and ADDON.getSettingBool('force_ac3'):
+        if 'audio' in adap_set.getAttribute('mimeType'):
             for stream in adap_set.getElementsByTagName("Representation"):
                 attrib = {}
 
@@ -765,15 +777,20 @@ def mpd_parse(data, addon_name, URL):
 
                 for key in stream.attributes.keys():
                     attrib[key] = stream.getAttribute(key)
+
+                if prefered_language and check_key(attrib, 'lang') and attrib['lang'].lower() != prefered_language:
+                    parent = stream.parentNode
+                    parent.removeChild(stream)
+                    continue
             
                 try:
                     if attrib['codecs'].lower() == 'ac-3':
                         ac3_found = True
                 except:
                     pass
-        elif type == 'video' and ADDON.getSettingBool('force_highest_bandwidth'):
+        elif 'video' in adap_set.getAttribute('mimeType') and ADDON.getSettingBool('force_highest_bandwidth'):
             highest_bandwidth = 0
-            is_video = False
+            is_video = True
             is_trick = False
 
             for stream in adap_set.getElementsByTagName("Representation"):
@@ -790,10 +807,8 @@ def mpd_parse(data, addon_name, URL):
                     if bandwidth > highest_bandwidth:
                         highest_bandwidth = bandwidth
 
-                if 'video' in attrib.get('mimeType', ''):
-                    is_video = True
-
                 if 'maxPlayoutRate' in attrib:
+                    is_video = False
                     is_trick = True
 
             if is_trick:
@@ -822,40 +837,38 @@ def mpd_parse(data, addon_name, URL):
                     for key in stream.attributes.keys():
                         attrib[key] = stream.getAttribute(key)
 
-                    if 'bandwidth' in attrib and 'video' in attrib.get('mimeType', '') and not 'maxPlayoutRate' in attrib:
+                    if 'bandwidth' in attrib and not 'maxPlayoutRate' in attrib:
                         bandwidth = int(attrib['bandwidth'])
 
                         if bandwidth != highest_bandwidth:
                             parent = stream.parentNode
                             parent.removeChild(stream)
 
-    if ac3_found == True:
+    if ac3_found == True and ADDON.getSettingBool('force_ac3'):
         for adap_set in root.getElementsByTagName('AdaptationSet'):
-            for stream in adap_set.getElementsByTagName("Representation"):
-                attrib = {}
+            if 'audio' in adap_set.getAttribute('mimeType'):
+                for stream in adap_set.getElementsByTagName("Representation"):
+                    attrib = {}
 
-                for key in adap_set.attributes.keys():
-                    attrib[key] = adap_set.getAttribute(key)
+                    for key in adap_set.attributes.keys():
+                        attrib[key] = adap_set.getAttribute(key)
 
-                for key in stream.attributes.keys():
-                    attrib[key] = stream.getAttribute(key)
+                    for key in stream.attributes.keys():
+                        attrib[key] = stream.getAttribute(key)
 
-                try:
-                    if attrib['contentType'].lower() == 'audio' and not attrib['codecs'].lower() == 'ac-3':
-                        parent = adap_set.parentNode
-                        parent.removeChild(adap_set)
-                except:
-                    pass
+                    try:
+                        if not attrib['codecs'].lower() == 'ac-3':
+                            parent = stream.parentNode
+                            parent.removeChild(stream)
+                    except:
+                        pass
 
     if addon_name == "kpn" and 'npo1' in URL.lower():
         last_segment = 0
         last_timecode = 0
 
         for adap_set in root.getElementsByTagName('AdaptationSet'):
-            if not 'contentType' in adap_set.attributes.keys():
-                continue
-
-            if adap_set.getAttribute('contentType').lower() == 'audio':
+            if 'audio' in adap_set.getAttribute('mimeType'):
                 for segmenttimeline in adap_set.getElementsByTagName("SegmentTimeline"):
                     for segment in segmenttimeline.getElementsByTagName("S"):
                         if not 'd' in segment.attributes.keys():
@@ -914,6 +927,12 @@ def fix_audio(URL):
         pass
 
     return URL
+
+def check_key(object, key):
+    if key in object and object[key] and len(str(object[key])) > 0:
+        return True
+    else:
+        return False
 
 def load_file(file, isJSON=False):
     if not os.path.isfile(file):

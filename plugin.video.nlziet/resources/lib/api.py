@@ -261,7 +261,7 @@ def api_mix(list1, list2, list3=None):
 
     return result
 
-def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0):
+def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0, change_audio=0):
     playdata = {'path': '', 'license': '', 'info': '', 'properties': {}}
 
     if not api_get_session():
@@ -269,6 +269,8 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     from_beginning = int(from_beginning)
     pvr = int(pvr)
+    change_audio = int(change_audio)
+    
     profile_settings = load_profile(profile_id=1)
 
     headers = { 'authorization': 'Bearer {id_token}'.format(id_token=profile_settings['access_token'])}
@@ -351,7 +353,17 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     if not len(str(license)) > 0:
         return playdata
 
-    playdata = {'path': path, 'license': license, 'info': info, 'properties': properties}
+    mpd = ''
+
+    if change_audio == 1:
+        download = api_download(url=path, type='get', headers=headers, data=None, json_data=False, return_json=False)
+        data = download['data']
+        code = download['code']
+
+        if code and code == 200:
+            mpd = data
+
+    playdata = {'path': path, 'mpd': mpd, 'license': license, 'info': info, 'properties': properties}
 
     return playdata
 
