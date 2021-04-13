@@ -26,6 +26,9 @@ def change_icon():
             r.close()
 
     settingsJSON = load_file(file='settings.json', isJSON=True)
+    
+    if not settingsJSON or not check_key(settingsJSON, 'icon') or not check_key(settingsJSON['icon'], 'md5') or not check_key(settingsJSON['icon'], 'url'):
+        return
 
     if not md5sum(addon_icon) or settingsJSON['icon']['md5'] != md5sum(addon_icon):
         r = requests.get(settingsJSON['icon']['url'], stream=True)
