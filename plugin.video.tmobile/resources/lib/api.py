@@ -109,7 +109,7 @@ def api_get_session(force=0):
 def api_list_watchlist():
     return None
 
-def api_login():
+def api_login(selected=None):
     creds = get_credentials()
     username = creds['username']
     password = creds['password']
@@ -183,6 +183,22 @@ def api_login():
 
                     return api_login()
 
+            for row in data['devices']:
+                if check_key(row, 'status') and check_key(row, 'onlineState') and check_key(row, 'physicalDeviceID'):
+                    if row['status'] == '1' and row['onlineState'] == '0' and (not check_key(row, 'name') or len(str(row['name'])) < 1 or 'PC' in str(row['name'])):
+                        profile_settings['devicekey'] = row['physicalDeviceID']
+                        save_profile(profile_id=1, profile=profile_settings)
+
+                        return api_login()
+                        
+            for row in data['devices']:
+                if check_key(row, 'status') and check_key(row, 'onlineState') and check_key(row, 'physicalDeviceID'):
+                    if row['status'] == '1':
+                        profile_settings['devicekey'] = row['physicalDeviceID']
+                        save_profile(profile_id=1, profile=profile_settings)
+
+                        return api_login()
+
         return { 'code': code, 'data': data, 'result': False }
 
     profile_settings['csrf_token'] = data['csrfToken']
@@ -200,7 +216,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     from_beginning = int(from_beginning)
     pvr = int(pvr)
     change_audio = int(change_audio)
-    
+
     profile_settings = load_profile(profile_id=1)
 
     headers = {'Content-Type': 'application/json', 'X_CSRFToken': profile_settings['csrf_token']}

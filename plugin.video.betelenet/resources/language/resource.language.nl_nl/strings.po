@@ -667,3 +667,11 @@ msgstr "Progamma's per genre"
 msgctxt "#330045"
 msgid "Select Audio Language"
 msgstr "Selecteer Audio Taal"
+
+msgctxt "#330046"
+msgid "Unkown device"
+msgstr "Onbekend apparaat"
+
+msgctxt "#330047"
+msgid "Select device to replace"
+msgstr "Selecteer apparaat om te vervangen"

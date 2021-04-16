@@ -175,6 +175,8 @@ class BaseLanguage(object):
     TITLESBYGENREDESC = 330043
     PROGSGENRE = 330044
     SELECT_AUDIO_LANGUAGE = 330045
+    SELECT_DEVICE = 330046
+    UNKNOWN_DEVICE = 330047
     
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)

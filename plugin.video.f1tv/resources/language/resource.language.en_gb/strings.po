@@ -621,3 +621,11 @@ msgstr ""
 msgctxt "#330045"
 msgid "Select Audio Language"
 msgstr ""
+
+msgctxt "#330046"
+msgid "Unkown device"
+msgstr ""
+
+msgctxt "#330047"
+msgid "Select device to replace"
+msgstr ""

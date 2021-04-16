@@ -171,10 +171,11 @@ def api_vod_download(type, start=0):
 
         if type == '395':
             items = []
+            item_ids = []
 
             for row in data['resultObj']['containers']:
                 for row2 in row['retrieveItems']['resultObj']['containers']:
-                        if row2['metadata']['contentSubtype'] == 'LIVE':
+                        if row2['metadata']['contentSubtype'] == 'LIVE' and not row2['id'] in item_ids:                            
                             item = {}
                             item['id'] = row2['id']
                             item['title'] = row2['metadata']['title']
@@ -185,6 +186,7 @@ def api_vod_download(type, start=0):
                             item['start'] = ''
 
                             items.append(item)
+                            item_ids.append(row2['id'])
 
             return items
         else:
@@ -225,7 +227,7 @@ def api_vod_download(type, start=0):
                                     vodJSON['menu'][row2['id']]['type'] = 'content'
 
                                 if check_key(row2['metadata'], 'pictureUrl') and len(row2['metadata']['pictureUrl']) > 0:
-                                    vodJSON['menu'][row2['id']]['image'] = "https://ott.formula1.com/image-resizer/image/{image}?w=1920&h=1080&q=HI&o=L".format(image=row2['metadata']['pictureUrl'])
+                                    vodJSON['menu'][row2['id']]['image'] = "{image_url}/{image}?w=1920&h=1080&q=HI&o=L".format(image_url=CONST_IMAGE_URL, image=row2['metadata']['pictureUrl'])
                                 else:
                                     vodJSON['menu'][row2['id']]['image'] = ""
 
@@ -248,9 +250,9 @@ def api_vod_download(type, start=0):
                     vodJSONtitles.append(row['metadata']['label'])
 
                     if check_key(row['metadata'], 'pictureUrl') and len(row['metadata']['pictureUrl']) > 0:
-                        vodJSON['menu'][row['id']]['image'] = "https://ott.formula1.com/image-resizer/image/{image}?w=1920&h=1080&q=HI&o=L".format(image=row['metadata']['pictureUrl'])
+                        vodJSON['menu'][row['id']]['image'] = "{image_url}/{image}?w=1920&h=1080&q=HI&o=L".format(image_url=CONST_IMAGE_URL, image=row['metadata']['pictureUrl'])
                     elif check_key(row['metadata'], 'imageUrl') and len(row['metadata']['imageUrl']) > 0:
-                        vodJSON['menu'][row['id']]['image'] = "https://ott.formula1.com/image-resizer/image/{image}?w=1920&h=1080&q=HI&o=L".format(image=row['metadata']['imageUrl'])
+                        vodJSON['menu'][row['id']]['image'] = "{image_url}/{image}?w=1920&h=1080&q=HI&o=L".format(image_url=CONST_IMAGE_URL, image=row['metadata']['imageUrl'])
                     else:
                         vodJSON['menu'][row['id']]['image'] = ""
 
@@ -275,7 +277,7 @@ def api_vod_download(type, start=0):
                         vodJSON['menu'][row2['id']]['label'] = row2['metadata']['title']
 
                         if check_key(row['metadata'], 'pictureUrl') and len(row2['metadata']['pictureUrl']) > 0:
-                            vodJSON['menu'][row2['id']]['image'] = "https://ott.formula1.com/image-resizer/image/{image}?w=1920&h=1080&q=HI&o=L".format(image=row2['metadata']['pictureUrl'])
+                            vodJSON['menu'][row2['id']]['image'] = "{image_url}/{image}?w=1920&h=1080&q=HI&o=L".format(image_url=CONST_IMAGE_URL, image=row2['metadata']['pictureUrl'])
                         else:
                             vodJSON['menu'][row2['id']]['image'] = ""
 
@@ -303,7 +305,7 @@ def api_vod_download(type, start=0):
                     vodJSON['menu'][row['id']]['label'] = row['metadata']['label']
 
                     if check_key(row['metadata'], 'pictureUrl') and len(row['metadata']['pictureUrl']) > 0:
-                        vodJSON['menu'][row['id']]['image'] = "https://ott.formula1.com/image-resizer/image/{image}?w=1920&h=1080&q=HI&o=L".format(image=row['metadata']['pictureUrl'])
+                        vodJSON['menu'][row['id']]['image'] = "{image_url}/{image}?w=1920&h=1080&q=HI&o=L".format(image_url=CONST_IMAGE_URL, image=row['metadata']['pictureUrl'])
                     else:
                         vodJSON['menu'][row['id']]['image'] = ""
 
@@ -323,7 +325,7 @@ def api_vod_download(type, start=0):
         if not menu_data["menu"][str(type)] or len(menu_data["menu"][str(type)]['url']) == 0:
             return vodJSON2
 
-        url = "https://f1tv.formula1.com{url}".format(url=menu_data["menu"][str(type)]['url'])
+        url = "{base_url}{url}".format(base_url=CONST_BASE_URL, url=menu_data["menu"][str(type)]['url'])
         download = api_download(url=url, type='get', headers=None, data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']
@@ -509,7 +511,7 @@ def api_extract_content(data):
             returnar[id]['entitlement'] = ''
 
         if len(row['metadata']['pictureUrl']) > 0:
-            returnar[id]['image'] = "https://ott.formula1.com/image-resizer/image/{image}?w=1920&h=1080&q=HI&o=L".format(image=row['metadata']['pictureUrl'])
+            returnar[id]['image'] = "{image_url}/{image}?w=1920&h=1080&q=HI&o=L".format(image_url=CONST_IMAGE_URL, image=row['metadata']['pictureUrl'])
         else:
             returnar[id]['image'] = ""
 

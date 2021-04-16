@@ -800,7 +800,7 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
                         select_list.append(language_list[attrib['lang']])
 
         if len(language_list) > 1:
-            selected = gui.select('Selecteer audio taal', select_list)
+            selected = gui.select(_.SELECT_AUDIO_LANGUAGE, select_list)
             
             try:
                 write_file(file='stream_language', data=select_list[selected], isJSON=False)
