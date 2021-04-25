@@ -129,8 +129,8 @@ def install_widevine(reinstall=False):
         return True
     elif system == 'UWP':
         raise InputStreamError(_.IA_UWP_ERROR)
-    elif 'aarch64' in arch or 'arm64' in arch:
-        raise InputStreamError(_.IA_AARCH64_ERROR)
+    #elif 'aarch64' in arch or 'arm64' in arch:
+    #    raise InputStreamError(_.IA_AARCH64_ERROR)
 
     last_check = int(ia_addon.getSetting('_last_check') or 0)
     ver_slug = system + arch + str(kodi_version) + ia_addon.getAddonInfo('version')

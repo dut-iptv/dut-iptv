@@ -336,8 +336,14 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
             ADDON = xbmcaddon.Addon(id="plugin.video.{addon_name}".format(addon_name=addon_name))
             ADDON_PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 
-            if proxy_get_match(path=self.path, addon_name=addon_name):
+            if proxy_get_match(path=self.path, addon_name=addon_name) and os.path.isfile(ADDON_PROFILE + 'stream_hostname'):
                 stream_url[addon_name] = load_file(file=ADDON_PROFILE + 'stream_hostname', isJSON=False)
+                
+                try:
+                    os.remove(ADDON_PROFILE + 'stream_hostname')
+                except:
+                    pass
+                
                 now_playing = int(time.time())
                 last_token = int(time.time()) + 60
 

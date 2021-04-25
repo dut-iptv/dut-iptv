@@ -30,7 +30,7 @@ def api_get_info(id, channel=''):
     except:
         return info
 
-    channel_url = '{base_url}/v6/epg/locations/{friendly}/live/1?fromDate={date}'.format(base_url=CONST_API_URL, friendly=friendly, date=datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S"))
+    channel_url = '{base_url}/v7/epg/locations/{friendly}/live/1?fromDate={date}'.format(base_url=CONST_API_URL, friendly=friendly, date=datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S"))
 
     download = api_download(url=channel_url, type='get', headers=None, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -49,7 +49,7 @@ def api_get_info(id, channel=''):
     if not id:
         return info
 
-    info_url = '{base_url}/v6/epg/location/{location}'.format(base_url=CONST_API_URL, location=id)
+    info_url = '{base_url}/v7/epg/location/{location}'.format(base_url=CONST_API_URL, location=id)
 
     download = api_download(url=info_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -246,21 +246,6 @@ def api_login(force=False):
 
     return { 'code': code, 'data': data, 'result': True }
 
-def api_mix(list1, list2, list3=None):
-    if list3:
-        i,j,k = iter(list1), iter(list2), iter(list3)
-        result = [item for sublist in zip(i,j,k) for item in sublist]
-        result += [item for item in i]
-        result += [item for item in j]
-        result += [item for item in k]
-    else:
-        i,j = iter(list1), iter(list2)
-        result = [item for sublist in zip(i,j) for item in sublist]
-        result += [item for item in i]
-        result += [item for item in j]
-
-    return result
-
 def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0, change_audio=0):
     playdata = {'path': '', 'license': '', 'info': '', 'properties': {}}
 
@@ -270,7 +255,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     from_beginning = int(from_beginning)
     pvr = int(pvr)
     change_audio = int(change_audio)
-    
+
     profile_settings = load_profile(profile_id=1)
 
     headers = { 'authorization': 'Bearer {id_token}'.format(id_token=profile_settings['access_token'])}
@@ -287,7 +272,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         pass
 
     if type == 'vod':
-        play_url = '{base_url}/v6/playnow/ondemand/0/{location}'.format(base_url=CONST_API_URL, location=id)
+        play_url = '{base_url}/v7/playnow/ondemand/0/{location}'.format(base_url=CONST_API_URL, location=id)
 
         download = api_download(url=play_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
         data = download['data']
@@ -297,13 +282,13 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
             return playdata
 
         info = data['VideoInformation']
-        url_base = '{base_url}/v6/stream/handshake/Widevine/dash/VOD/{id}'.format(base_url=CONST_API_URL, id=info['Id'])
+        url_base = '{base_url}/v7/stream/handshake/Widevine/dash/VOD/{id}'.format(base_url=CONST_API_URL, id=info['Id'])
         timeshift = info['Id']
     elif type == 'channel' and channel and friendly:
-        url_base = '{base_url}/v6/stream/handshake/Widevine/dash/Live/{friendly}'.format(base_url=CONST_API_URL, friendly=friendly)
+        url_base = '{base_url}/v7/stream/handshake/Widevine/dash/Live/{friendly}'.format(base_url=CONST_API_URL, friendly=friendly)
         timeshift = 'false'
     else:
-        url_base = '{base_url}/v6/stream/handshake/Widevine/dash/Replay/{id}'.format(base_url=CONST_API_URL, id=id)
+        url_base = '{base_url}/v7/stream/handshake/Widevine/dash/Replay/{id}'.format(base_url=CONST_API_URL, id=id)
         timeshift = id
 
     play_url = '{url_base}?playerName=NLZIET%20Meister%20Player%20Web&profile=default&maxResolution=&timeshift={timeshift}'.format(url_base=url_base, timeshift=timeshift)
@@ -320,7 +305,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     if not type == 'vod' and (pvr == 0):
         if type == 'channel' and friendly:
-            channel_url = '{base_url}/v6/epg/locations/{friendly}/live/1?fromDate={date}'.format(base_url=CONST_API_URL, friendly=friendly, date=datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S"))
+            channel_url = '{base_url}/v7/epg/locations/{friendly}/live/1?fromDate={date}'.format(base_url=CONST_API_URL, friendly=friendly, date=datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S"))
 
             download = api_download(url=channel_url, type='get', headers=None, data=None, json_data=False, return_json=True)
             data = download['data']
@@ -339,7 +324,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         if not id:
             return playdata
 
-        info_url = '{base_url}/v6/epg/location/{location}'.format(base_url=CONST_API_URL, location=id)
+        info_url = '{base_url}/v7/epg/location/{location}'.format(base_url=CONST_API_URL, location=id)
 
         download = api_download(url=info_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
         data = download['data']
@@ -368,75 +353,56 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     return playdata
 
 def api_process_vod(data):
-    data = api_mix(data['Items']['npo'], data['Items']['rtl'], data['Items']['sbs'])
-
     items = []
 
     for row in data:
         item = {}
 
-        if not check_key(row, 'Type'):
-            continue
-
-        if row['Type'] == 'Vod':
-            key = 'VideoTile'
-        elif row['Type'] == 'Epg':
-            key = 'EpgTile'
-        elif row['Type'] == 'Serie':
-            key = 'SerieTile'
+        if not check_key(row, 'type'):
+            type = 'Serie'
         else:
+            if row['type'] == 'Vod':
+                type = 'Vod'
+            elif row['type'] == 'Epg':
+                type = 'Epg'
+            else:
+                continue
+
+        if not check_key(row, 'id') or not check_key(row, 'title'):
             continue
 
-        if not check_key(row, key):
-            continue
-
-        entry = row[key]
-
-        if not check_key(entry, 'Id') or (not check_key(entry, 'Titel') and (not check_key(entry, 'Serie') or not check_key(entry['Serie'], 'Titel'))):
-            continue
-
-        id = entry['Id']
-        basetitle = ''
+        id = row['id']
+        basetitle = row['title']
         desc = ''
         start = ''
         duration = 0
         image = ''
 
-        if check_key(entry, 'Serie') and check_key(entry['Serie'], 'Titel'):
-            basetitle = entry['Serie']['Titel']
+        if check_key(row, 'description'):
+            desc = row['description']
 
-        if check_key(entry, 'Titel'):
-            if len(entry['Titel']) > 0 and basetitle != entry['Titel']:
-                if len(basetitle) > 0:
-                    basetitle += ": " + entry['Titel']
-                else:
-                    basetitle = entry['Titel']
+        if check_key(row, 'formattedDuration'):
+            duration = convert_to_seconds(row['formattedDuration'])
 
-        if check_key(entry, 'Omschrijving'):
-            desc = entry['Omschrijving']
-
-        if check_key(entry, 'Duur'):
-            duration = entry['Duur']
-
-        if check_key(entry, 'AfbeeldingUrl'):
-            image = entry['AfbeeldingUrl']
+        if check_key(row, 'image'):
+            image = row['image']['landscapeUrl']
 
             if not 'http' in image:
                 image_split = image.rsplit('/', 1)
 
                 if len(image_split) == 2:
-                    image = '{image_url}/thumbnails/hd1080/{image}'.format(image_url=CONST_IMAGE_URL, image=image.rsplit('/', 1)[1])
+                    image = '{image_url}/legacy/thumbnails/{image}'.format(image_url=CONST_IMAGE_URL, image=image.rsplit('/', 1)[1])
                 else:
                     image = '{image_url}/{image}'.format(image_url=CONST_IMAGE_URL, image=image)
 
-        if check_key(entry, 'Uitzenddatum'):
-            start = entry['Uitzenddatum']
+        if check_key(row, 'formattedDate') and check_key(row, 'formattedTime'):
+            start = "{date} {time}".format(date=row['formattedDate'], time=row['formattedTime'])
 
         item['id'] = id
         item['title'] = basetitle
         item['description'] = desc
         item['duration'] = duration
-        item['type'] = row['Type']
+        item['type'] = type
         item['icon'] = image
         item['start'] = start
 
@@ -460,7 +426,7 @@ def api_search(query):
     if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
         data = load_file(file=file, isJSON=True)
     else:
-        search_url = '{base_url}/v6/search/v2/combined?searchterm={query}&maxSerieResults=99999999&maxVideoResults=99999999&expand=true&expandlist=true'.format(base_url=CONST_API_URL, query=quote_plus(query))
+        search_url = '{base_url}/v7/search/combined?searchterm={query}&maxSerieResults=99999999&maxVideoResults=99999999&expand=true&expandlist=true'.format(base_url=CONST_API_URL, query=quote_plus(query))
 
         download = api_download(url=search_url, type='get', headers=None, data=None, json_data=False, return_json=True)
         data = download['data']
@@ -494,7 +460,7 @@ def api_search(query):
                     image_split = image.rsplit('/', 1)
 
                     if len(image_split) == 2:
-                        image = '{image_url}/thumbnails/hd1080/{image}'.format(image_url=CONST_IMAGE_URL, image=image.rsplit('/', 1)[1])
+                        image = '{image_url}/legacy/thumbnails/{image}'.format(image_url=CONST_IMAGE_URL, image=image.rsplit('/', 1)[1])
                     else:
                         image = '{image_url}/{image}'.format(image_url=CONST_IMAGE_URL, image=image)
 
@@ -554,7 +520,7 @@ def api_search(query):
                     image_split = image.rsplit('/', 1)
 
                     if len(image_split) == 2:
-                        image = '{image_url}/thumbnails/hd1080/{image}'.format(image_url=CONST_IMAGE_URL, image=image.rsplit('/', 1)[1])
+                        image = '{image_url}/legacy/thumbnails/{image}'.format(image_url=CONST_IMAGE_URL, image=image.rsplit('/', 1)[1])
                     else:
                         image = '{image_url}/{image}'.format(image_url=CONST_IMAGE_URL, image=image)
 
@@ -594,16 +560,24 @@ def api_vod_download(type, start=0):
     if not api_get_session():
         return None
 
-    if type == "movies":
-        url = '{base_url}/v6/tabs/GenreFilms?count=52&expand=true&expandlist=true&maxResults=52&offset={start}'.format(base_url=CONST_API_URL, start=start)
+    if type == "moviesnpo":
+        url = '{base_url}/v7/recommend/movies?limit=52&offset={start}&contentProvider=npo'.format(base_url=CONST_API_URL, start=start)
+    elif type == "movies":
+        url = '{base_url}/v7/recommend/movies?limit=52&offset={start}'.format(base_url=CONST_API_URL, start=start)
+    elif type == "watchaheadnpo":
+        url = '{base_url}/v7/watchinadvance?limit=52&offset={start}&contentProvider=npo'.format(base_url=CONST_API_URL, start=start)
     elif type == "watchahead":
-        url = '{base_url}/v6/tabs/VooruitKijken2?count=52&expand=true&expandlist=true&maxResults=52&offset={start}'.format(base_url=CONST_API_URL, start=start)
+        url = '{base_url}/v7/watchinadvance?limit=52&offset={start}'.format(base_url=CONST_API_URL, start=start)
+    elif type == "seriesbingenpo":
+        url = '{base_url}/v7/recommend/series?limit=52&offset={start}&contentProvider=npo'.format(base_url=CONST_API_URL, start=start)
     elif type == "seriesbinge":
-        url = '{base_url}/v6/tabs/SeriesBingewatch?count=52&expand=true&expandlist=true&maxResults=52&offset={start}'.format(base_url=CONST_API_URL, start=start)
+        url = '{base_url}/v7/recommend/series?limit=52&offset={start}'.format(base_url=CONST_API_URL, start=start)
     elif type == "mostviewed":
-        url = '{base_url}/v6/tabs/MostViewed?count=52&expand=true&expandlist=true&maxResults=52&offset={start}'.format(base_url=CONST_API_URL, start=start)
+        url = '{base_url}/v7/recommend/trendingvideos?limit=52&offset={start}'.format(base_url=CONST_API_URL, start=start)
+    elif type == "tipfeednpo":
+        url = '{base_url}/v7/recommend/recommendedvideos?limit=52&offset={start}&contentProvider=npo'.format(base_url=CONST_API_URL, start=start)
     elif type == "tipfeed":
-        url = '{base_url}/v6/tabs/Tipfeed?count=52&expand=true&expandlist=true&maxResults=52&offset={start}'.format(base_url=CONST_API_URL, start=start)
+        url = '{base_url}/v7/recommend/recommendedvideos?limit=52&offset={start}'.format(base_url=CONST_API_URL, start=start)
     else:
         return None
 
@@ -623,7 +597,7 @@ def api_vod_download(type, start=0):
         if code and code == 200 and data:
             write_file(file=file, data=data, isJSON=True)
 
-    if not data or not check_key(data, 'Items'):
+    if not data:
         return None
 
     return api_process_vod(data=data)
@@ -634,7 +608,7 @@ def api_vod_season(series, id):
 
     season = []
 
-    program_url = '{base_url}/v6/series/{series}/seizoenItems?seizoenId={id}&count=99999999&expand=true&expandlist=true&maxResults=99999999&offset=0'.format(base_url=CONST_API_URL, series=series, id=id)
+    program_url = '{base_url}/v7/series/{series}/episodes?seasonId={id}&limit=999&offset=0'.format(base_url=CONST_API_URL, series=series, id=id)
 
     type = "vod_series_" + str(series) + "_season_" + str(id)
     encodedBytes = base64.b32encode(type.encode("utf-8"))
@@ -662,56 +636,51 @@ def api_vod_season(series, id):
         image = ''
         label = ''
 
-        if check_key(row, 'AfleveringTitel') and len(row['AfleveringTitel']) > 0:
-            episodeTitle = row['AfleveringTitel']
+        if check_key(row, 'subtitle') and len(row['subtitle']) > 0:
+            episodeTitle = row['subtitle']
         else:
-            episodeTitle = row['ProgrammaTitel']
+            episodeTitle = row['title']
 
-        if check_key(row, 'Duur'):
-            duration = row['Duur']
+        if check_key(row, 'formattedDuration'):
+            duration = convert_to_seconds(row['formattedDuration'])
 
-        if check_key(row, 'ContentId'):
-            ep_id = row['ContentId']
+        if check_key(row, 'id'):
+            ep_id = row['id']
 
-        if check_key(row, 'ProgrammaOmschrijving'):
-            desc = row['ProgrammaOmschrijving']
+        if check_key(row, 'description'):
+            desc = row['description']
 
-        if check_key(row, 'ProgrammaAfbeelding'):
-            image = row['ProgrammaAfbeelding']
+        if check_key(row, 'image') and check_key(row['image'], 'landscapeUrl'):
+            image = row['image']['landscapeUrl']
 
             if not 'http' in image:
                 image_split = image.rsplit('/', 1)
 
                 if len(image_split) == 2:
-                    image = '{image_url}/thumbnails/hd1080/{image}'.format(image_url=CONST_IMAGE_URL, image=image.rsplit('/', 1)[1])
+                    image = '{image_url}/legacy/thumbnails/{image}'.format(image_url=CONST_IMAGE_URL, image=image.rsplit('/', 1)[1])
                 else:
                     image = '{image_url}/{image}'.format(image_url=CONST_IMAGE_URL, image=image)
 
-        if check_key(row, 'Uitzenddatum'):
-            start = row['Uitzenddatum']
-            startT = datetime.datetime.fromtimestamp(time.mktime(time.strptime(start, "%Y-%m-%dT%H:%M:%S")))
-            startT = convert_datetime_timezone(startT, "UTC", "UTC")
+        if check_key(row, 'formattedDate') and check_key(row, 'formattedTime'):
+            label += "{date} {time}".format(date=row['formattedDate'], time=row['formattedTime'])
 
-            if xbmc.getLanguage(xbmc.ISO_639_1) == 'nl':
-                label += '{weekday} {day} {month} {yearhourminute} '.format(weekday=date_to_nl_dag(startT), day=startT.strftime("%d"), month=date_to_nl_maand(startT), yearhourminute=startT.strftime("%Y %H:%M"))
-            else:
-                label += startT.strftime("%A %d %B %Y %H:%M ").capitalize()
+        if check_key(row, 'formattedEpisodeNumbering'):
+            label += " " + str(row['formattedEpisodeNumbering'])
 
-        if check_key(row, 'SeizoenVolgnummer'):
-            label += str(row['SeizoenVolgnummer'])
+            regex = r"S([0-9]*):A([0-9]*)"
+            matches = re.finditer(regex, str(row['formattedEpisodeNumbering']))
 
-        if check_key(row, 'AfleveringVolgnummer'):
-            if len(label) > 0:
-                label += "."
-
-            label += str(row['AfleveringVolgnummer'])
+            for matchNum, match in enumerate(matches, start=1):
+                if len(match.groups()) == 2:
+                    seasonno = match.group(1)
+                    episodeno = match.group(2)
 
         if len(label) > 0:
             label += " - "
 
         label += episodeTitle
 
-        season.append({'label': label, 'id': ep_id, 'start': start, 'duration': duration, 'title': episodeTitle, 'seasonNumber': row['SeizoenVolgnummer'], 'episodeNumber': row['AfleveringVolgnummer'], 'description': desc, 'image': image})
+        season.append({'label': label, 'id': ep_id, 'start': '', 'duration': duration, 'title': episodeTitle, 'seasonNumber': seasonno, 'episodeNumber': episodeno, 'description': desc, 'image': image})
 
     season[:] = sorted(season, key=api_sort_episodes)
 
@@ -723,7 +692,7 @@ def api_vod_seasons(type, id):
 
     seasons = []
 
-    program_url = '{base_url}/v6/series/{id}/fullWithSeizoenen?count=99999999&expand=true&expandlist=true&maxResults=99999999&offset=0'.format(base_url=CONST_API_URL, id=id)
+    program_url = '{base_url}/v7/series/{id}'.format(base_url=CONST_API_URL, id=id)
 
     type = "vod_seasons_" + str(id)
     encodedBytes = base64.b32encode(type.encode("utf-8"))
@@ -741,83 +710,32 @@ def api_vod_seasons(type, id):
         if code and code == 200 and data:
             write_file(file=file, data=data, isJSON=True)
 
-    if not data or not check_key(data, 'Serie'):
+    if not data:
         return None
 
     season_count = 0
     type = 'seasons'
 
-    if check_key(data, 'SeizoenenForSerie'):
-        for row in data['SeizoenenForSerie']:
+    if check_key(data, 'seasons'):
+        for row in data['seasons']:
             season_count += 1
 
-            seasons.append({'id': row['SeizoenId'], 'seriesNumber': row['Titel'], 'description': data['Serie']['Omschrijving'], 'image': data['Serie']['ProgrammaAfbeelding']})
+            seasons.append({'id': row['id'], 'seriesNumber': row['title'], 'description': data['description'], 'image': data['image']['landscapeUrl']})
 
-    if check_key(data, 'ItemsForSeizoen') and season_count < 2:
-        seasons = []
-        type = 'episodes'
+    seasons[:] = sorted(seasons, key=api_sort_season)
 
-        for row in data['ItemsForSeizoen']:
-            duration = 0
-            ep_id = ''
-            desc = ''
-            image = ''
-            start = ''
-            label = ''
-
-            if check_key(row, 'AfleveringTitel'):
-                episodeTitle = row['AfleveringTitel']
-            else:
-                episodeTitle = row['ProgrammaTitel']
-
-            if check_key(row, 'Duur'):
-                duration = row['Duur']
-
-            if check_key(row, 'ContentId'):
-                ep_id = row['ContentId']
-
-            if check_key(row, 'ProgrammaOmschrijving'):
-                desc = row['ProgrammaOmschrijving']
-
-            if check_key(row, 'ProgrammaAfbeelding'):
-                image = row['ProgrammaAfbeelding']
-
-                if not 'http' in image:
-                    image_split = image.rsplit('/', 1)
-
-                    if len(image_split) == 2:
-                        image = '{image_url}/thumbnails/hd1080/{image}'.format(image_url=CONST_IMAGE_URL, image=image.rsplit('/', 1)[1])
-                    else:
-                        image = '{image_url}/{image}'.format(image_url=CONST_IMAGE_URL, image=image)
-
-            if check_key(row, 'Uitzenddatum'):
-                start = row['Uitzenddatum']
-
-            if check_key(row, 'SeizoenVolgnummer'):
-                label += str(row['SeizoenVolgnummer'])
-
-            if check_key(row, 'AfleveringVolgnummer'):
-                if len(label) > 0:
-                    label += "."
-
-                label += str(row['AfleveringVolgnummer'])
-
-            if len(label) > 0:
-                label += " - "
-
-            label += episodeTitle
-
-            seasons.append({'label': label, 'id': ep_id, 'start': start, 'duration': duration, 'title': episodeTitle, 'seasonNumber': row['SeizoenVolgnummer'], 'episodeNumber': row['AfleveringVolgnummer'], 'description': desc, 'image': image})
-
-    if type == 'seasons':
-        seasons[:] = sorted(seasons, key=api_sort_season)
-    elif type == 'episodes':
-        seasons[:] = sorted(seasons, key=api_sort_episodes)
-
-    return {'program': data['Serie'], 'type': type, 'seasons': seasons}
+    return {'program': data, 'type': type, 'seasons': seasons}
 
 def api_watchlist_listing():
     return None
 
 def api_clean_after_playback():
     pass
+    
+def convert_to_seconds(s):
+    UNITS = {'s':'seconds', 'm':'minutes', 'h':'hours', 'd':'days', 'w':'weeks'}
+
+    return int(datetime.timedelta(**{
+        UNITS.get(m.group('unit').lower(), 'seconds'): int(m.group('val'))
+        for m in re.finditer(r'(?P<val>\d+)(?P<unit>[smhdw]?)', s, flags=re.I)
+    }).total_seconds())
