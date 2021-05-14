@@ -43,7 +43,7 @@ CONST_START_FROM_BEGINNING = True
 CONST_USE_PROXY = True
 
 CONST_VOD_CAPABILITY = [
-    { 'file': 'series', 'label': _.SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 1 },
+    #{ 'file': 'series', 'label': _.SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 1 },
     { 'file': 'tipfeednpo', 'label': _.RECOMMENDED + ' NPO', 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
     { 'file': 'tipfeed', 'label': _.RECOMMENDED, 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
     { 'file': 'watchaheadnpo', 'label': _.WATCHAHEAD + ' NPO', 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },

@@ -270,28 +270,35 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         friendly = data[str(channel)]['assetid']
     except:
         pass
+        
+    if type == 'channel' and friendly:
+        channel_url = '{base_url}/v7/epg/locations/{friendly}/live/1?fromDate={date}'.format(base_url=CONST_API_URL, friendly=friendly, date=datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S"))
 
-    if type == 'vod':
-        play_url = '{base_url}/v7/playnow/ondemand/0/{location}'.format(base_url=CONST_API_URL, location=id)
-
-        download = api_download(url=play_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+        download = api_download(url=channel_url, type='get', headers=None, data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']
 
-        if not code or not code == 200 or not data or not check_key(data, 'VideoInformation'):
+        if not code or not code == 200 or not data:
             return playdata
 
-        info = data['VideoInformation']
-        url_base = '{base_url}/v7/stream/handshake/Widevine/dash/VOD/{id}'.format(base_url=CONST_API_URL, id=info['Id'])
-        timeshift = info['Id']
+        for row in data:
+            if not check_key(row, 'Channel') or not check_key(row, 'Locations'):
+                return playdata
+
+            for row2 in row['Locations']:
+                id = row2['LocationId']
+
+    if not id:
+        return playdata
+        
+    if type == 'vod':
+        url_base = '{base_url}/v7/stream/handshake/Widevine/dash/VOD/{id}'.format(base_url=CONST_API_URL, id=id)
     elif type == 'channel' and channel and friendly:
-        url_base = '{base_url}/v7/stream/handshake/Widevine/dash/Live/{friendly}'.format(base_url=CONST_API_URL, friendly=friendly)
-        timeshift = 'false'
+        url_base = '{base_url}/v7/stream/handshake/Widevine/dash/Live/{id}'.format(base_url=CONST_API_URL, id=id)
     else:
         url_base = '{base_url}/v7/stream/handshake/Widevine/dash/Replay/{id}'.format(base_url=CONST_API_URL, id=id)
-        timeshift = id
 
-    play_url = '{url_base}?playerName=NLZIET%20Meister%20Player%20Web&profile=default&maxResolution=&timeshift={timeshift}'.format(url_base=url_base, timeshift=timeshift)
+    play_url = '{url_base}?playerName=BitmovinWeb'.format(url_base=url_base)
 
     download = api_download(url=play_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -304,26 +311,6 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     path = data['uri']
 
     if not type == 'vod' and (pvr == 0):
-        if type == 'channel' and friendly:
-            channel_url = '{base_url}/v7/epg/locations/{friendly}/live/1?fromDate={date}'.format(base_url=CONST_API_URL, friendly=friendly, date=datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S"))
-
-            download = api_download(url=channel_url, type='get', headers=None, data=None, json_data=False, return_json=True)
-            data = download['data']
-            code = download['code']
-
-            if not code or not code == 200 or not data:
-                return playdata
-
-            for row in data:
-                if not check_key(row, 'Channel') or not check_key(row, 'Locations'):
-                    return playdata
-
-                for row2 in row['Locations']:
-                    id = row2['LocationId']
-
-        if not id:
-            return playdata
-
         info_url = '{base_url}/v7/epg/location/{location}'.format(base_url=CONST_API_URL, location=id)
 
         download = api_download(url=info_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
@@ -663,6 +650,9 @@ def api_vod_season(series, id):
 
         if check_key(row, 'formattedDate') and check_key(row, 'formattedTime'):
             label += "{date} {time}".format(date=row['formattedDate'], time=row['formattedTime'])
+
+        seasonno = ''
+        episodeno = ''
 
         if check_key(row, 'formattedEpisodeNumbering'):
             label += " " + str(row['formattedEpisodeNumbering'])
