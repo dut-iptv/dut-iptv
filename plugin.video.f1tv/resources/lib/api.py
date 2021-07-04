@@ -401,25 +401,26 @@ def api_vod_season(series, id):
         season.append({'label': label, 'id': ep_id, 'start': start, 'duration': duration, 'title': label, 'seasonNumber': seasonno, 'episodeNumber': episodeno, 'description': desc, 'image': image})
 
         for n in range(0, 100):
-            for row2 in row['metadata']['additionalStreams']:
-                if not n == int(row2['racingNumber']):
-                    continue
+            if check_key(row['metadata'], 'additionalStreams'):
+                for row2 in row['metadata']['additionalStreams']:
+                    if not n == int(row2['racingNumber']):
+                        continue
 
-                ep_id = ''
-                label = ''
+                    ep_id = ''
+                    label = ''
 
-                if check_key(row['metadata'], 'title'):
-                    if n == 0:
-                        label = str(row2['title'])
-                    elif (check_key(row2, 'teamName') and check_key(row2, 'driverFirstName') and check_key(row2, 'driverLastName')):
-                        label = str(row2['racingNumber']) + ' ' + str(row2['driverFirstName']) + ' ' + str(row2['driverLastName']) + ' (' + str(row2['teamName']) + ')'
-                    else:
-                        label = str(row2['title'])
+                    if check_key(row['metadata'], 'title'):
+                        if n == 0:
+                            label = str(row2['title'])
+                        elif (check_key(row2, 'teamName') and check_key(row2, 'driverFirstName') and check_key(row2, 'driverLastName')):
+                            label = str(row2['racingNumber']) + ' ' + str(row2['driverFirstName']) + ' ' + str(row2['driverLastName']) + ' (' + str(row2['teamName']) + ')'
+                        else:
+                            label = str(row2['title'])
 
-                if check_key(row2, 'playbackUrl'):
-                    ep_id = row2['playbackUrl']
+                    if check_key(row2, 'playbackUrl'):
+                        ep_id = row2['playbackUrl']
 
-                season.append({'label': label, 'id': ep_id, 'start': start, 'duration': duration, 'title': label, 'seasonNumber': seasonno, 'episodeNumber': episodeno, 'description': desc, 'image': image})
+                    season.append({'label': label, 'id': ep_id, 'start': start, 'duration': duration, 'title': label, 'seasonNumber': seasonno, 'episodeNumber': episodeno, 'description': desc, 'image': image})
 
     return season
 
