@@ -102,13 +102,16 @@ def plugin_process_playdata(playdata):
     if check_key(playdata, 'license') and check_key(playdata['license'], 'triggers') and check_key(playdata['license']['triggers'][0], 'licenseURL'):
         item_inputstream = inputstream.Widevine(
             license_key = playdata['license']['triggers'][0]['licenseURL'],
+            manifest_update_parameter = 'update',
         )
 
         if check_key(playdata['license']['triggers'][0], 'customData'):
             CDMHEADERS['AcquireLicense.CustomData'] = playdata['license']['triggers'][0]['customData']
             CDMHEADERS['CADeviceType'] = 'Widevine OTT client'
     else:
-        item_inputstream = inputstream.MPD()
+        item_inputstream = inputstream.MPD(
+            manifest_update_parameter = 'update',
+        )
 
     return item_inputstream, CDMHEADERS
 

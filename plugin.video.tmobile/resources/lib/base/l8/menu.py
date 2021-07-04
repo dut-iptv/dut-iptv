@@ -30,7 +30,7 @@ def home(**kwargs):
     profile_settings = load_profile(profile_id=1)
 
     if not ADDON_ID == 'plugin.executable.dutiptv' and (not check_key(profile_settings, 'version') or not ADDON_VERSION == profile_settings['version']):
-        change_icon()
+        #change_icon()
         profile_settings['version'] = ADDON_VERSION
         save_profile(profile_id=1, profile=profile_settings)
 
