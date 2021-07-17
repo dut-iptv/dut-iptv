@@ -175,6 +175,7 @@ def api_vod_download(type, start=0):
 
             for row in data['resultObj']['containers']:
                 for row2 in row['retrieveItems']['resultObj']['containers']:
+                    try:
                         if check_key(row2, 'metàdata') and check_key(row2['metadata'], 'contentSubtype'):
                             if row2['metadata']['contentSubtype'] == 'LIVE' and not row2['id'] in item_ids:                            
                                 item = {}
@@ -188,6 +189,8 @@ def api_vod_download(type, start=0):
 
                                 items.append(item)
                                 item_ids.append(row2['id'])
+                    except:
+                        pass
 
             return items
         else:
