@@ -175,22 +175,19 @@ def api_vod_download(type, start=0):
 
             for row in data['resultObj']['containers']:
                 for row2 in row['retrieveItems']['resultObj']['containers']:
-                    try:
-                        if check_key(row2, 'metàdata') and check_key(row2['metadata'], 'contentSubtype'):
-                            if row2['metadata']['contentSubtype'] == 'LIVE' and not row2['id'] in item_ids:                            
-                                item = {}
-                                item['id'] = row2['id']
-                                item['title'] = row2['metadata']['title']
-                                item['description'] = row2['metadata']['longDescription']
-                                item['duration'] = row2['metadata']['duration']
-                                item['type'] = 'event'
-                                item['icon'] = '{image_url}/{image}?w=1920&h=1080&q=HI&o=L'.format(image_url=CONST_IMAGE_URL, image=row2['metadata']['pictureUrl'])
-                                item['start'] = ''
+                    if check_key(row2, 'metadata') and check_key(row2['metadata'], 'contentSubtype'):
+                        if row2['metadata']['contentSubtype'] == 'LIVE' and not row2['id'] in item_ids:                            
+                            item = {}
+                            item['id'] = row2['id']
+                            item['title'] = row2['metadata']['title']
+                            item['description'] = row2['metadata']['longDescription']
+                            item['duration'] = row2['metadata']['duration']
+                            item['type'] = 'event'
+                            item['icon'] = '{image_url}/{image}?w=1920&h=1080&q=HI&o=L'.format(image_url=CONST_IMAGE_URL, image=row2['metadata']['pictureUrl'])
+                            item['start'] = ''
 
-                                items.append(item)
-                                item_ids.append(row2['id'])
-                    except:
-                        pass
+                            items.append(item)
+                            item_ids.append(row2['id'])
 
             return items
         else:
