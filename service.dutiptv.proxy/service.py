@@ -15,7 +15,7 @@ def new_getaddrinfo(*args):
         return prv_getaddrinfo(dns_cache[args[0]], *args[1:])
     else:
         return prv_getaddrinfo(*args)
-        
+
 socket.getaddrinfo = new_getaddrinfo
 
 def parse_dns_string(reader, data):
@@ -338,12 +338,12 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
 
             if proxy_get_match(path=self.path, addon_name=addon_name) and os.path.isfile(ADDON_PROFILE + 'stream_hostname'):
                 stream_url[addon_name] = load_file(file=ADDON_PROFILE + 'stream_hostname', isJSON=False)
-                
+
                 try:
                     os.remove(ADDON_PROFILE + 'stream_hostname')
                 except:
                     pass
-                
+
                 now_playing = int(time.time())
                 last_token = int(time.time()) + 60
 
@@ -407,7 +407,7 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
                     URL = fix_audio(URL)
 
                 now_playing = int(time.time())
-                
+
                 if (addon_name == 'betelenet' or addon_name == 'ziggo') and last_token < now_playing:
                     token_renew = load_file(file=ADDON_PROFILE + 'token_renew', isJSON=False)
                     xbmc.executebuiltin('RunPlugin(%s)' % (token_renew))
@@ -528,7 +528,7 @@ class Session(requests.Session):
             try:
                 if (self._addon_name == 'betelenet' or self._addon_name == 'ziggo'):
                     override_dns(CONST_BASE_DOMAIN[self._addon_name], CONST_BASE_IP[self._addon_name])
-                
+
                 data = super(Session, self).request(method, url, **kwargs)
 
                 if self._cookies_key and self._save_cookies:
@@ -645,7 +645,7 @@ def sly_mpd_parse(data):
 
         if adapt_frame_rate:
             adap_set.removeAttribute('frameRate')
-            
+
         if 'video' in adap_set.getAttribute('mimeType'):
             is_video = True
 
@@ -767,12 +767,12 @@ def mpd_parse(data, addon_name, URL):
             mpd.setAttribute('mediaPresentationDuration', 'PT{hour}H{minute}M{second}S'.format(hour=hour, minute=minute, second=second))
 
     prefered_language = load_file(file=ADDON_PROFILE + 'stream_language', isJSON=False)
-    
+
     try:
         prefered_language = AUDIO_LANGUAGES_REV[prefered_language]
     except:
         pass
-    
+
     for adap_set in root.getElementsByTagName('AdaptationSet'):
         if 'audio' in adap_set.getAttribute('mimeType'):
             for stream in adap_set.getElementsByTagName("Representation"):
@@ -788,7 +788,7 @@ def mpd_parse(data, addon_name, URL):
                     parent = stream.parentNode
                     parent.removeChild(stream)
                     continue
-            
+
                 try:
                     if attrib['codecs'].lower() == 'ac-3':
                         ac3_found = True

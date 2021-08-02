@@ -287,10 +287,21 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
             for row2 in row['Locations']:
                 id = row2['LocationId']
+    elif not type == 'vod':
+        detail_url = '{base_url}/v7/content/detail/{id}'.format(base_url=CONST_API_URL, id=id)
+
+        download = api_download(url=detail_url, type='get', headers=None, data=None, json_data=False, return_json=True)
+        data = download['data']
+        code = download['code']
+        
+        if code and code == 200 and data:
+            if check_key(data, 'assets'):
+                if check_key(data['assets'], 'epg') and check_key(data['assets']['epg'][0], 'locationId'):
+                    id = data['assets']['epg'][0]['locationId']
 
     if not id:
         return playdata
-        
+                   
     if type == 'vod':
         url_base = '{base_url}/v7/stream/handshake/Widevine/dash/VOD/{id}'.format(base_url=CONST_API_URL, id=id)
     elif type == 'channel' and channel and friendly:
@@ -371,7 +382,7 @@ def api_process_vod(data):
         if check_key(row, 'formattedDuration'):
             duration = convert_to_seconds(row['formattedDuration'])
 
-        if check_key(row, 'image'):
+        if check_key(row, 'image') and check_key(row['image'], 'landscapeUrl'):
             image = row['image']['landscapeUrl']
 
             if not 'http' in image:
