@@ -66,11 +66,11 @@ Instructions adopted from the kodi wiki, see [HOW-TO:Install add-ons from zip fi
 - Execute the following commands in a terminal:
 
 ```
-sudo apt-get install python-crypto
-sudo apt-get install build-essential python-pip
-sudo pip install -U setuptools
-sudo pip install wheel
-sudo pip install pycryptodomex
+sudo apt-get install python3-crypto
+sudo apt-get install build-essential python3-pip
+sudo python3 -m pip install -U setuptools
+sudo python3 -m pip install wheel
+sudo python3 -m pip install pycryptodomex
 ```
 
 ### Source code / Release information / Issues / PR's / Discussions
