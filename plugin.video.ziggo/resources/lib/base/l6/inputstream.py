@@ -178,21 +178,28 @@ def install_widevine(reinstall=False):
     return True
 
 def _get_system_arch():
-    if xbmc.getCondVisibility('system.platform.android'):
-        system = 'Android'
-    elif 'WindowsApps' in xbmcvfs.translatePath('special://xbmcbin/'):
+    if xbmc.getCondVisibility('System.Platform.UWP') or '4n2hpmxwrvr6p' in xbmcvfs.translatePath('special://xbmc/') or 'WindowsApps' in xbmcvfs.translatePath('special://xbmcbin/'):
         system = 'UWP'
+    elif xbmc.getCondVisibility('System.Platform.Android'):
+        system = 'Android'
+    elif xbmc.getCondVisibility('System.Platform.IOS'):
+        system = 'IOS'
     else:
         system = platform.system()
 
     if system == 'Windows':
         arch = platform.architecture()[0]
-    elif system == 'Android':
-        arch = ''
     else:
-        arch = platform.machine()
+        try:
+            arch = platform.machine()
+        except:
+            arch = ''
 
-    if 'arm' in arch:
+    #64bit kernel with 32bit userland
+    if ('aarch64' in arch or 'arm64' in arch) and (struct.calcsize("P") * 8) == 32:
+        arch = 'armv7'
+
+    elif 'arm' in arch:
         if 'v6' in arch:
             arch = 'armv6'
         else:
