@@ -1,4 +1,4 @@
-import glob, time, os, platform, shutil, sys, xbmc, xbmcaddon, xbmcvfs
+import glob, time, os, platform, shutil, struct, sys, xbmc, xbmcaddon, xbmcvfs
 
 from resources.lib.base.l1.constants import ADDON_PROFILE, CONST_DUT_EPG_BASE, SESSION_CHUNKSIZE
 from resources.lib.base.l2.log import log

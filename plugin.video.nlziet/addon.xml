@@ -8,7 +8,7 @@
     <import addon="script.module.pytz" version="2014.2"/>
     <import addon="script.module.requests" version="2.22.0"/>
     <import addon="script.module.beautifulsoup4" version="4.6.2"/>
-    <import addon="service.dutiptv.proxy" version="1.2.2+matrix.1"/>
+    <import addon="service.dutiptv.proxy" version="1.2.3+matrix.1"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>video</provides>
