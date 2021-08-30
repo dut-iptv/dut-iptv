@@ -1,4 +1,4 @@
-import glob, time, os, platform, shutil, struct, sys, xbmc, xbmcaddon, xbmcvfs
+import glob, inputstreamhelper, os, platform, shutil, struct, sys, time, xbmc, xbmcaddon, xbmcvfs
 
 from resources.lib.base.l1.constants import ADDON_PROFILE, CONST_DUT_EPG_BASE, SESSION_CHUNKSIZE
 from resources.lib.base.l2.log import log
@@ -121,6 +121,9 @@ def supports_playready():
     return bool(ia_addon and xbmc.getCondVisibility('system.platform.android'))
 
 def install_widevine(reinstall=False):
+    is_helper = inputstreamhelper.Helper('mpd', drm='com.widevine.alpha')    
+    return is_helper._check_drm()
+
     ia_addon = get_ia_addon(required=True)
     system, arch = _get_system_arch()
     kodi_version = get_kodi_version()
