@@ -18,15 +18,13 @@
 
 -Supports watching TV and listening to radio using the IPTV Simple PVR Addon
 
--Supports catchup using IPTV Simple PVR Addon in Kodi 19
+-Supports catchup using IPTV Simple PVR Addon (through the separate Dut-IPTV Simple IPTV Connector addon)
 
 ### Required
 
 -Subscription to any of the supported providers (not free)
 
--Kodi 18 or higher with Widevine Support (free) for versions up to 1.0.0
-
--Kodi 19 or higher with Widevine Support (free) for versions above 1.0.0
+-Kodi 19 or higher with Widevine Support (free)
 
 ### Installation
 Instructions adopted from the kodi wiki, see [HOW-TO:Install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
