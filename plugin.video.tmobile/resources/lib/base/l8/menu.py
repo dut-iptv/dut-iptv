@@ -102,7 +102,6 @@ def live_tv(**kwargs):
             info = {'plot': row['description']},
             art = {'thumb': row['image']},
             path = row['path'],
-            #playable = row['playable'],
             context = row['context'],
         )
 
@@ -863,18 +862,6 @@ def renew_token(**kwargs):
         data[key] = value
 
     mod_path = plugin_renew_token(data)
-
-    #listitem = plugin.Item(
-    #    path = mod_path,
-    #)
-
-    #newItem = listitem.get_li()
-
-    #xbmcplugin.addDirectoryItem(ADDON_HANDLE, mod_path, newItem)
-    #xbmcplugin.endOfDirectory(ADDON_HANDLE, cacheToDisc=False)
-
-    #if xbmc.Monitor().waitForAbort(0.1):
-    #    return None
 
 @plugin.route()
 def add_to_watchlist(id, type, **kwargs):

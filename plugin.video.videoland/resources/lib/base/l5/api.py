@@ -426,22 +426,3 @@ def api_get_vod_by_type(type, character, genre, subscription_filter, menu=0):
         data2[currow] = row
 
     return data2
-
-def api_get_widevine():
-    widevine_url = '{dut_epg_url}/widevine.json'.format(dut_epg_url=CONST_DUT_EPG_BASE)
-
-    file = "cache" + os.sep + "widevine.json"
-
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=7):
-        data = load_file(file=file, isJSON=True)
-    else:
-        download = api_download(url=widevine_url, type='get', headers=None, data=None, json_data=True, return_json=True)
-        data = download['data']
-        code = download['code']
-
-        if code and code == 200 and data:
-            write_file(file=file, data=data, isJSON=True)
-        else:
-            return None
-
-    return data

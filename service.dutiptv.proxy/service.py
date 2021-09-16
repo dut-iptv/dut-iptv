@@ -897,6 +897,11 @@ def mpd_parse(data, addon_name, URL):
             audio_segments[segment] = last
 
         last = segment
+                
+    for adap_set in root.getElementsByTagName('AdaptationSet'):
+        if len(adap_set.getElementsByTagName("Representation")) == 0:
+            parent = adap_set.parentNode
+            parent.removeChild(adap_set)
 
     return root.toxml(encoding='utf-8')
 

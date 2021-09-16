@@ -259,12 +259,6 @@ class Item(object):
 
             li.setProperty('inputstream.adaptive.manifest_type', self.inputstream.manifest_type)
 
-            if self.inputstream.media_renewal_url:
-                li.setProperty('inputstream.adaptive.media_renewal_url', self.inputstream.media_renewal_url)
-
-            if self.inputstream.media_renewal_time:
-                li.setProperty('inputstream.adaptive.media_renewal_time', str(self.inputstream.media_renewal_time))
-
             if self.inputstream.manifest_update_parameter:
                 li.setProperty('inputstream.adaptive.manifest_update_parameter', str(self.inputstream.manifest_update_parameter))
 
@@ -289,7 +283,7 @@ class Item(object):
 
             if self.inputstream.mimetype and not mimetype:
                 mimetype = self.inputstream.mimetype
-
+            
         if self.path and self.path.lower().startswith('http'):
             if not mimetype:
                 parse = urlparse(self.path.lower())
