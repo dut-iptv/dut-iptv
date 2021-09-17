@@ -4,13 +4,6 @@
     <import addon="xbmc.addon" version="12.0.0"/>
   </requires>
   <extension point="xbmc.addon.repository" name="Dutch IPTV Repository">
-    <dir minversion="18.9.0">
-      <info compressed="false">https://dut-iptv.github.io/matrix/addons.xml</info>
-      <checksum>https://dut-iptv.github.io/matrix/addons.xml.md5</checksum>
-      <datadir zip="true">https://dut-iptv.github.io/matrix/</datadir>
-      <hashes>false</hashes>
-      <artdir>https://dut-iptv.github.io/matrix/</artdir>
-    </dir>
     <dir minversion="19.0.0">
       <info compressed="false">https://dut-iptv.github.io/matrix/addons.xml</info>
       <checksum>https://dut-iptv.github.io/matrix/addons.xml.md5</checksum>
