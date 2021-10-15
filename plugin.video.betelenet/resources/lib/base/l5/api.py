@@ -35,7 +35,7 @@ def api_download(url, type, headers=None, data=None, json_data=True, return_json
 
     session.close()
 
-    return { 'code': resp.status_code, 'data': returned_data, 'headers': resp.headers }
+    return { 'code': resp.status_code, 'data': returned_data, 'headers': resp.headers, 'url': resp.url }
 
 def api_get_channels():
     channels_url = '{dut_epg_url}/channels.json'.format(dut_epg_url=CONST_DUT_EPG)
