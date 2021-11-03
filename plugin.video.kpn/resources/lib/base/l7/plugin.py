@@ -72,7 +72,7 @@ def _home(**kwargs):
 @route('_ia_install')
 def _ia_install(**kwargs):
     _close()
-    inputstream.install_widevine(reinstall=True)
+    inputstream.install_widevine()
 
 def reboot():
     _close()
