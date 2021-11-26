@@ -18,6 +18,12 @@
 
 -Kodi 19 or higher with Widevine Support (free) for versions above 1.0.0
 
+### Installation bug
+
+-On some platforms trying to install the addon can result in Kodi crashing. This seems to primarly effect Nvidia Shield TV and possible general Android (TV) devices
+
+-As a workaround you can install the addon by selecting the install "Dut-IPTV Simple IPTV Connector" option from one of the Video addons settings menu and following the instructions there.
+
 ### Thanks
 
 -Matt Huisman for his development of the kodi addons that where used as a base for this addon

@@ -3,17 +3,17 @@ import datetime, json, os, pytz, re, string, sys, time, xbmc, xbmcplugin
 
 from fuzzywuzzy import fuzz
 from resources.lib.api import api_add_to_watchlist, api_list_watchlist, api_login, api_play_url, api_remove_from_watchlist, api_search, api_vod_download, api_vod_season, api_vod_seasons, api_watchlist_listing
-from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, ADDON_VERSION, AUDIO_LANGUAGES, PROVIDER_NAME
+from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, ADDON_VERSION, ADDONS_PATH, AUDIO_LANGUAGES, PROVIDER_NAME
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
 from resources.lib.base.l3.util import change_icon, check_key, clear_old, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, disable_prefs, get_credentials, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import Error
-from resources.lib.base.l5.api import api_download, api_get_channels, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
+from resources.lib.base.l5.api import api_download, api_get_channels, api_get_connector, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
 from resources.lib.base.l7 import plugin
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_FIRST_BOOT, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_HAS_SEARCH, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_USE_PROXY, CONST_VOD_CAPABILITY, CONST_WATCHLIST
-from resources.lib.util import plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
+from resources.lib.util import check_devices, plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
 from urllib.parse import urlparse
 from xml.dom.minidom import parseString
 
@@ -41,7 +41,7 @@ def home(**kwargs):
             folder.add_item(label=_(_.LIVE_TV, _bold=True),  path=plugin.url_for(func_or_url=live_tv))
 
         if CONST_HAS_REPLAY:
-            folder.add_item(label=_(_.CHANNELS, _bold=True), path=plugin.url_for(func_or_url=replaytv))
+            folder.add_item(label=_(_.CHANNELS, _bold=True), path=plugin.url_for(func_or_url=replaytv, movies=0))
 
         if settings.getBool('showMoviesSeries'):
             for vod_entry in CONST_VOD_CAPABILITY:
@@ -108,13 +108,20 @@ def live_tv(**kwargs):
     return folder
 
 @plugin.route()
-def replaytv(**kwargs):
+def replaytv(movies=0, **kwargs):
+    movies = int(movies)
+
     folder = plugin.Folder(title=_.CHANNELS)
+
+    folder.add_item(
+        label = _.MOVIES,
+        path = plugin.url_for(func_or_url=replaytv_alphabetical, movies=1),
+    )
 
     folder.add_item(
         label = _.PROGSAZ,
         info = {'plot': _.PROGSAZDESC},
-        path = plugin.url_for(func_or_url=replaytv_alphabetical),
+        path = plugin.url_for(func_or_url=replaytv_alphabetical, movies=movies),
     )
 
     for row in get_replay_channels():
@@ -129,14 +136,25 @@ def replaytv(**kwargs):
     return folder
 
 @plugin.route()
-def replaytv_alphabetical(**kwargs):
+def replaytv_alphabetical(movies=0, **kwargs):
+    movies = int(movies)
+
     folder = plugin.Folder(title=_.PROGSAZ)
+
+    label = _.ALLTITLES
+
+    folder.add_item(
+        label = label,
+        info = {'plot': _.ALLTITLESDESC},
+        path = plugin.url_for(func_or_url=replaytv_list, label=label, start=0, character='', movies=movies),
+    )
+
     label = _.OTHERTITLES
 
     folder.add_item(
         label = label,
         info = {'plot': _.OTHERTITLESDESC},
-        path = plugin.url_for(func_or_url=replaytv_list, label=label, start=0, character='other'),
+        path = plugin.url_for(func_or_url=replaytv_list, label=label, start=0, character='other', movies=movies),
     )
 
     for character in string.ascii_uppercase:
@@ -145,17 +163,18 @@ def replaytv_alphabetical(**kwargs):
         folder.add_item(
             label = label,
             info = {'plot': _.TITLESWITHDESC + character},
-            path = plugin.url_for(func_or_url=replaytv_list, label=label, start=0, character=character),
+            path = plugin.url_for(func_or_url=replaytv_list, label=label, start=0, character=character, movies=movies),
         )
 
     return folder
 
 @plugin.route()
-def replaytv_list(character, label='', start=0, **kwargs):
+def replaytv_list(character, label='', start=0, movies=0, **kwargs):
     start = int(start)
+    movies = int(movies)
     folder = plugin.Folder(title=label)
 
-    processed = process_replaytv_list(character=character, start=start)
+    processed = process_replaytv_list(character=character, start=start, movies=movies)
 
     if check_key(processed, 'items'):
         folder.add_items(processed['items'])
@@ -164,7 +183,7 @@ def replaytv_list(character, label='', start=0, **kwargs):
         folder.add_item(
             label = _(_.NEXT_PAGE, _bold=True),
             properties = {'SpecialSort': 'bottom'},
-            path = plugin.url_for(func_or_url=replaytv_list, character=character, label=label, start=processed['count2']),
+            path = plugin.url_for(func_or_url=replaytv_list, character=character, label=label, start=processed['count2'], movies=movies),
         )
 
     return folder
@@ -357,7 +376,7 @@ def vod_series(label, type, id, **kwargs):
                 context2.append(
                     (_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=str(episode['id']), change_audio=1)), ),
                 )
-            
+
                 items.append(plugin.Item(
                     label = str(episode['label']),
                     info = {
@@ -391,7 +410,7 @@ def vod_season(label, series, id, **kwargs):
         context = [
             (_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=str(episode['id']), data=json.dumps(episode), change_audio=1)), ),
         ]
-        
+
         items.append(plugin.Item(
             label = str(episode['label']),
             info = {
@@ -567,7 +586,7 @@ def settings_menu(**kwargs):
         folder.add_item(label=_.CHANNEL_PICKER, path=plugin.url_for(func_or_url=channel_picker_menu))
 
     folder.add_item(label=_.SET_KODI, path=plugin.url_for(func_or_url=plugin._set_settings_kodi))
-    folder.add_item(label=_.INSTALL_WV_DRM, path=plugin.url_for(func_or_url=plugin._ia_install))
+    folder.add_item(label='Dut-IPTV Simple IPTV Connector installeren', path=plugin.url_for(func_or_url=install_connector))
     folder.add_item(label=_.RESET_SESSION, path=plugin.url_for(func_or_url=login, ask=0))
     folder.add_item(label=_.RESET, path=plugin.url_for(func_or_url=reset_addon))
     folder.add_item(label=_.LOGOUT, path=plugin.url_for(func_or_url=logout))
@@ -575,6 +594,30 @@ def settings_menu(**kwargs):
     folder.add_item(label="Addon " + _.SETTINGS, path=plugin.url_for(func_or_url=plugin._settings))
 
     return folder
+
+@plugin.route()
+def install_connector(**kwargs):
+    addon = 'plugin.executable.dutiptv'
+
+    if xbmc.getCondVisibility('System.HasAddon({addon})'.format(addon=addon)) == 1:
+        try:
+            VIDEO_ADDON = xbmcaddon.Addon(id=addon)
+            gui.ok(message='Dut-IPTV Simple IPTV Connector is already installed')
+        except:
+            xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + addon + '","enabled":false}}}}')
+
+            try:
+                VIDEO_ADDON = xbmcaddon.Addon(id=addon)
+                gui.ok(message='Dut-IPTV Simple IPTV Connector was succesfully enabled')
+            except:
+                gui.ok(message='Please enable the connector from the Kodi Addons menu')
+    else:
+        if os.path.isdir(ADDONS_PATH + 'plugin.executable.dutiptv'):
+            gui.ok(message='Please restart Kodi and run this menu item again to enable the Connector')
+        elif api_get_connector() == True:
+            gui.ok(message='Dut-IPTV Simple IPTV Connector was succesfully downloaded. Please restart Kodi and enable the connector from the Kodi Addons menu')
+        else:
+            gui.ok(message='Downloading the Dut-IPTV Simple IPTV Connector was not succesfull.')
 
 @plugin.route()
 def channel_picker_menu(**kwargs):
@@ -773,6 +816,9 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
     except:
         pass
 
+    if PROVIDER_NAME == 'betelenet':
+        check_devices()
+
     if check_key(playdata, 'mpd') and len(str(playdata['mpd'])) > 0:
         language_list = {}
         root = parseString(playdata['mpd'].encode('utf8'))
@@ -795,12 +841,12 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
                             language_list[attrib['lang']] = AUDIO_LANGUAGES[attrib['lang']]
                         else:
                             language_list[attrib['lang']] = attrib['lang']
-                            
+
                         select_list.append(language_list[attrib['lang']])
 
         if len(language_list) > 1:
             selected = gui.select(_.SELECT_AUDIO_LANGUAGE, select_list)
-            
+
             try:
                 write_file(file='stream_language', data=select_list[selected], isJSON=False)
             except:
@@ -980,7 +1026,7 @@ def get_live_channels(all=False):
                     context = [
                         (_.START_BEGINNING, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='channel', channel=id, id=str(row['assetid']), from_beginning=1, _is_live=True)), ),
                     ]
-                    
+
                 context = [
                     (_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='channel', channel=id, id=str(row['assetid']), from_beginning=0, change_audio=1, _is_live=True)), ),
                 ]
@@ -1025,7 +1071,9 @@ def get_replay_channels(all=False):
 
     return channels
 
-def process_replaytv_list(character, start=0):
+def process_replaytv_list(character, start=0, movies=0):
+    movies = int(movies)
+
     now = datetime.datetime.now(pytz.timezone("Europe/Amsterdam"))
     sevendays = datetime.datetime.now(pytz.timezone("Europe/Amsterdam")) - datetime.timedelta(days=7)
     nowstamp = int((now - datetime.datetime(1970, 1, 1, tzinfo=pytz.utc)).total_seconds())
@@ -1046,7 +1094,10 @@ def process_replaytv_list(character, start=0):
             if int(currow['replay']) == 1:
                 channels_ar.append(row)
 
-    data = api_get_list_by_first(first=character, start=nowstamp, end=sevendaysstamp, channels=channels_ar)
+    if len(str(character)) > 0:
+        data = api_get_list_by_first(first=character, start=nowstamp, end=sevendaysstamp, channels=channels_ar, movies=movies)
+    else:
+        data = api_get_list(start=nowstamp, end=sevendaysstamp, channels=channels_ar, movies=movies)
 
     start = int(start)
     items = []
@@ -1059,7 +1110,7 @@ def process_replaytv_list(character, start=0):
     for currow in data:
         row = data[currow]
 
-        if item_count == 51:
+        if item_count == settings.getInt('item_count'):
             break
 
         count += 1
@@ -1089,7 +1140,8 @@ def process_replaytv_list(character, start=0):
 
     return returnar
 
-def process_replaytv_search(search):
+def process_replaytv_search(search, movies=0):
+    movies = int(movies)
     now = datetime.datetime.now(pytz.timezone("Europe/Amsterdam"))
     sevendays = datetime.datetime.now(pytz.timezone("Europe/Amsterdam")) - datetime.timedelta(days=7)
     nowstamp = int((now - datetime.datetime(1970, 1, 1, tzinfo=pytz.utc)).total_seconds())
@@ -1112,7 +1164,7 @@ def process_replaytv_search(search):
             if int(currow['replay']) == 1:
                 channels_ar.append(row)
 
-    data = api_get_list(start=nowstamp, end=sevendaysstamp, channels=channels_ar)
+    data = api_get_list(start=nowstamp, end=sevendaysstamp, channels=channels_ar, movies=movies)
 
     items = []
 
@@ -1172,7 +1224,7 @@ def process_replaytv_content(station, day=0, start=0):
     for currow in data:
         row = data[currow]
 
-        if item_count == 51:
+        if item_count == settings.getInt('item_count'):
             break
 
         count += 1
@@ -1266,7 +1318,7 @@ def process_replaytv_list_content(label, idtitle, start=0):
     for currow in data:
         row = data[currow]
 
-        if item_count == 51:
+        if item_count == settings.getInt('item_count'):
             break
 
         count += 1
@@ -1362,7 +1414,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
         else:
             row = currow
 
-        if item_count == 51:
+        if item_count == settings.getInt('item_count'):
             break
 
         count += 1
@@ -1397,7 +1449,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
         program_image = str(row['icon'])
         program_image_large = str(row['icon'])
         program_type = str(row['type'])
-        
+
         if CONST_WATCHLIST:
             context.append((_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=id, type='group')), ))
 
@@ -1420,7 +1472,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
             info = {'plot': description, 'duration': duration, 'mediatype': 'video', 'sorttitle': label.upper()}
             playable = True
         else:
-            continue        
+            continue
 
         items.append(plugin.Item(
             label = label,

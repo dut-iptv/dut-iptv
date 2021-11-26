@@ -12,6 +12,9 @@ from resources.lib.base.l6 import inputstream
 
 from urllib.parse import urlencode
 
+def check_devices():
+    pass
+
 def plugin_ask_for_creds(creds):
     username = str(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 

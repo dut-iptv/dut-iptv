@@ -11,6 +11,9 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l6 import inputstream
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_IMAGE_URL
 
+def check_devices():
+    pass
+
 def plugin_ask_for_creds(creds):
     if str(creds['username']).isnumeric():
         creds['username'] = ''

@@ -20,6 +20,10 @@
 
 -Supports catchup using IPTV Simple PVR Addon in Kodi 19 (through the separate Dut-IPTV Simple IPTV Connector addon)
 
+### Maximum supported Resolution
+
+- 1080P
+
 ### Required
 
 -Subscription to Canaldigitaal IPTV or Satelite TV (not free)

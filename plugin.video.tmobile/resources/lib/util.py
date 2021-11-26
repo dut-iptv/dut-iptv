@@ -10,6 +10,9 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l5.api import api_get_channels
 from resources.lib.base.l6 import inputstream
 
+def check_devices():
+    pass
+
 def plugin_ask_for_creds(creds):
     username = str(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 

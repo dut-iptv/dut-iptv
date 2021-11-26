@@ -12,6 +12,10 @@
 
 -Search Content
 
+### Maximum supported Resolution
+
+- 1080P
+
 ### Required
 
 -Subscription to Videoland (not free)

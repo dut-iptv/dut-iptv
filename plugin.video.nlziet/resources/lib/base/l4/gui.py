@@ -264,8 +264,14 @@ class Item(object):
 
             if self.inputstream.license_type:
                 li.setProperty('inputstream.adaptive.license_type', self.inputstream.license_type)
-
+        
+            if self.inputstream.server_certificate:
+                li.setProperty('inputstream.adaptive.server_certificate', self.inputstream.server_certificate)
+        
             streamheaders = self.get_url_headers(only_user_agent=True)
+            
+            if self.inputstream.license_flags:
+                li.setProperty('inputstream.adaptive.license_flags', self.inputstream.license_flags)
 
             if streamheaders:
                 li.setProperty('inputstream.adaptive.stream_headers', streamheaders)

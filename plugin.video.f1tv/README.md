@@ -8,6 +8,10 @@
 
 -Unofficial 3rd Party F1 TV plugin for Kodi
 
+### Maximum supported Resolution
+
+- 1080P (50hz)
+
 ### Required
 
 -Subscription to F1 TV (not free)

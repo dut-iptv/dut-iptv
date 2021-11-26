@@ -645,3 +645,7 @@ msgstr ""
 msgctxt "#330047"
 msgid "Select device to replace"
 msgstr ""
+
+msgctxt "#330048"
+msgid "Items per page"
+msgstr ""

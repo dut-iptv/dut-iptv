@@ -1,7 +1,7 @@
-import base64, os, json, xbmc
+import base64, shutil, os, json, xbmc
 
 from collections import OrderedDict
-from resources.lib.base.l1.constants import ADDON_PROFILE, CONST_DUT_EPG_BASE, CONST_DUT_EPG, SESSION_CHUNKSIZE
+from resources.lib.base.l1.constants import ADDON_PROFILE, ADDONS_PATH, CONST_DUT_EPG_BASE, CONST_DUT_EPG, SESSION_CHUNKSIZE
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.util import check_key, clear_cache, fixBadZipfile, is_file_older_than_x_days, load_file, load_profile, update_prefs, write_file
@@ -167,13 +167,17 @@ def api_get_genre_list(type):
 
     return data
 
-def api_get_list(start, end, channels):
+def api_get_list(start, end, channels, movies=0):
     if not os.path.isdir(ADDON_PROFILE + 'tmp'):
         os.makedirs(ADDON_PROFILE + 'tmp')
 
     list_url = '{dut_epg_url}/list.zip'.format(dut_epg_url=CONST_DUT_EPG)
     tmp = ADDON_PROFILE + 'tmp' + os.sep + 'list.zip'
-    file = "cache" + os.sep + "list.json"
+    
+    if movies == 1:
+        file = "cache" + os.sep + "list_movies.json"
+    else:
+        file = "cache" + os.sep + "list.json"
 
     if check_key(CONST_MOD_CACHE, 'list'):
         days = CONST_MOD_CACHE['list']
@@ -254,13 +258,17 @@ def api_get_list(start, end, channels):
 
     return data2
 
-def api_get_list_by_first(first, start, end, channels):
+def api_get_list_by_first(first, start, end, channels, movies=False):
     if not os.path.isdir(ADDON_PROFILE + 'tmp'):
         os.makedirs(ADDON_PROFILE + 'tmp')
 
     list_url = '{dut_epg_url}/list.zip'.format(dut_epg_url=CONST_DUT_EPG)
     tmp = ADDON_PROFILE + 'tmp' + os.sep + 'list.zip'
-    file = "cache" + os.sep + "list.json"
+    
+    if movies == True:
+        file = "cache" + os.sep + "list_movies.json"
+    else:
+        file = "cache" + os.sep + "list.json"
 
     if check_key(CONST_MOD_CACHE, 'list'):
         days = CONST_MOD_CACHE['list']
@@ -312,7 +320,10 @@ def api_get_list_by_first(first, start, end, channels):
 
     data2 = OrderedDict()
 
-    data = data[str(first)]
+    try:
+        data = data[str(first)]
+    except:
+        data = []
 
     for currow in data:
         row = data[currow]
@@ -339,6 +350,56 @@ def api_get_list_by_first(first, start, end, channels):
         data2[currow] = row
 
     return data2
+
+def api_get_connector():
+    if not os.path.isdir(ADDON_PROFILE + 'tmp'):
+        os.makedirs(ADDON_PROFILE + 'tmp')
+
+    connector_url = 'https://dut-iptv.github.io/matrix/plugin.executable.dutiptv/plugin.executable.dutiptv-latest.zip'
+    tmp = ADDON_PROFILE + 'tmp' + os.sep + 'connector.zip'
+  
+    resp = Session().get(connector_url, stream=True)
+
+    if resp.status_code != 200:
+        resp.close()
+        return None
+
+    with open(tmp, 'wb') as f:
+        for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
+            f.write(chunk)
+
+    resp.close()
+
+    if os.path.isfile(tmp):
+        from zipfile import ZipFile
+
+        try:
+            with ZipFile(tmp, 'r') as zipObj:
+                zipObj.extractall(ADDON_PROFILE + "tmp" + os.sep)
+        except:
+            try:
+                fixBadZipfile(tmp)
+
+                with ZipFile(tmp, 'r') as zipObj:
+                    zipObj.extractall(ADDON_PROFILE + "tmp" + os.sep)
+            except:
+                try:
+                    from resources.lib.base.l1.zipfile import ZipFile as ZipFile2
+
+                    with ZipFile2(tmp, 'r') as zipObj:
+                        zipObj.extractall(ADDON_PROFILE + "tmp" + os.sep)
+                except:
+                    return None
+
+        if os.path.isdir(ADDON_PROFILE + "tmp" + os.sep + 'plugin.executable.dutiptv'):
+            shutil.move(ADDON_PROFILE + "tmp" + os.sep + 'plugin.executable.dutiptv', ADDONS_PATH + 'plugin.executable.dutiptv')
+            
+            if os.path.isfile(tmp):
+                os.remove(tmp)
+                
+            return True
+    else:
+        return None
 
 def api_get_vod_by_type(type, character, genre, subscription_filter, menu=0):
     menu = int(menu)

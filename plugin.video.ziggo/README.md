@@ -20,6 +20,10 @@
 
 -Supports catchup using IPTV Simple PVR Addon in Kodi 19 (through the separate Dut-IPTV Simple IPTV Connector addon)
 
+### Maximum supported Resolution
+
+- 720P
+
 ### Required
 
 -Subscription to Ziggo providers (not free)

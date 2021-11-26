@@ -639,3 +639,7 @@ msgstr "Onbekend apparaat"
 msgctxt "#330047"
 msgid "Select device to replace"
 msgstr "Selecteer apparaat om te vervangen"
+
+msgctxt "#330048"
+msgid "Items per page"
+msgstr "Items per pagina"

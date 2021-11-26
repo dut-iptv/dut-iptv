@@ -161,7 +161,11 @@ def api_vod_download(type, start=0):
     type = str(type)
 
     if type in CONST_MAIN_VOD_AR:
-        info_url = '{base_url}/2.0/R/ENG/WEB_DASH/ALL/PAGE/{id}/F1_TV_Pro_Annual/2'.format(base_url=CONST_BASE_URL, id=type)
+        if type == '804':
+            info_url = '{base_url}/2.0/R/ENG/WEB_DASH/ALL/PAGE/SEARCH/VOD/Anonymous/2?orderBy=contractStartDate&sortOrder=asc&filter_Series=W%20Series&filter_orderByDefault=Y&title=W%20Series&pageID=395_804'.format(base_url=CONST_BASE_URL)
+        else:
+            info_url = '{base_url}/2.0/R/ENG/WEB_DASH/ALL/PAGE/{id}/F1_TV_Pro_Annual/2'.format(base_url=CONST_BASE_URL, id=type)
+
         download = api_download(url=info_url, type='get', headers=None, data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']
@@ -197,7 +201,7 @@ def api_vod_download(type, start=0):
 
             for row in data['resultObj']['containers']:
                 if row['layout'] == 'horizontal_thumbnail':
-                    if type == '493' and ('EXTCOLLECTION' in row['retrieveItems']['uriOriginal'] or 'EXTCOLLECTION' in row['actions'][0]['uri']):
+                    if (type == '493' and ('EXTCOLLECTION' in row['retrieveItems']['uriOriginal'] or 'EXTCOLLECTION' in row['actions'][0]['uri'])) or type == '3946':
                         for row2 in row['retrieveItems']['resultObj']['containers']:
                             if row2['layout'] == 'CONTENT_ITEM':
                                 if row2['metadata']['title'] in vodJSONtitles:
@@ -215,10 +219,14 @@ def api_vod_download(type, start=0):
                                 else:
                                     continue
 
-                                if check_key(row2['metadata'], 'season') and len(str(row2['metadata']['season'])) > 0:
-                                    vodJSON['menu'][row2['id']]['label'] = str(row2['metadata']['season']) + ' Season'
-                                else:
-                                    vodJSON['menu'][row2['id']]['label'] = row2['metadata']['title']
+                                if type == '493':
+                                    if check_key(row2['metadata'], 'season') and len(str(row2['metadata']['season'])) > 0:
+                                        vodJSON['menu'][row2['id']]['label'] = str(row2['metadata']['season']) + ' Season'
+                                    else:
+                                        vodJSON['menu'][row2['id']]['label'] = row2['metadata']['title']
+                                elif type == '3946':
+                                    if check_key(row2['metadata'], 'title') and len(str(row2['metadata']['title'])) > 0:
+                                        vodJSON['menu'][row2['id']]['label'] = row2['metadata']['title']
 
                                 vodJSONtitles.append(vodJSON['menu'][row2['id']]['label'])
 
@@ -268,8 +276,12 @@ def api_vod_download(type, start=0):
 
                         if len(row2['metadata']['title']) < 1:
                             continue
-
-                        if check_key(row2, 'actions') and '2.0' in row2['actions'][0]['uri'] and api_check_page(row2['actions'][0]['uri']) == False:
+                        
+                        if check_key(row, 'retrieveItems') and '2.0' in row['retrieveItems']['uriOriginal'] and api_check_page(row['retrieveItems']['uriOriginal']) == False:
+                            continue
+                        elif check_key(row, 'actions') and '2.0' in row['actions'][0]['uri'] and api_check_page(row['actions'][0]['uri']) == False:
+                            continue
+                        elif check_key(row2, 'actions') and '2.0' in row2['actions'][0]['uri'] and api_check_page(row2['actions'][0]['uri']) == False:
                             vodJSON['menu'][row2['id']] = {}
                             vodJSON['menu'][row2['id']]['url'] = row2['actions'][0]['uri']
                         else:
@@ -316,7 +328,35 @@ def api_vod_download(type, start=0):
                         vodJSON['menu'][row['id']]['type'] = 'content'
 
                     vodJSONtitles.append(row['metadata']['label'])
+                elif row['layout'] == 'CONTENT_ITEM':
+                    row2 = row
+                    
+                    if row2['metadata']['title'] in vodJSONtitles:
+                        continue
 
+                    if len(row2['metadata']['title']) < 1:
+                        continue
+
+                    if check_key(row2, 'actions') and '2.0' in row2['actions'][0]['uri'] and api_check_page(row2['actions'][0]['uri']) == False:
+                        vodJSON['menu'][row2['id']] = {}
+                        vodJSON['menu'][row2['id']]['url'] = row2['actions'][0]['uri']
+                    else:
+                        continue
+
+                    vodJSON['menu'][row2['id']]['label'] = row2['metadata']['title']
+
+                    if check_key(row['metadata'], 'pictureUrl') and len(row2['metadata']['pictureUrl']) > 0:
+                        vodJSON['menu'][row2['id']]['image'] = "{image_url}/{image}?w=1920&h=1080&q=HI&o=L".format(image_url=CONST_IMAGE_URL, image=row2['metadata']['pictureUrl'])
+                    else:
+                        vodJSON['menu'][row2['id']]['image'] = ""
+
+                    if 'CONTENT/VIDEO/' in vodJSON['menu'][row2['id']]['url']:
+                        vodJSON['menu'][row2['id']]['type'] = 'video'
+                    else:
+                        vodJSON['menu'][row2['id']]['type'] = 'content'
+
+                    vodJSONtitles.append(row2['metadata']['title'])
+                                       
             write_file(file='cache' + os.sep + 'menu.json', data=vodJSON, isJSON=True)
             return vodJSON
     else:
@@ -353,6 +393,9 @@ def api_vod_download(type, start=0):
             vodJSON2[row['id']]['entitlement'] = row['entitlement']
             vodJSON2[row['id']]['icon'] = row['image']
             vodJSON2[row['id']]['category'] = row['category']
+            log("TEST2")
+            log(row['title'])
+            log(row['image'])
 
         return vodJSON2
 
@@ -421,6 +464,9 @@ def api_vod_season(series, id):
                         ep_id = row2['playbackUrl']
 
                     season.append({'label': label, 'id': ep_id, 'start': start, 'duration': duration, 'title': label, 'seasonNumber': seasonno, 'episodeNumber': episodeno, 'description': desc, 'image': image})
+                    log("TEST3")
+                    log(label)
+                    log(image)
 
     return season
 

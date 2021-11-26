@@ -1,5 +1,5 @@
 import _strptime
-import datetime, json, re, sys, xbmc
+import datetime, io, json, os, re, sys, xbmc, xbmcvfs
 
 from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
@@ -11,6 +11,69 @@ from resources.lib.base.l5.api import api_download, api_get_channels
 from resources.lib.base.l6 import inputstream
 from resources.lib.constants import CONST_API_URLS, CONST_DEFAULT_CLIENTID
 from urllib.parse import urlencode
+
+def check_devices():
+    device_id = load_file('device_id', isJSON=False)
+    
+    if not device_id:
+        LOGPATH = xbmcvfs.translatePath('special://logpath')
+        LOGFILE = os.path.join(LOGPATH, 'kodi.old.log')
+        
+        with io.open(LOGFILE, 'r', encoding='utf-8', errors='ignore') as f:
+            text = f.read()
+            
+        regex = r"HEADER_IN:\sX-DRM-Device-ID:\s([a-zA-Z0-9]*)"
+
+        matches = re.finditer(regex, text, re.MULTILINE)
+
+        for matchNum, match in enumerate(matches, start=1):
+            device_id = match.group(1)
+            break
+            
+        if not device_id:
+            LOGFILE = os.path.join(LOGPATH, 'kodi.log')
+        
+            with io.open(LOGFILE, 'r', encoding='utf-8', errors='ignore') as f:
+                text = f.read()
+                
+            regex = r"HEADER_IN:\sX-DRM-Device-ID:\s([a-zA-Z0-9]*)"
+
+            matches = re.finditer(regex, text, re.MULTILINE)
+
+            for matchNum, match in enumerate(matches, start=1):
+                device_id = match.group(1)
+                break
+
+        if device_id:
+            from resources.lib.api import api_list_devices, api_replace_device, api_new_device
+
+            devices = api_list_devices()
+            
+            select_list = []
+            device_ar = {}
+            count = 0
+
+            if devices:
+                found = False
+
+                for device in devices:
+                    if str(device['deviceId']) == device_id:
+                        found = True
+                        break
+
+                    device_ar[count] = device['deviceId']
+                    count += 1
+                    select_list.append(device['customerDefinedName'])
+
+                if found == False:
+                    if len(devices) == 5:
+                        selected = gui.select('Selecteer Device om te vervangen:', select_list)
+                        if check_key(device_ar, selected):
+                            api_replace_device(device_ar[selected], device_id)
+                    else:
+                        api_new_device(device_id)
+        else:
+            gui.ok(message='Geen device ID gevonden. Het afspelen zal zo mislukken, hierna wordt automatisch een device ID gegenereerd. Je krijgt hier geen bericht van. Herstart direct het afspelen.', heading='Geen device ID gevonden')
 
 def check_entitlements():
     from resources.lib.api import api_get_play_token
@@ -142,8 +205,6 @@ def get_image(prefix, content):
     return image_url
 
 def get_play_url(content):
-                                                 
-
     if check_key(content, 'url') and check_key(content, 'contentLocator'):
         return {'play_url': content['url'], 'locator': content['contentLocator']}
     else:
@@ -286,7 +347,7 @@ def plugin_process_playdata(playdata):
         'X-OESP-Username': creds['username'],
         'X-OESP-License-Token': profile_settings['drm_token'],
         'X-OESP-DRM-SchemeIdUri': 'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed',
-        'X-OESP-Content-Locator': playdata['locator'],
+        'X-OESP-Content-Locator': playdata['locator']
     }
 
     params = []
@@ -304,6 +365,8 @@ def plugin_process_playdata(playdata):
 
     item_inputstream = inputstream.Widevine(
         license_key = playdata['license'],
+        #server_certificate = load_file('widevine_cert', isJSON=False),
+        #license_flags = 'persistent_storage'
         #media_renewal_url = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params))),
         #media_renewal_time = 60,
         #manifest_update_parameter = 'full',

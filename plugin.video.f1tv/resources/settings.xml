@@ -12,6 +12,12 @@
                     <default>false</default>
                     <control type="toggle" />
                 </setting>
+                <setting id="item_count" type="integer" label="330048">
+                    <default>51</default>
+                    <control type="edit" format="integer">
+                        <heading>330048</heading>
+                    </control>
+                </setting>
                 <setting id="force_highest_bandwidth" type="boolean" label="32101">
                     <default>true</default>
                     <control type="toggle" />

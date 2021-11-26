@@ -4,10 +4,11 @@ class InputstreamItem(object):
     content_type = ''
     manifest_type = ''
     license_type = ''
+    server_certificate = ''
     license_key = ''
     mimetype = ''
     manifest_update_parameter = ''
-
+    license_flags = ''
     def check(self):
         return False
 
@@ -41,8 +42,10 @@ class Widevine(InputstreamItem):
     license_type = 'com.widevine.alpha'
     mimetype = 'application/dash+xml'
 
-    def __init__(self, license_key=None, content_type='application/octet-stream', challenge='R{SSM}', response='', manifest_update_parameter=None):
+    def __init__(self, server_certificate=None, license_key=None, license_flags=None, content_type='application/octet-stream', challenge='R{SSM}', response='', manifest_update_parameter=None):
+        self.server_certificate = server_certificate
         self.license_key = license_key
+        self.license_flags = license_flags
         self.content_type = content_type
         self.challenge = challenge
         self.response = response

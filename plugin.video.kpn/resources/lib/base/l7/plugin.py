@@ -72,7 +72,7 @@ def _home(**kwargs):
 @route('_ia_install')
 def _ia_install(**kwargs):
     _close()
-    inputstream.install_widevine(reinstall=True)
+    inputstream.install_widevine()
 
 def reboot():
     _close()
@@ -93,23 +93,23 @@ def _set_settings_kodi(**kwargs):
     _close()
 
     try:
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"videoplayer.preferdefaultflag", "value":"true"}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"videoplayer.preferdefaultflag", "value":true}, "id":1}')
         xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"locale.audiolanguage", "value":"default"}, "id":1}')
         xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"locale.subtitlelanguage", "value":"default"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrmanager.preselectplayingchannel", "value":"false"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrmanager.syncchannelgroups", "value":"true"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrmanager.backendchannelorder", "value":"true"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrmanager.usebackendchannelnumbers", "value":"true"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.selectaction", "value":"5"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.pastdaystodisplay", "value":"7"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.futuredaystodisplay", "value":"1"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.hidenoinfoavailable", "value":"true"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.epgupdate", "value":"720"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.preventupdateswhileplayingtv", "value":"true"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.ignoredbforclient", "value":"true"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrrecord.instantrecordaction", "value":"2"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrpowermanagement.enabled", "value":"false"}, "id":1}')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrparental.enabled", "value":"false"}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrmanager.preselectplayingchannel", "value":false}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrmanager.syncchannelgroups", "value":true}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrmanager.backendchannelorder", "value":true}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrmanager.usebackendchannelnumbers", "value":true}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.selectaction", "value":5}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.pastdaystodisplay", "value":7}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.futuredaystodisplay", "value":1}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.hidenoinfoavailable", "value":true}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.epgupdate", "value":720}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.preventupdateswhileplayingtv", "value":true}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"epg.ignoredbforclient", "value":true}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrrecord.instantrecordaction", "value":2}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrpowermanagement.enabled", "value":false}, "id":1}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"pvrparental.enabled", "value":false}, "id":1}')
         gui.notification(_.DONE_NOREBOOT)
     except:
         pass
@@ -174,6 +174,14 @@ class Item(gui.Item):
         except:
             pass
 
+        if ADDON_ID == 'plugin.video.betelenet':
+            device_id = load_file('device_id', isJSON=False)
+
+            if not device_id:
+                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"debug.extralogging", "value":true}, "id":1}')
+                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"debug.showloginfo", "value":true}, "id":1}')
+                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"Settings.SetSettingValue", "params":{"setting":"debug.setextraloglevel", "value":[64]}, "id":1}')
+
         if settings.getBool(key='disable_subtitle'):
             self.properties['disable_subtitle'] = 1
 
@@ -209,7 +217,11 @@ class Item(gui.Item):
         while player.is_active:
             if xbmc.getCondVisibility("Player.HasMedia") and player.is_started:
                 playbackStarted = True
-                
+
+                if ADDON_ID == 'plugin.video.betelenet':
+                    if not device_id:
+                        player.stop()
+
                 if 'disable_subtitle' in self.properties:
                     player.showSubtitles(False)
                     self.properties.pop('disable_subtitle', None)
@@ -277,6 +289,12 @@ class Item(gui.Item):
 
         if playbackStarted == True:
             api_clean_after_playback()
+
+        if ADDON_ID == 'plugin.video.betelenet':
+            if not device_id:
+                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"debug.showloginfo", "value":false}, "id":1}')
+                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"Settings.SetSettingValue", "params":{"setting":"debug.setextraloglevel", "value":[]}, "id":1}')
+                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"debug.extralogging", "value":false}, "id":1}')
 
 class MyPlayer(xbmc.Player):
     def __init__(self):

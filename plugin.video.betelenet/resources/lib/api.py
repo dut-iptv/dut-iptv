@@ -1,4 +1,4 @@
-import base64, json, os, re, sys, time, xbmc
+import base64, json, os, re, requests, sys, time, xbmc
 
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
@@ -53,8 +53,8 @@ def api_get_headers():
         'X-OESP-Username': username,
     }
 
-    if check_key(profile_settings, 'ziggo_profile_id') and len(str(profile_settings['ziggo_profile_id'])) > 0:
-        HEADERS['X-OESP-Profile-Id'] = profile_settings['ziggo_profile_id']
+    if check_key(profile_settings, 'betelenet_profile_id') and len(str(profile_settings['betelenet_profile_id'])) > 0:
+        HEADERS['X-OESP-Profile-Id'] = profile_settings['betelenet_profile_id']
 
     return HEADERS
 
@@ -133,14 +133,17 @@ def api_get_session(force=0):
     force = int(force)
     profile_settings = load_profile(profile_id=1)
 
-    devices_url = CONST_API_URLS['devices_url']
+    devices_url = CONST_API_URLS['devices_url'] + profile_settings['household_id'] + '/devices'
 
     download = api_download(url=devices_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
     code = download['code']
 
-    if not code or not code == 200 or not data or not check_key(data, 'isAccountEnabled'):
-        login_result = api_login()
+    if not code or not code == 200: # or not data or not check_key(data, 'isAccountEnabled'):
+        if int(time.time() * 1000) > int(profile_settings['refresh_token_expiry']):
+            login_result = api_login()
+        else:
+            login_result = api_get_session_token()
 
         if not login_result['result']:
             return False
@@ -152,13 +155,126 @@ def api_get_session(force=0):
 
     return True
 
+def api_list_devices():
+    download = api_download(url=CONST_API_URLS['devices_digital_url'] + '/status', type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
+    data = download['data']
+    code = download['code']
+
+    if not code or not code == 200 or not data or not check_key(data, 'devices'):
+    	return False
+
+    return data['devices']
+
+def api_new_device(new_id):
+    jsondata = {
+        "deviceId": new_id,
+        "deviceName": "Mijn computer - Google Chrome",
+        "customerDefinedName": "Mijn computer - Google Chrome",
+        "deviceClass":"Desktop"
+    }
+
+    HEADERS = api_get_headers()
+    HEADERS['Content-Type'] = 'application/json'
+
+    download = requests.post(url=CONST_API_URLS['devices_digital_url'], headers=HEADERS, json=jsondata)
+    data = download.text
+    code = download.status_code
+
+    if not code or not code == 204:
+    	return False
+
+    write_file('device_id', data=new_id, isJSON=False)
+
+    return True
+
+def get_server_certificate(locator, token):
+    HEADERS = api_get_headers()
+    HEADERS["Content-Type"] = "application/octet-stream"
+    HEADERS["X-OESP-Content-Locator"] = locator
+    HEADERS["X-OESP-DRM-SchemeIdUri"] = "urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed"
+    HEADERS["X-OESP-License-Token"] = token
+    HEADERS["X-OESP-License-Token-Type"]= "velocix"
+
+    download = requests.post(url=CONST_API_URLS['widevine_url'], headers=HEADERS, data="\b\x04")
+    return base64.b64encode(download.content)
+
+def api_replace_device(old_id, new_id):
+    jsondata = {
+        "deviceId": new_id,
+        "deviceName": "Mijn computer - Google Chrome",
+        "customerDefinedName": "Mijn computer - Google Chrome",
+        "deviceClass":"Desktop"
+    }
+
+    HEADERS = api_get_headers()
+    HEADERS['Content-Type'] = 'application/json'
+
+    download = requests.put(url=CONST_API_URLS['devices_digital_url'] + '/' + str(old_id), headers=HEADERS, json=jsondata)
+    code = download.status_code
+
+    if not code or not code == 200:
+    	return False
+
+    write_file('device_id', data=new_id, isJSON=False)
+
+    return True
+
+def api_get_session_token():
+    creds = get_credentials()
+    username = creds['username']
+
+    profile_settings = load_profile(profile_id=1)
+
+    HEADERS = {
+        'User-Agent':  DEFAULT_USER_AGENT,
+        'X-Client-Id': CONST_DEFAULT_CLIENTID + "||" + DEFAULT_USER_AGENT,
+    }
+
+    download = api_download(url=CONST_API_URLS['session_url'] + '?token=true', type='post', headers=HEADERS, data={"username": username, "refreshToken": profile_settings['refresh_token']}, json_data=True, return_json=True)
+    data = download['data']
+    code = download['code']
+
+    if not code or not data or not check_key(data, 'oespToken'):
+        if not code:
+            code = {}
+
+        if not data:
+            data = {}
+
+        return { 'code': code, 'data': data, 'result': False }
+
+    betelenet_profile_id = ''
+    household_id = ''
+
+    try:
+        betelenet_profile_id = data['customer']['sharedProfileId']
+    except:
+        pass
+
+    try:
+        household_id = data['customer']['householdId']
+    except:
+        pass
+
+    profile_settings['access_token'] = data['oespToken']
+    profile_settings['refresh_token'] = data['refreshToken']
+    profile_settings['refresh_token_expiry'] = data['refreshTokenExpiry']
+    profile_settings['betelenet_profile_id'] = betelenet_profile_id
+    profile_settings['household_id'] = household_id
+    save_profile(profile_id=1, profile=profile_settings)
+
+    if len(str(profile_settings['watchlist_id'])) == 0:
+        api_get_watchlist_id()
+
+    return { 'code': code, 'data': data, 'result': True }
+
 def api_get_watchlist_id():
     if not api_get_session():
         return None
 
     profile_settings = load_profile(profile_id=1)
 
-    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&maxResults=1&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_API_URLS['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
+    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&maxResults=1&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_API_URLS['watchlist_url'], profile_id=profile_settings['betelenet_profile_id'])
 
     download = api_download(url=watchlist_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
@@ -178,7 +294,7 @@ def api_list_watchlist():
 
     profile_settings = load_profile(profile_id=1)
 
-    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_API_URLS['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
+    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_API_URLS['watchlist_url'], profile_id=profile_settings['betelenet_profile_id'])
 
     download = api_download(url=watchlist_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
@@ -202,7 +318,9 @@ def api_login():
     profile_settings = load_profile(profile_id=1)
 
     profile_settings['access_token'] = ''
-    profile_settings['ziggo_profile_id'] = ''
+    profile_settings['refresh_token'] = ''
+    profile_settings['refresh_token_expiry'] = 0
+    profile_settings['betelenet_profile_id'] = ''
     profile_settings['household_id'] = ''
     profile_settings['watchlist_id'] = ''
     save_profile(profile_id=1, profile=profile_settings)
@@ -212,44 +330,58 @@ def api_login():
         'X-Client-Id': CONST_DEFAULT_CLIENTID + "||" + DEFAULT_USER_AGENT,
     }
 
-    download = api_download(url=CONST_API_URLS['session_url'], type='post', headers=HEADERS, data={"username": username, "password": password}, json_data=True, return_json=True)
+    download = api_download(url=CONST_API_URLS['authorization_url'], type='get', headers=HEADERS, data=None, json_data=False, return_json=True)
     data = download['data']
     code = download['code']
 
-    if code and data and check_key(data, 'reason') and data['reason'] == 'wrong backoffice':
+    if not code or not code == 200 or not data or not check_key(data, 'session') or not check_key(data['session'], 'validityToken') or not check_key(data['session'], 'state') or not check_key(data['session'], 'authorizationUri'):
         return { 'code': code, 'data': data, 'result': False }
 
-    if not code or not data or not check_key(data, 'oespToken'):
-        if not code:
-            code = {}
+    validityToken = data['session']['validityToken']
+    state = data['session']['state']
 
-        if not data:
-            data = {}
+    download = api_download(url=data['authorizationUri'], type='get', headers=HEADERS, data=None, json_data=False, return_json=False)
+    data = download['data']
+    code = download['code']
 
+    if not code or not code == 302:
         return { 'code': code, 'data': data, 'result': False }
 
-    ziggo_profile_id = ''
-    household_id = ''
+    formdata = {
+        "j_username": username,
+        "j_password": password,
+        "rememberme": "true"
+    }
 
-    try:
-        ziggo_profile_id = data['customer']['sharedProfileId']
-    except:
-        pass
+    download = api_download(url=CONST_API_URLS['login_url'], type='post', headers=HEADERS, data=formdata, json_data=False, return_json=False)
+    data = download['data']
+    code = download['code']
 
-    try:
-        household_id = data['customer']['householdId']
-    except:
-        pass
+    if not code or not code == 200 or not data or not 'SSO Login Success' in data:
+        return { 'code': code, 'data': data, 'result': False }
 
-    profile_settings['access_token'] = data['oespToken']
-    profile_settings['ziggo_profile_id'] = ziggo_profile_id
-    profile_settings['household_id'] = household_id
+    params = parse_qs(urlparse(download['url']).query)
+    auth_code = params.get('code')[0]
+
+    jsondata = {
+        "authorizationGrant": {
+            "authorizationCode": auth_code,
+            "validityToken": validityToken,
+            "state": state
+        }
+    }
+
+    download = api_download(url=CONST_API_URLS['authorization_url'], type='post', headers=HEADERS, data=jsondata, json_data=True, return_json=True)
+    data = download['data']
+    code = download['code']
+
+    if not code or not code == 200 or not data or not check_key(data, 'refreshToken') or not check_key(data, 'username'):
+        return { 'code': code, 'data': data, 'result': False }
+
+    profile_settings['refresh_token'] = data['refreshToken']
     save_profile(profile_id=1, profile=profile_settings)
 
-    if len(str(profile_settings['watchlist_id'])) == 0:
-        api_get_watchlist_id()
-
-    return { 'code': code, 'data': data, 'result': True }
+    return api_get_session_token()
 
 def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0, change_audio=0):
     playdata = {'path': '', 'mpd': '', 'license': '', 'token': '', 'locator': '', 'type': '', 'properties': {}}
@@ -371,6 +503,10 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     save_profile(profile_id=1, profile=profile_settings)
 
     token = api_get_play_token(locator=locator, path=path, force=1)
+
+    #cert = get_server_certificate(locator=locator, token=token)
+    #write_file('widevine_cert', data=cert, isJSON=False)
+
     token_orig = token
 
     if not token or not len(str(token)) > 0:
@@ -669,5 +805,8 @@ def api_clean_after_playback():
 
     headers = api_get_headers()
     headers['Content-type'] = 'application/json'
-
-    download = api_download(url=CONST_API_URLS['clearstreams_url'], type='post', headers=headers, data='{}', json_data=False, return_json=False)
+    
+    device_id = load_file('device_id', isJSON=False)
+    
+    if device_id:
+        download = api_download(url=CONST_API_URLS['clearstreams_url'], type='post', headers=headers, data='{}', json_data=False, return_json=False)

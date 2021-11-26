@@ -20,6 +20,17 @@
 
 -Supports catchup using IPTV Simple PVR Addon (through the separate Dut-IPTV Simple IPTV Connector addon)
 
+### Maximum supported Resolution
+
+- CanalDigitaal: 1080P
+- F1 TV: 1080P (50hz)
+- KPN/Telfort/XS4ALL: 1080P
+- NLZiet: 1080P
+- Telenet (BE): 720P
+- T-Mobile: 1080P
+- Videoland: 1080P
+- Ziggo: 720P
+
 ### Required
 
 -Subscription to any of the supported providers (not free)
@@ -59,7 +70,7 @@ Instructions adopted from the kodi wiki, see [HOW-TO:Install add-ons from zip fi
 
 - The addons require the pycryptodomex packages, which is not included in OSMC and possibly general linux distributions
 
-- These steps are not required for CoreELEC/LibreELEC/Windows/Android/Mac
+- These steps are not required for CoreELEC/LibreELEC/Windows/Android
 
 - Execute the following commands in a terminal:
 

@@ -14,7 +14,7 @@
                 <setting id="disableErotica" type="boolean" label="320122">
                     <default>true</default>
                     <control type="toggle" />
-                </setting>                
+                </setting>
                 <setting id="disableRegionalChannels" type="boolean" label="320125">
                     <default>true</default>
                     <control type="toggle" />
@@ -38,6 +38,12 @@
                 <setting id="force_ac3" type="boolean" label="30037">
                     <default>false</default>
                     <control type="toggle" />
+                </setting>
+                <setting id="item_count" type="integer" label="330048">
+                    <default>51</default>
+                    <control type="edit" format="integer">
+                        <heading>330048</heading>
+                    </control>
                 </setting>
                 <setting id="force_highest_bandwidth" type="boolean" label="32101">
                     <default>true</default>

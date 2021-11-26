@@ -1,4 +1,4 @@
-import xbmcaddon, xbmcvfs
+import os, xbmcaddon, xbmcvfs
 
 ##### ADDON ####
 ADDON = xbmcaddon.Addon()
@@ -9,6 +9,8 @@ PROVIDER_NAME = ADDON_ID.replace('plugin.video.', '')
 
 ADDON_PATH = xbmcvfs.translatePath(ADDON.getAddonInfo('path'))
 ADDON_PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
+
+ADDONS_PATH = xbmcvfs.translatePath('special://home') + 'addons' + os.sep
 
 ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_FANART = ADDON.getAddonInfo('fanart')

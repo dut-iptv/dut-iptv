@@ -10,6 +10,9 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l6 import inputstream
 from resources.lib.constants import CONST_IMAGE_URL
 
+def check_devices():
+    pass
+
 def plugin_ask_for_creds(creds):
     username = str(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 

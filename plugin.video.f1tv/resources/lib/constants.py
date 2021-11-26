@@ -30,9 +30,9 @@ CONST_HAS_REPLAY = False
 
 CONST_HAS_SEARCH = False
 
-CONST_IMAGE_URL = 'https://ott.formula1.com/image-resizer/image'
+CONST_IMAGE_URL = 'https://f1tv.formula1.com/image-resizer/image'
 
-CONST_MAIN_VOD_AR = ['395', '1510', '392', '2128', '2130', '493', '410', '413']
+CONST_MAIN_VOD_AR = ['395', '1510', '392', '2128', '2130', '493', '410', '413', '3675', '3673', '3946', '804']
 
 CONST_MOD_CACHE = {}
 
@@ -47,10 +47,14 @@ CONST_VOD_CAPABILITY = [
     { 'file': 1510, 'label': '2021 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
     { 'file': 392, 'label': '2020 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
     { 'file': 2128, 'label': '2019 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
-    { 'file': 2130, 'label': '2018 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
+    { 'file': 2130, 'label': '2018 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },  
     { 'file': 493, 'label': 'Archive', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
     { 'file': 410, 'label': 'Shows', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
     { 'file': 413, 'label': 'Documentaries', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
+    { 'file': 3675, 'label': 'F2', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
+    { 'file': 3673, 'label': 'F3', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
+    { 'file': 3946, 'label': 'Porsche Mobil 1 Supercup', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
+    { 'file': 804, 'label': 'W Series', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
 ]
 
 CONST_WATCHLIST = False

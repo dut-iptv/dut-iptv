@@ -12,6 +12,9 @@ from resources.lib.base.l6 import inputstream
 from resources.lib.constants import CONST_API_URLS, CONST_DEFAULT_CLIENTID
 from urllib.parse import urlencode
 
+def check_devices():
+    pass
+
 def check_entitlements():
     from resources.lib.api import api_get_play_token
 

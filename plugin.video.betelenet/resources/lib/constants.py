@@ -134,7 +134,8 @@ complete_base_url = '{base_url}/BE/nld'.format(base_url=base)
 CONST_API_URLS = {
     'base_url': complete_base_url + '/web',
     'clearstreams_url': 'https://obo-prod.oesp.telenettv.be/oesp/v4/BE/nld/web/playback/clearstreams',
-    'devices_url': "https://obo-prod.oesp.telenettv.be/oesp/v4/BE/nld/web/settopboxes/profile",
+    'devices_url': "https://prod.spark.telenettv.be/nld/web/personalization-service/v1/customer/",
+    'devices_digital_url': "https://obo-prod.oesp.telenettv.be/oesp/v4/BE/nld/web/devices",
     'search_url': "https://obo-prod.oesp.telenettv.be/oesp/v4/BE/nld/web/search/content",
     'session_url': "https://obo-prod.oesp.telenettv.be/oesp/v4/BE/nld/web/session",
     'channels_url': "https://obo-prod.oesp.telenettv.be/oesp/v4/BE/nld/web/channels",
@@ -143,7 +144,9 @@ CONST_API_URLS = {
     'listings_url': "https://obo-prod.oesp.telenettv.be/oesp/v4/BE/nld/web/listings",
     'mediaitems_url': "https://obo-prod.oesp.telenettv.be/oesp/v4/BE/nld/web/mediaitems",
     'mediagroupsfeeds_url': "https://obo-prod.oesp.telenettv.be/oesp/v4/BE/nld/web/mediagroups/feeds",
-    'watchlist_url': "https://obo-prod.oesp.telenettv.be/oesp/v4/BE/nld/web/watchlists/later"
+    'watchlist_url': "https://obo-prod.oesp.telenettv.be/oesp/v4/BE/nld/web/watchlists/later",
+    'login_url': 'https://login.prd.telenet.be/openid/login.do',
+    'authorization_url': '{complete_base_url}/web/authorization'.format(complete_base_url=complete_base_url),
 }
 
 CONST_ALLOWED_HEADERS = {
