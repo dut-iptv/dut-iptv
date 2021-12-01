@@ -326,11 +326,12 @@ def vod(file, label, start=0, character=None, genre=None, online=0, az=0, menu=0
                 else:
                     label = genre
 
-                folder.add_item(
-                    label = label,
-                    info = {'plot': genre},
-                    path = plugin.url_for(func_or_url=vod, file=file.replace(PROVIDER_NAME, ''), label=label, start=start, genre=genre, online=online, az=0),
-                )
+                if label and len(str(label)) > 0:
+                    folder.add_item(
+                        label = label,
+                        info = {'plot': genre},
+                        path = plugin.url_for(func_or_url=vod, file=file.replace(PROVIDER_NAME, ''), label=label, start=start, genre=genre, online=online, az=0),
+                    )
 
         return folder
     else:
