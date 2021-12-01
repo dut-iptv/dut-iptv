@@ -38,6 +38,8 @@ CONST_BASE_HEADERS = {
     'Sec-Fetch-Site': 'same-origin',
 }
 
+CONST_CONTINUE_WATCH = False
+
 CONST_FIRST_BOOT = True
 
 CONST_HAS_LIVE = True
@@ -53,6 +55,8 @@ CONST_START_FROM_BEGINNING = True
 CONST_ONLINE_SEARCH = False
 
 CONST_USE_PROXY = True
+
+CONST_USE_PROFILES = False
 
 CONST_VOD_CAPABILITY = [
     { 'file': 'cnlseriesnl', 'label': 'Canal+ ' + _.SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 2 },

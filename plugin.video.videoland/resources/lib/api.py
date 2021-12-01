@@ -12,10 +12,10 @@ from resources.lib.constants import CONST_BASE_HEADERS, CONST_BASE_URL, CONST_GI
 from resources.lib.util import plugin_process_info
 from urllib.parse import parse_qs, urlparse, quote_plus
 
-def api_add_to_watchlist(id, type):
+def api_add_to_watchlist(id, type):   
     if not api_get_session():
         return None
-        
+
     headers = {
         'videoland-platform': 'videoland',
     }
@@ -37,7 +37,7 @@ def api_get_info(id, channel=''):
 
     return info
 
-def api_get_session(force=0):
+def api_get_session(force=0, return_data=False):
     force = int(force)
 
     profile_url = '{base_url}/api/v3/profiles'.format(base_url=CONST_BASE_URL)
@@ -51,20 +51,101 @@ def api_get_session(force=0):
     data = download['data']
     code = download['code']
 
-    if not code or not code == 200 or not data or not check_key(data[0], 'id') or not check_key(data[0], 'gigya_id'):
+    if not code or not code == 200 or not data or not check_key(data[0], 'id'):
         login_result = api_login()
 
         if not login_result['result']:
+            if return_data == True:
+                return {'result': False, 'data': login_result['data'], 'code': login_result['code']}
+
             return False
+        else:
+            download = api_download(url=profile_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+            data = download['data']
+            code = download['code']
 
     profile_settings = load_profile(profile_id=1)
     profile_settings['last_login_success'] = 1
     profile_settings['last_login_time'] = int(time.time())
     save_profile(profile_id=1, profile=profile_settings)
 
+    if return_data == True:
+        return {'result': True, 'data': data, 'code': code}
+
     return True
 
-def api_list_watchlist():
+def api_get_profiles():
+    profiles = api_get_session(force=0, return_data=True)
+    return_profiles = {}
+
+    if profiles['result'] == True:
+        for result in profiles['data']:
+            if result['is_active'] == True:
+                return_profiles[result['id']] = {}
+                return_profiles[result['id']]['id'] = result['id']
+                return_profiles[result['id']]['name'] = result['profilename']
+
+    return return_profiles
+
+def api_set_profile(id=''):
+    profile_settings = load_profile(profile_id=1)
+    profiles = api_get_session(force=0, return_data=True)
+    name = ''
+    owner_id = ''
+    owner_name = ''
+    saved_id = ''
+    saved_name = ''
+
+    if not profiles or profiles['result'] == False:
+        return False
+
+    for result in profiles['data']:
+        if result['is_account_owner'] == True:
+            owner_id = result['id']
+            owner_name = result['profilename']
+        if result['is_active'] == True and result['id'] == id:
+            name = result['profilename']
+        if result['is_active'] == True and result['id'] == profile_settings['profile_id']:
+            saved_id = result['id']
+            saved_name = result['profilename']
+
+    if len(str(name)) == 0:
+        if len(str(saved_name)) > 0:
+            id = saved_id
+            name = saved_name
+        else:
+            id = owner_id
+            name = owner_name
+
+    switch_url = '{base_url}/api/v3/profiles/{id}/switch'.format(base_url=CONST_BASE_URL, id=id)
+
+    headers = {
+        'videoland-platform': 'videoland',
+        "Referer": CONST_BASE_URL + "/profielkeuze",
+    }
+
+    session_post_data = {
+        'customer_id': id
+    }
+
+    download = api_download(url=switch_url, type='post', headers=headers, data=session_post_data, json_data=False, return_json=False)
+    code = download['code']
+
+    log(download)
+
+    if not code or not code == 204:
+        return False
+
+    profile_settings = load_profile(profile_id=1)
+    profile_settings['profile_name'] = name
+    profile_settings['profile_id'] = id
+    save_profile(profile_id=1, profile=profile_settings)
+
+    return True
+
+def api_list_watchlist(continuewatch=0):
+    continuewatch = int(continuewatch)
+    
     if not api_get_session():
         return None
 
@@ -74,7 +155,10 @@ def api_list_watchlist():
         'videoland-platform': 'videoland',
     }
 
-    watchlist_url = '{base_url}/api/v3/watchlist?profileId={profile_id}'.format(base_url=CONST_BASE_URL, profile_id=profile_settings['profile_id'])
+    if continuewatch == 1:
+        watchlist_url = '{base_url}/api/v3/progress/{id}'.format(base_url=CONST_BASE_URL, id=profile_settings['profile_id'])
+    else:
+        watchlist_url = '{base_url}/api/v3/watchlist/{id}'.format(base_url=CONST_BASE_URL, id=profile_settings['profile_id'])
 
     download = api_download(url=watchlist_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -98,7 +182,6 @@ def api_login():
     profile_settings = load_profile(profile_id=1)
     profile_settings['vlid'] = ''
     profile_settings['profile_id'] = ''
-    profile_settings['gigya_id'] = ''
 
     save_profile(profile_id=1, profile=profile_settings)
 
@@ -174,12 +257,12 @@ def api_login():
     data = download['data']
     code = download['code']
 
-    if not code or not code == 200 or not data or not check_key(data[0], 'id') or not check_key(data[0], 'gigya_id'):
+    if not code or not code == 200 or not data or not check_key(data[0], 'id'):
         return { 'code': code, 'data': data, 'result': False }
 
-    profile_settings['profile_id'] = data[0]['id']
-    profile_settings['gigya_id'] = data[0]['gigya_id']
     save_profile(profile_id=1, profile=profile_settings)
+
+    api_set_profile()
 
     return { 'code': code, 'data': data, 'result': True }
 
@@ -194,7 +277,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     change_audio = int(change_audio)
 
     profile_settings = load_profile(profile_id=1)
-    
+
     info = {}
     properties = {}
 
@@ -204,6 +287,31 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     headers = {
         'videoland-platform': 'videoland',
     }
+
+    if type == 'channel':
+        play_url_path = id
+
+        download = api_download(url=play_url_path, type='get', headers=headers, data=None, json_data=False, return_json=True)
+        data = download['data']
+        code = download['code']
+
+        if not code or not code == 200 or not data or not check_key(data, 'manifest') or not check_key(data, 'token'):
+            return playdata
+
+        path = data['manifest']
+
+        if check_key(data, 'licenseUrl'):
+            license = data['licenseUrl']
+
+        profile_settings['ticket_id'] = ''
+        profile_settings['token'] = data['token']
+        save_profile(profile_id=1, profile=profile_settings)
+
+        mpd = ''
+
+        playdata = {'path': path, 'mpd': mpd, 'license': license, 'info': info, 'properties': properties}
+
+        return playdata
 
     if id.startswith('E'):
         typestr = 'episode'
@@ -263,20 +371,25 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     return playdata
 
-def api_remove_from_watchlist(id):
+def api_remove_from_watchlist(id, continuewatch=0):
+    continuewatch = int(continuewatch)
+    
     if not api_get_session():
         return None
 
     headers = {
         'videoland-platform': 'videoland',
     }
-
-    remove_url = '{base_url}/api/v3/watchlist/{id}'.format(base_url=CONST_BASE_URL, id=id)
+    
+    if continuewatch == 1:
+        remove_url = '{base_url}/api/v3/progress/{id}'.format(base_url=CONST_BASE_URL, id=id)
+    else:
+        remove_url = '{base_url}/api/v3/watchlist/{id}'.format(base_url=CONST_BASE_URL, id=id)
 
     download = api_download(url=remove_url, type='delete', headers=headers, data=None, json_data=False, return_json=False)
     code = download['code']
 
-    if not code or not code == 200:
+    if not code or (not code == 200 and not code == 204):
         return False
 
     return True
@@ -403,24 +516,25 @@ def api_watchlist_listing():
 def api_clean_after_playback():
     profile_settings = load_profile(profile_id=1)
 
-    session_post_data = {
-        'action': "stop",
-        'buffer_state': 0,
-        'buffer_total': 1,
-        'offset': "00:00:00",
-        'token': profile_settings['token']
-    }
+    if len(str(profile_settings['ticket_id'])) > 0:
+        session_post_data = {
+            'action': "stop",
+            'buffer_state': 0,
+            'buffer_total': 1,
+            'offset': "00:00:00",
+            'token': profile_settings['token']
+        }
 
-    headers = {
-        'videoland-platform': 'videoland',
-    }
+        headers = {
+            'videoland-platform': 'videoland',
+        }
 
-    stop_url = '{base_url}/api/v3/heartbeat/{ticket_id}?action=stop&offset=00:00:00'.format(base_url=CONST_BASE_URL, ticket_id=profile_settings['ticket_id'])
+        stop_url = '{base_url}/api/v3/heartbeat/{ticket_id}?action=stop&offset=00:00:00'.format(base_url=CONST_BASE_URL, ticket_id=profile_settings['ticket_id'])
 
-    download = api_download(url=stop_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
+        download = api_download(url=stop_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
 
-    session_post_data['action'] = 'exit'
+        session_post_data['action'] = 'exit'
 
-    exit_url = '{base_url}/api/v3/heartbeat/{ticket_id}?action=exit&offset=00:00:00'.format(base_url=CONST_BASE_URL, ticket_id=profile_settings['ticket_id'])
+        exit_url = '{base_url}/api/v3/heartbeat/{ticket_id}?action=exit&offset=00:00:00'.format(base_url=CONST_BASE_URL, ticket_id=profile_settings['ticket_id'])
 
-    download = api_download(url=exit_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
+        download = api_download(url=exit_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)

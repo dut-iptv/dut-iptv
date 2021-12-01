@@ -633,3 +633,67 @@ msgstr ""
 msgctxt "#330048"
 msgid "Items per page"
 msgstr ""
+
+msgctxt "#330049"
+msgid "Profile"
+msgstr ""
+
+msgctxt "#330050"
+msgid "Default"
+msgstr ""
+
+msgctxt "#330051"
+msgid "Install Dut-IPTV Simple IPTV Connector"
+msgstr ""
+
+msgctxt "#330052"
+msgid "Dut-IPTV Simple IPTV Connector is already installed"
+msgstr ""
+
+msgctxt "#330053"
+msgid "Dut-IPTV Simple IPTV Connector was succesfully enabled"
+msgstr ""
+
+msgctxt "#330054"
+msgid "Please enable the connector from the Kodi Addons menu"
+msgstr ""
+
+msgctxt "#330055"
+msgid "Please restart Kodi and run this menu item again to enable the Connector"
+msgstr ""
+
+msgctxt "#330056"
+msgid "Dut-IPTV Simple IPTV Connector was succesfully downloaded. Please restart Kodi and enable the connector from the Kodi Addons menu"
+msgstr ""
+
+msgctxt "#330057"
+msgid "Downloading the Dut-IPTV Simple IPTV Connector was not succesfull"
+msgstr ""
+
+msgctxt "#330058"
+msgid "Select profile"
+msgstr ""
+
+msgctxt "#330059"
+msgid "Profile changed to: "
+msgstr ""
+
+msgctxt "#330060"
+msgid "Profile change failed"
+msgstr ""
+
+msgctxt "#330061"
+msgid "Continue Watching"
+msgstr ""
+
+msgctxt "#330062"
+msgid "Removed from Continue Watching"
+msgstr ""
+
+msgctxt "#330063"
+msgid "Remove from Continue Watching failed"
+msgstr ""
+
+msgctxt "#330064"
+msgid "Remove from Continue Watching"
+msgstr ""

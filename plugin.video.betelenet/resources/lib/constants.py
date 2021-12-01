@@ -174,6 +174,8 @@ CONST_BASE_HEADERS = {
     'Sec-Fetch-Site': 'cross-site',
 }
 
+CONST_CONTINUE_WATCH = False
+
 CONST_DEFAULT_CLIENTID = '4.29.11'
 
 CONST_FIRST_BOOT = True
@@ -191,6 +193,8 @@ CONST_ONLINE_SEARCH = False
 CONST_START_FROM_BEGINNING = True
 
 CONST_USE_PROXY = True
+
+CONST_USE_PROFILES = False
 
 CONST_VOD_CAPABILITY = [
     { 'file': 'series', 'label': _.SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 2 },

@@ -326,7 +326,7 @@ def plugin_renew_token(data):
 
     return data['path']
 
-def plugin_process_watchlist(data):
+def plugin_process_watchlist(data, continuewatch=0):
     items = []
 
     if check_key(data, 'entries'):
@@ -407,12 +407,13 @@ def plugin_process_watchlist(data):
                 },
                 path = path,
                 playable = playable,
+                progress = 0,
                 context = context
             ))
 
     return items
 
-def plugin_process_watchlist_listing(data, id=None):
+def plugin_process_watchlist_listing(data, id=None, continuewatch=0):
     items = []
 
     if check_key(data, 'listings'):

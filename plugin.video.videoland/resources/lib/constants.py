@@ -20,11 +20,13 @@ CONST_BASE_HEADERS = {
     'Sec-Fetch-Site': 'same-origin',
 }
 
+CONST_CONTINUE_WATCH = True
+
 CONST_FIRST_BOOT = False
 
 CONST_GIGYA_URL = 'https://accounts.eu1.gigya.com'
 
-CONST_HAS_LIVE = False
+CONST_HAS_LIVE = True
 
 CONST_HAS_REPLAY = False
 
@@ -38,11 +40,17 @@ CONST_START_FROM_BEGINNING = False
 
 CONST_USE_PROXY = True
 
+CONST_USE_PROFILES = True
+
 CONST_VOD_CAPABILITY = [
     { 'file': 'series', 'label': _.SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'seriesvideoland', 'label': _.SERIES + ' (Categorie)', 'start': 0, 'menu': 0, 'online': 0, 'search': 0, 'az': 4 },
     { 'file': 'movies', 'label': _.MOVIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'moviesvideoland', 'label': _.MOVIES + ' (Categorie)', 'start': 0, 'menu': 0, 'online': 0, 'search': 0, 'az': 4 },
     { 'file': 'kidsseries', 'label': _.KIDS_SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'kidsseriesvideoland', 'label': _.KIDS_SERIES + ' (Categorie)', 'start': 0, 'menu': 0, 'online': 0, 'search': 0, 'az': 4 },
     { 'file': 'kidsmovies', 'label': _.KIDS_MOVIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 2 },
+    { 'file': 'kidsmoviesvideoland', 'label': _.KIDS_MOVIES + ' (Categorie)', 'start': 0, 'menu': 0, 'online': 0, 'search': 0, 'az': 4 },
 ]
 
 CONST_WATCHLIST = True

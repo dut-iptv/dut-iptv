@@ -21,6 +21,8 @@ CONST_BASE_HEADERS = {
     'Sec-Fetch-Site': 'same-origin',
 }
 
+CONST_CONTINUE_WATCH = False
+
 CONST_DEFAULT_API = 'https://api.tv.kpn.com/101/1.2.0/A/nld/pctv/kpn'
 
 CONST_FIRST_BOOT = True
@@ -40,6 +42,8 @@ CONST_ONLINE_SEARCH = False
 CONST_START_FROM_BEGINNING = True
 
 CONST_USE_PROXY = True
+
+CONST_USE_PROFILES = False
 
 CONST_VOD_CAPABILITY = [
     { 'file': 'series', 'label': _.SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 1 },

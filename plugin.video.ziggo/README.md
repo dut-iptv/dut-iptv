@@ -18,7 +18,7 @@
 
 -Supports watching TV and listening to radio using the IPTV Simple PVR Addon (through the separate Dut-IPTV Simple IPTV Connector addon)
 
--Supports catchup using IPTV Simple PVR Addon in Kodi 19 (through the separate Dut-IPTV Simple IPTV Connector addon)
+-Supports catchup using IPTV Simple PVR Addon (through the separate Dut-IPTV Simple IPTV Connector addon)
 
 ### Maximum supported Resolution
 
@@ -26,11 +26,9 @@
 
 ### Required
 
--Subscription to Ziggo providers (not free)
+-Subscription to Ziggo (not free)
 
--Kodi 18 or higher with Widevine Support (free) for versions up to 1.0.0
-
--Kodi 19 or higher with Widevine Support (free) for versions above 1.0.0
+-Kodi 19 or higher with Widevine Support (free)
 
 ### Thanks
 

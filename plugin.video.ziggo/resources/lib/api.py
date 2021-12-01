@@ -155,6 +155,12 @@ def api_get_session(force=0):
 
     return True
 
+def api_get_profiles():
+    return None
+
+def api_set_profile(id=''):
+    return None
+
 def api_get_watchlist_id():
     if not api_get_session():
         return None
@@ -175,7 +181,7 @@ def api_get_watchlist_id():
 
     return True
 
-def api_list_watchlist():
+def api_list_watchlist(continuewatch=0):
     if not api_get_session():
         return None
 
@@ -412,7 +418,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     return playdata
 
-def api_remove_from_watchlist(id):
+def api_remove_from_watchlist(id, continuewatch=0):
     if not api_get_session():
         return None
 

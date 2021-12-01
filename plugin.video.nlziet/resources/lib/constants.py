@@ -23,6 +23,8 @@ CONST_BASE_HEADERS = {
 
 CONST_BASE_URL = 'https://www.nlziet.nl'
 
+CONST_CONTINUE_WATCH = False
+
 CONST_FIRST_BOOT = True
 
 CONST_HAS_LIVE = True
@@ -34,6 +36,7 @@ CONST_HAS_SEARCH = True
 CONST_MOD_CACHE = {}
 
 CONST_ID_URL = 'https://id.nlziet.nl'
+
 CONST_IMAGE_URL = 'https://nlzietprodstorage.blob.core.windows.net'
 
 CONST_ONLINE_SEARCH = False
@@ -41,6 +44,8 @@ CONST_ONLINE_SEARCH = False
 CONST_START_FROM_BEGINNING = True
 
 CONST_USE_PROXY = True
+
+CONST_USE_PROFILES = False
 
 CONST_VOD_CAPABILITY = [
     #{ 'file': 'series', 'label': _.SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 1 },

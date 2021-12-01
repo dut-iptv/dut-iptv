@@ -2,7 +2,7 @@ import _strptime
 import datetime, json, os, pytz, re, string, sys, time, xbmc, xbmcplugin
 
 from fuzzywuzzy import fuzz
-from resources.lib.api import api_add_to_watchlist, api_list_watchlist, api_login, api_play_url, api_remove_from_watchlist, api_search, api_vod_download, api_vod_season, api_vod_seasons, api_watchlist_listing
+from resources.lib.api import api_add_to_watchlist, api_get_profiles, api_set_profile, api_list_watchlist, api_login, api_play_url, api_remove_from_watchlist, api_search, api_vod_download, api_vod_season, api_vod_seasons, api_watchlist_listing
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, ADDON_VERSION, ADDONS_PATH, AUDIO_LANGUAGES, PROVIDER_NAME
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
@@ -12,7 +12,7 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_connector, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
 from resources.lib.base.l7 import plugin
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_FIRST_BOOT, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_HAS_SEARCH, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_USE_PROXY, CONST_VOD_CAPABILITY, CONST_WATCHLIST
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_CONTINUE_WATCH, CONST_FIRST_BOOT, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_HAS_SEARCH, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_USE_PROXY, CONST_USE_PROFILES, CONST_VOD_CAPABILITY, CONST_WATCHLIST
 from resources.lib.util import check_devices, plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
 from urllib.parse import urlparse
 from xml.dom.minidom import parseString
@@ -49,9 +49,20 @@ def home(**kwargs):
 
         if CONST_WATCHLIST:
             folder.add_item(label=_(_.WATCHLIST, _bold=True), path=plugin.url_for(func_or_url=watchlist))
+            
+        if CONST_CONTINUE_WATCH:
+            folder.add_item(label=_(_.CONTINUE_WATCH, _bold=True), path=plugin.url_for(func_or_url=watchlist, continuewatch=1))
 
         if CONST_HAS_SEARCH:
             folder.add_item(label=_(_.SEARCH, _bold=True), path=plugin.url_for(func_or_url=search_menu))
+
+        if CONST_USE_PROFILES:
+            if check_key(profile_settings, 'profile_name') and len(str(profile_settings['profile_name'])) > 0:
+                profile_txt = _.PROFILE + ': ' + str(profile_settings['profile_name'])
+            else:
+                profile_txt = _.PROFILE + ': ' + _.DEFAULT
+
+            folder.add_item(label=_(profile_txt, _bold=True), path=plugin.url_for(func_or_url=switch_profile))
 
     folder.add_item(label=_(_.LOGIN, _bold=True), path=plugin.url_for(func_or_url=login))
     folder.add_item(label=_.SETTINGS, path=plugin.url_for(func_or_url=settings_menu))
@@ -300,19 +311,25 @@ def vod(file, label, start=0, character=None, genre=None, online=0, az=0, menu=0
             )
 
         return folder
-    elif az == 3:
+    elif az == 3 or az == 4:
         folder = plugin.Folder(title=_.PROGSGENRE)
 
-        data = api_get_genre_list(type=file)
+        if az == 4:
+            data = api_get_genre_list(type=file, add=0)
+        else:
+            data = api_get_genre_list(type=file)
 
         if data:
             for genre in data:
-                label = genre
+                if az == 4:
+                    label = data[genre]
+                else:
+                    label = genre
 
                 folder.add_item(
                     label = label,
                     info = {'plot': genre},
-                    path = plugin.url_for(func_or_url=vod, file=file, label=label, start=start, genre=genre, online=online, az=0),
+                    path = plugin.url_for(func_or_url=vod, file=file.replace(PROVIDER_NAME, ''), label=label, start=start, genre=genre, online=online, az=0),
                 )
 
         return folder
@@ -483,6 +500,33 @@ def search_menu(**kwargs):
     return folder
 
 @plugin.route()
+def switch_profile(**kwargs):
+    profiles = api_get_profiles()
+    select_list = []
+    id_list = {}
+
+    for row in profiles:
+        profile = profiles[row]
+
+        id_list[profile['name']] = profile['id']
+        select_list.append(profile['name'])
+
+    if len(select_list) > 1:
+        selected = gui.select(_.SELECT_PROFILE, select_list)
+
+        try:
+            result = api_set_profile(id=id_list[select_list[selected]])
+
+            if result:
+                gui.ok(message=_.SELECT_PROFILE_SUCCESS + str(select_list[selected]))
+            else:
+                gui.ok(message=_.SELECT_PROFILE_FAILED)
+        except:
+            gui.ok(message=_.SELECT_PROFILE_FAILED)
+    else:
+        gui.ok(message=_.SELECT_PROFILE_FAILED)
+
+@plugin.route()
 def search(query=None, **kwargs):
     items = []
 
@@ -586,7 +630,7 @@ def settings_menu(**kwargs):
         folder.add_item(label=_.CHANNEL_PICKER, path=plugin.url_for(func_or_url=channel_picker_menu))
 
     folder.add_item(label=_.SET_KODI, path=plugin.url_for(func_or_url=plugin._set_settings_kodi))
-    folder.add_item(label='Dut-IPTV Simple IPTV Connector installeren', path=plugin.url_for(func_or_url=install_connector))
+    folder.add_item(label=_.INSTALL_DUT_IPTV, path=plugin.url_for(func_or_url=install_connector))
     folder.add_item(label=_.RESET_SESSION, path=plugin.url_for(func_or_url=login, ask=0))
     folder.add_item(label=_.RESET, path=plugin.url_for(func_or_url=reset_addon))
     folder.add_item(label=_.LOGOUT, path=plugin.url_for(func_or_url=logout))
@@ -602,22 +646,22 @@ def install_connector(**kwargs):
     if xbmc.getCondVisibility('System.HasAddon({addon})'.format(addon=addon)) == 1:
         try:
             VIDEO_ADDON = xbmcaddon.Addon(id=addon)
-            gui.ok(message='Dut-IPTV Simple IPTV Connector is already installed')
+            gui.ok(message=_.DUT_IPTV_ALREADY_INSTALLED)
         except:
             xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + addon + '","enabled":false}}}}')
 
             try:
                 VIDEO_ADDON = xbmcaddon.Addon(id=addon)
-                gui.ok(message='Dut-IPTV Simple IPTV Connector was succesfully enabled')
+                gui.ok(message=_.DUT_IPTV_ENABLED)
             except:
-                gui.ok(message='Please enable the connector from the Kodi Addons menu')
+                gui.ok(message=_.DUT_IPTV_ENABLE_FROM_ADDONS)
     else:
         if os.path.isdir(ADDONS_PATH + 'plugin.executable.dutiptv'):
-            gui.ok(message='Please restart Kodi and run this menu item again to enable the Connector')
+            gui.ok(message=_.DUT_IPTV_RESTART_KODI)
         elif api_get_connector() == True:
-            gui.ok(message='Dut-IPTV Simple IPTV Connector was succesfully downloaded. Please restart Kodi and enable the connector from the Kodi Addons menu')
+            gui.ok(message=_.DUT_IPTV_INSTALLED)
         else:
-            gui.ok(message='Downloading the Dut-IPTV Simple IPTV Connector was not succesfull.')
+            gui.ok(message=_.DUT_IPTV_DOWNLOAD_FAILED)
 
 @plugin.route()
 def channel_picker_menu(**kwargs):
@@ -917,27 +961,44 @@ def add_to_watchlist(id, type, **kwargs):
         gui.notification(_.ADD_TO_WATCHLIST_FAILED)
 
 @plugin.route()
-def remove_from_watchlist(id, **kwargs):
-    if api_remove_from_watchlist(id=id):
+def remove_from_watchlist(id, continuewatch=0, **kwargs):
+    continuewatch = int(continuewatch)
+
+    if api_remove_from_watchlist(id=id, continuewatch=continuewatch):
         gui.refresh()
-        gui.notification(_.REMOVED_FROM_WATCHLIST)
+
+        if continuewatch == 0:
+            gui.notification(_.REMOVED_FROM_WATCHLIST)
+        else:
+            gui.notification(_.REMOVED_FROM_CONTINUE)
     else:
-        gui.notification(_.REMOVE_FROM_WATCHLIST_FAILED)
+        if continuewatch == 0:
+            gui.notification(_.REMOVE_FROM_WATCHLIST_FAILED)
+        else:
+            gui.notification(_.REMOVE_FROM_CONTINUE_FAILED)
 
 @plugin.route()
-def watchlist(**kwargs):
+def watchlist(continuewatch=0, **kwargs):
+    continuewatch = int(continuewatch)
+
     folder = plugin.Folder(title=_.WATCHLIST)
 
-    data = api_list_watchlist()
+    data = api_list_watchlist(continuewatch=continuewatch)
 
     if data:
-        processed = plugin_process_watchlist(data=data)
+        processed = plugin_process_watchlist(data=data, continuewatch=continuewatch)
 
         if processed:
             items = []
 
             for ref in processed:
                 currow = processed[ref]
+
+                progress = {}
+
+                if int(currow['progress']) > 0 and int(currow['duration']) > 0:
+                    progress['TotalTime'] = str(currow['duration'])
+                    progress['ResumeTime'] = str(int((int(currow['progress']) // 100) * (int(currow['duration']))))
 
                 items.append(plugin.Item(
                     label = currow['label1'],
@@ -953,6 +1014,7 @@ def watchlist(**kwargs):
                     },
                     path = currow['path'],
                     playable = currow['playable'],
+                    properties = progress,
                     context = currow['context']
                 ))
 
@@ -961,18 +1023,18 @@ def watchlist(**kwargs):
     return folder
 
 @plugin.route()
-def watchlist_listing(label, id, search=0, **kwargs):
+def watchlist_listing(label, id, search=0, continuewatch=0, **kwargs):
     search = int(search)
 
     folder = plugin.Folder(title=label)
 
-    data = api_watchlist_listing(id)
+    data = api_watchlist_listing(id, continuewatch=continuewatch)
 
     if search == 0:
         id = None
 
     if data:
-        processed = plugin_process_watchlist_listing(data=data, id=id)
+        processed = plugin_process_watchlist_listing(data=data, id=id, continuewatch=continuewatch)
 
         if processed:
             items = []

@@ -141,11 +141,14 @@ def api_get_epg_by_idtitle(idtitle, start, end, channels):
 
     return data2
 
-def api_get_genre_list(type):
+def api_get_genre_list(type, add=1):
+    add = int(add)
+
     if not os.path.isdir(ADDON_PROFILE + 'tmp'):
         os.makedirs(ADDON_PROFILE + 'tmp')
 
-    type = type + 'genres'
+    if add == 1:
+        type = type + 'genres'      
 
     encodedBytes = base64.b32encode(type.encode("utf-8"))
     type = str(encodedBytes, "utf-8")
@@ -234,9 +237,9 @@ def api_get_list(start, end, channels, movies=0):
 
         for currow in data:
             row = data[currow]
-
+            
             try:
-                if not int(row['startl']) < start and not int(row['starth']) > end:
+                if not int(row['startl']) < start or not int(row['starth']) > end:
                     continue
             except:
                 pass
@@ -472,9 +475,17 @@ def api_get_vod_by_type(type, character, genre, subscription_filter, menu=0):
         row = data[currow]
 
         id = row['id']
+        
+        log(row)
+        
+        if genre:
+            log(genre)
 
-        if genre and row['category']:
-            if not genre in row['category']:
+        if genre and genre.startswith('C') and genre[1:].isnumeric():
+            if not row['vidcollection'] or not genre in row['vidcollection']:
+                continue
+        elif genre:
+            if not row['category'] or not genre in row['category']:
                 continue
 
         if character:

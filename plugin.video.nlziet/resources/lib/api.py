@@ -79,7 +79,13 @@ def api_get_session(force=0):
 
     return True
 
-def api_list_watchlist():
+def api_get_profiles():
+    return None
+
+def api_set_profile(id=''):
+    return None
+
+def api_list_watchlist(continuewatch=0):
     return None
 
 def api_login(force=False):
@@ -408,7 +414,7 @@ def api_process_vod(data):
 
     return items
 
-def api_remove_from_watchlist():
+def api_remove_from_watchlist(id, continuewatch=0):
     return None
 
 def api_search(query):

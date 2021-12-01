@@ -198,12 +198,12 @@ def plugin_vod_subscription_filter():
 
     return subscription_filter
 
-def plugin_process_watchlist(data):
+def plugin_process_watchlist(data, continuewatch=0):
     items = []
 
     return items
 
-def plugin_process_watchlist_listing(data, id=None):
+def plugin_process_watchlist_listing(data, id=None, continuewatch=0):
     items = []
 
     return items

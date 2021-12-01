@@ -20,7 +20,7 @@
 
 -Subscription to Videoland (not free)
 
--Kodi 19 or higher with Widevine Support (free) for versions above 1.0.0
+-Kodi 19 or higher with Widevine Support (free)
 
 ### Thanks
 

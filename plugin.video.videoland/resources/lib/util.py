@@ -33,9 +33,6 @@ def plugin_ask_for_creds(creds):
     return {'result': True, 'username': username, 'password': password}
 
 def plugin_login_error(login_result):
-    #if check_key(login_result['data'], 'result') and check_key(login_result['data']['result'], 'retCode') and login_result['data']['result']['retCode'] == "157022007":
-    #    gui.ok(message=_.TOO_MANY_DEVICES, heading=_.LOGIN_ERROR_TITLE)
-    #else:
     gui.ok(message=_.LOGIN_ERROR, heading=_.LOGIN_ERROR_TITLE)
 
 def plugin_post_login():
@@ -95,7 +92,13 @@ def plugin_process_playdata(playdata):
         'User-Agent': DEFAULT_USER_AGENT,
     }
 
-    if check_key(playdata, 'license') and check_key(playdata['license'], 'widevine') and check_key(playdata['license']['widevine'], 'license'):
+    if check_key(playdata, 'license') and len(str(profile_settings['ticket_id'])) == 0:
+        CDMHEADERS['Authorization'] = 'Bearer ' + profile_settings['token']
+
+        item_inputstream = inputstream.Widevine(
+            license_key = playdata['license'],
+        )
+    elif check_key(playdata, 'license') and check_key(playdata['license'], 'widevine') and check_key(playdata['license']['widevine'], 'license'):
         item_inputstream = inputstream.Widevine(
             license_key = playdata['license']['widevine']['license'],
         )
@@ -110,9 +113,11 @@ def plugin_renew_token(data):
 def plugin_vod_subscription_filter():
     return None
 
-def plugin_process_watchlist(data):
+def plugin_process_watchlist(data, continuewatch=0):
+    continuewatch = int(continuewatch)
+
     items = {}
-    
+
     if check_key(data, 'details'):
         for row in data['details']:
             currow = data['details'][row]
@@ -120,22 +125,50 @@ def plugin_process_watchlist(data):
             info = plugin_process_info({'info': currow})
 
             context = []
-            
+
             params = []
             params.append(('_', 'remove_from_watchlist'))
-            params.append(('id', currow['ref']))
+            params.append(('continuewatch', continuewatch))
+            
+            progress = 0
 
-            context.append((_.REMOVE_FROM_WATCHLIST, 'RunPlugin({context_url})'.format(context_url='plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))), ))
+            if continuewatch == 1:
+                remove_txt = _.REMOVE_FROM_CONTINUE
+
+                if currow['type'] == 'episode':
+                    params.append(('id', str(currow['id']) + '?series=' + str(currow['series_ref'])))
+                else:
+                    params.append(('id', str(currow['id']) + '?series='))
+                    
+                if not currow['type'] == 'series':
+                    progress = data['progress'][row]
+            else:
+                remove_txt = _.REMOVE_FROM_WATCHLIST
+                params.append(('id', currow['ref']))
+
+            context.append((remove_txt, 'RunPlugin({context_url})'.format(context_url='plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))), ))
 
             type = 'vod'
-            
-            if currow['type'] == 'series':
+
+            if currow['type'] == 'episode':
+                params = []
+                params.append(('_', 'play_video'))
+                params.append(('type', type))
+                params.append(('channel', None))
+
+                params.append(('id', 'E' + str(currow['series_ref'][1:]) + '###' + str(currow['season_id']) + '###' + str(currow['id'])))
+                params.append(('title', None))
+
+                path = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))
+                playable = True
+                mediatype = 'video'
+            elif currow['type'] == 'series' and continuewatch == 0:
                 params = []
                 params.append(('_', 'vod_series'))
                 params.append(('type', 'series'))
                 params.append(('label', currow['title']))
                 params.append(('id', currow['ref']))
-            
+
                 path = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))
                 playable = False
                 mediatype = ''
@@ -146,7 +179,7 @@ def plugin_process_watchlist(data):
                 params.append(('channel', None))
                 params.append(('id', currow['ref']))
                 params.append(('title', None))
-                
+
                 path = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))
                 playable = True
                 mediatype = 'video'
@@ -162,16 +195,19 @@ def plugin_process_watchlist(data):
                 'image_large': info['image_large'],
                 'path': path,
                 'playable': playable,
+                'progress': progress,
                 'context': context
             }
 
     return items
 
-def plugin_process_watchlist_listing(data, id=None):
+def plugin_process_watchlist_listing(data, id=None, continuewatch=0):
+    continuewatch = int(continuewatch)
+
     items = []
 
     return items
-    
+
 def encode_obj(in_obj):
     def encode_list(in_list):
         out_list = []

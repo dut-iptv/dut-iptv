@@ -20,6 +20,8 @@ CONST_BASE_HEADERS = {
     'Sec-Fetch-Site': 'same-origin',
 }
 
+CONST_CONTINUE_WATCH = False
+
 CONST_DEFAULT_API = 'https://api.formula1.com/v2/account'
 
 CONST_FIRST_BOOT = False

@@ -643,3 +643,67 @@ msgstr "Selecteer apparaat om te vervangen"
 msgctxt "#330048"
 msgid "Items per page"
 msgstr "Items per pagina"
+
+msgctxt "#330049"
+msgid "Profile"
+msgstr "Profiel"
+
+msgctxt "#330050"
+msgid "Default"
+msgstr "Standaard"
+
+msgctxt "#330051"
+msgid "Install Dut-IPTV Simple IPTV Connector"
+msgstr "Dut-IPTV Simple IPTV Connector installeren"
+
+msgctxt "#330052"
+msgid "Dut-IPTV Simple IPTV Connector is already installed"
+msgstr "Dut-IPTV Simple IPTV Connector is al geinstalleerd"
+
+msgctxt "#330053"
+msgid "Dut-IPTV Simple IPTV Connector was succesfully enabled"
+msgstr "Dut-IPTV Simple IPTV Connector is ingeschakeld"
+
+msgctxt "#330054"
+msgid "Please enable the Dut-IPTV Simple IPTV connector from the Kodi Addons menu"
+msgstr "Activeer de Dut-IPTV Simple IPTV connector vanuit het Kodi Addons menu"
+
+msgctxt "#330055"
+msgid "Please restart Kodi and run this menu item again to enable the Dut-IPTV Simple IPTV connector"
+msgstr "Herstart Kodi en laad dit menu item opnieuw om de Dut-IPTV Simple IPTV connector te activeren"
+
+msgctxt "#330056"
+msgid "Dut-IPTV Simple IPTV Connector was succesfully downloaded. Please restart Kodi and enable the connector from the Kodi Addons menu"
+msgstr "Dut-IPTV Simple IPTV Connector is gedownload. Herstart Kodi en activeer de Dut-IPTV Simple IPTV connector vanuit het Kodi Addons menu"
+
+msgctxt "#330057"
+msgid "Downloading the Dut-IPTV Simple IPTV Connector was not succesfull"
+msgstr "Downloaden van de Dut-IPTV Simple IPTV Connector is mislukt"
+
+msgctxt "#330058"
+msgid "Select profile"
+msgstr "Selecteer profiel"
+
+msgctxt "#330059"
+msgid "Profile changed to: "
+msgstr "Profiel veranderd naar: "
+
+msgctxt "#330060"
+msgid "Profile change failed"
+msgstr "Profiel veranderen mislukt"
+
+msgctxt "#330061"
+msgid "Continue Watching"
+msgstr "Verder Kijken"
+
+msgctxt "#330062"
+msgid "Removed from Continue Watching"
+msgstr "Verwijderd uit Verder Kijken"
+
+msgctxt "#330063"
+msgid "Remove from Continue Watching failed"
+msgstr "Verwijderen uit Verder Kijken mislukt"
+
+msgctxt "#330064"
+msgid "Remove from Continue Watching"
+msgstr "Verwijderen uit Verder Kijken"
