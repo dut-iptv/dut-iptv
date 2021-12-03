@@ -44,6 +44,8 @@ CONST_START_FROM_BEGINNING = False
 
 CONST_USE_PROXY = False
 
+CONST_USE_PROFILES = False
+
 CONST_VOD_CAPABILITY = [
     { 'file': 395, 'label': 'Live', 'start': 0, 'menu': 0, 'online': 1, 'search': 0, 'az': 0 },
     { 'file': 1510, 'label': '2021 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
