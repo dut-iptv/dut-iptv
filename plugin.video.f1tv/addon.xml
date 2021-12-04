@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.f1tv" name="F1 TV" provider-name="Anon" version="1.2.10+matrix.1">
+<addon id="plugin.video.f1tv" name="F1 TV" provider-name="Anon" version="1.2.11+matrix.1">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
-    <import addon="inputstream.adaptive" version="19.0.0"/>
+    <import addon="inputstream.ffmpegdirect" version="19.0.0"/>
     <import addon="script.module.fuzzywuzzy" version="0.17.0+matrix.1"/>
     <import addon="script.module.pycryptodome" version="3.4.3"/>
     <import addon="script.module.pytz" version="2019.3.0"/>

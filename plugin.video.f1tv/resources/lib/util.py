@@ -154,7 +154,7 @@ def plugin_process_playdata(playdata):
     #        license_key = playdata['license'],
     #    )
     #else:
-    item_inputstream = inputstream.HLS()
+    item_inputstream = inputstream.HLSDirect()
 
     return item_inputstream, CDMHEADERS
 

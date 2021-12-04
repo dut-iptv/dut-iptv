@@ -399,9 +399,6 @@ def api_vod_download(type, start=0):
             vodJSON2[row['id']]['entitlement'] = row['entitlement']
             vodJSON2[row['id']]['icon'] = row['image']
             vodJSON2[row['id']]['category'] = row['category']
-            log("TEST2")
-            log(row['title'])
-            log(row['image'])
 
         return vodJSON2
 
@@ -470,9 +467,6 @@ def api_vod_season(series, id):
                         ep_id = row2['playbackUrl']
 
                     season.append({'label': label, 'id': ep_id, 'start': start, 'duration': duration, 'title': label, 'seasonNumber': seasonno, 'episodeNumber': episodeno, 'description': desc, 'image': image})
-                    log("TEST3")
-                    log(label)
-                    log(image)
 
     return season
 
