@@ -14,6 +14,14 @@ class InputstreamItem(object):
     def check(self):
         return False
 
+class HLSFFMPEG(InputstreamItem):
+    addon = 'inputstream.ffmpeg'
+    manifest_type = 'hls'
+    mimetype = 'application/vnd.apple.mpegurl'
+
+    def check(self):
+        return True
+
 class HLSDirect(InputstreamItem):
     addon = 'inputstream.ffmpegdirect'
     manifest_type = 'hls'

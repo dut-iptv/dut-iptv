@@ -266,7 +266,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     if not api_get_session():
         return playdata
 
-    api_clean_after_playback()
+    api_clean_after_playback(stoptime=0)
 
     from_beginning = int(from_beginning)
     pvr = int(pvr)
@@ -673,7 +673,7 @@ def api_watchlist_listing(id):
 
     return data
 
-def api_clean_after_playback():
+def api_clean_after_playback(stoptime):
     profile_settings = load_profile(profile_id=1)
 
     headers = api_get_headers()

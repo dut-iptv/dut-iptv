@@ -140,5 +140,5 @@ def api_get_epg_by_addon(addon):
 
     return True
     
-def api_clean_after_playback():
+def api_clean_after_playback(stoptime):
     pass

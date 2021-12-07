@@ -1,6 +1,7 @@
 import datetime, ipaddress, io, json, pytz, os, re, requests, socket, sys, threading, time, xbmc, xbmcaddon, xbmcvfs, xbmcgui
 import http.server as ProxyServer
 
+from collections import OrderedDict
 from xml.dom.minidom import parseString
 
 dns_cache = {}
@@ -951,7 +952,7 @@ def load_file(file, isJSON=False):
 
     with io.open(file, 'r', encoding='utf-8') as f:
         if isJSON == True:
-            return json.load(f, object_pairs_hook=collections.OrderedDict)
+            return json.load(f, object_pairs_hook=OrderedDict)
         else:
             return f.read()
 

@@ -30,6 +30,12 @@
 
 -Kodi 19 or higher with Widevine Support (free)
 
+### Catchup issue using KPN and the Dut-IPTV Simple IPTV Connector on Android (TV) and ChromeOS devices
+
+-Trying to Replay a TV-program (Catchup) fails when using the Dut-IPTV Simple IPTV Connector and Simple IPTV PVR Client connected to the KPN on Android (TV) and ChromeOS devices. 
+-The exact reason for this is unknown at this time.
+-Live TV does work and Replay TV from the addon also has no issues.
+
 ### Thanks
 
 -Matt Huisman for his development of the kodi addons that where used as a base for this addon

@@ -479,7 +479,7 @@ def api_vod_subscription():
 def api_watchlist_listing():
     return None
 
-def api_clean_after_playback():
+def api_clean_after_playback(stoptime):
     pass
 
 def api_check_page(url):

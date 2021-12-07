@@ -326,12 +326,11 @@ def vod(file, label, start=0, character=None, genre=None, online=0, az=0, menu=0
                 else:
                     label = genre
 
-                if label and len(str(label)) > 0:
-                    folder.add_item(
-                        label = label,
-                        info = {'plot': genre},
-                        path = plugin.url_for(func_or_url=vod, file=file.replace(PROVIDER_NAME, ''), label=label, start=start, genre=genre, online=online, az=0),
-                    )
+                folder.add_item(
+                    label = label,
+                    info = {'plot': genre},
+                    path = plugin.url_for(func_or_url=vod, file=file.replace(PROVIDER_NAME, ''), label=label, start=start, genre=genre, online=online, az=0),
+                )
 
         return folder
     else:
@@ -649,7 +648,7 @@ def install_connector(**kwargs):
             VIDEO_ADDON = xbmcaddon.Addon(id=addon)
             gui.ok(message=_.DUT_IPTV_ALREADY_INSTALLED)
         except:
-            xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + addon + '","enabled":false}}}}')
+            xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + addon + '","enabled":true}}}}')
 
             try:
                 VIDEO_ADDON = xbmcaddon.Addon(id=addon)
@@ -996,10 +995,10 @@ def watchlist(continuewatch=0, **kwargs):
                 currow = processed[ref]
 
                 progress = {}
-
+                
                 if int(currow['progress']) > 0 and int(currow['duration']) > 0:
                     progress['TotalTime'] = str(currow['duration'])
-                    progress['ResumeTime'] = str(int((int(currow['progress']) // 100) * (int(currow['duration']))))
+                    progress['ResumeTime'] = str(int((int(currow['progress']) / 100) * (int(currow['duration']))))
 
                 items.append(plugin.Item(
                     label = currow['label1'],

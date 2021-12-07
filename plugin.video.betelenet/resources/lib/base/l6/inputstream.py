@@ -9,10 +9,29 @@ class InputstreamItem(object):
     mimetype = ''
     manifest_update_parameter = ''
     license_flags = ''
+    addon = ''
+    
     def check(self):
         return False
 
+class HLSFFMPEG(InputstreamItem):
+    addon = 'inputstream.ffmpeg'
+    manifest_type = 'hls'
+    mimetype = 'application/vnd.apple.mpegurl'
+
+    def check(self):
+        return True
+
+class HLSDirect(InputstreamItem):
+    addon = 'inputstream.ffmpegdirect'
+    manifest_type = 'hls'
+    mimetype = 'application/vnd.apple.mpegurl'
+
+    def check(self):
+        return True
+
 class HLS(InputstreamItem):
+    addon = 'inputstream.adaptive'
     manifest_type = 'hls'
     mimetype = 'application/vnd.apple.mpegurl'
 
@@ -20,6 +39,7 @@ class HLS(InputstreamItem):
         return True
 
 class MPD(InputstreamItem):
+    addon = 'inputstream.adaptive'
     manifest_type = 'mpd'
     mimetype = 'application/dash+xml'
 
@@ -30,6 +50,7 @@ class MPD(InputstreamItem):
         return True
 
 class Playready(InputstreamItem):
+    addon = 'inputstream.adaptive'
     manifest_type = 'ism'
     license_type = 'com.microsoft.playready'
     mimetype = 'application/vnd.ms-sstr+xml'
@@ -38,6 +59,7 @@ class Playready(InputstreamItem):
         return True
 
 class Widevine(InputstreamItem):
+    addon = 'inputstream.adaptive'
     manifest_type = 'mpd'
     license_type = 'com.widevine.alpha'
     mimetype = 'application/dash+xml'

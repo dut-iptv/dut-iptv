@@ -476,11 +476,6 @@ def api_get_vod_by_type(type, character, genre, subscription_filter, menu=0):
 
         id = row['id']
         
-        log(row)
-        
-        if genre:
-            log(genre)
-
         if genre and genre.startswith('C') and genre[1:].isnumeric():
             if not row['vidcollection'] or not genre in row['vidcollection']:
                 continue

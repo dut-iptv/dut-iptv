@@ -213,6 +213,8 @@ class Item(gui.Item):
                 player.play(self.path, li)
         else:
             player.play(self.path, li)
+            
+        currentTime = 0
 
         while player.is_active:
             if xbmc.getCondVisibility("Player.HasMedia") and player.is_started:
@@ -286,9 +288,14 @@ class Item(gui.Item):
                                     wait = calc_wait
 
             xbmc.Monitor().waitForAbort(1)
+            
+            try:
+                currentTime = player.getTime()
+            except:
+                pass
 
         if playbackStarted == True:
-            api_clean_after_playback()
+            api_clean_after_playback(int(currentTime))
 
         if ADDON_ID == 'plugin.video.betelenet':
             if not device_id:
@@ -303,14 +310,13 @@ class MyPlayer(xbmc.Player):
 
     def onPlayBackPaused(self):
         pass
-
+ 
     def onPlayBackResumed(self):
         pass
-
+ 
     def onPlayBackStarted(self):
         self.is_started = True
-        pass
-
+                 
     def onPlayBackEnded(self):
         self.is_active = False
 

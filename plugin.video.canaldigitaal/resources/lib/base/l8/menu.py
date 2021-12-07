@@ -1,5 +1,5 @@
 import _strptime
-import datetime, json, os, pytz, re, string, sys, time, xbmc, xbmcplugin
+import datetime, json, os, pytz, re, string, sys, time, xbmc, xbmcaddon, xbmcplugin
 
 from fuzzywuzzy import fuzz
 from resources.lib.api import api_add_to_watchlist, api_get_profiles, api_set_profile, api_list_watchlist, api_login, api_play_url, api_remove_from_watchlist, api_search, api_vod_download, api_vod_season, api_vod_seasons, api_watchlist_listing
@@ -641,14 +641,14 @@ def settings_menu(**kwargs):
 
 @plugin.route()
 def install_connector(**kwargs):
-    addon = 'plugin.executable.dutiptv'
-
+    addon = 'plugin.executable.dutiptv'   
+    
     if xbmc.getCondVisibility('System.HasAddon({addon})'.format(addon=addon)) == 1:
         try:
             VIDEO_ADDON = xbmcaddon.Addon(id=addon)
             gui.ok(message=_.DUT_IPTV_ALREADY_INSTALLED)
         except:
-            xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + addon + '","enabled":false}}}}')
+            xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + addon + '","enabled":true}}}}')
 
             try:
                 VIDEO_ADDON = xbmcaddon.Addon(id=addon)
@@ -656,8 +656,11 @@ def install_connector(**kwargs):
             except:
                 gui.ok(message=_.DUT_IPTV_ENABLE_FROM_ADDONS)
     else:
+        xbmc.executebuiltin('InstallAddon({})'.format(addon), True)
+        return
+    
         if os.path.isdir(ADDONS_PATH + 'plugin.executable.dutiptv'):
-            gui.ok(message=_.DUT_IPTV_RESTART_KODI)
+            gui.ok(message=_.DUT_IPTV_RESTART_KODI)                       
         elif api_get_connector() == True:
             gui.ok(message=_.DUT_IPTV_INSTALLED)
         else:
@@ -995,10 +998,10 @@ def watchlist(continuewatch=0, **kwargs):
                 currow = processed[ref]
 
                 progress = {}
-
+                
                 if int(currow['progress']) > 0 and int(currow['duration']) > 0:
                     progress['TotalTime'] = str(currow['duration'])
-                    progress['ResumeTime'] = str(int((int(currow['progress']) // 100) * (int(currow['duration']))))
+                    progress['ResumeTime'] = str(int((int(currow['progress']) / 100) * (int(currow['duration']))))
 
                 items.append(plugin.Item(
                     label = currow['label1'],

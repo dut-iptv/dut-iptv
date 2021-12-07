@@ -265,12 +265,12 @@ class Item(object):
 
                 if self.inputstream.license_type:
                     li.setProperty('inputstream.adaptive.license_type', self.inputstream.license_type)
-            
+
                 if self.inputstream.server_certificate:
                     li.setProperty('inputstream.adaptive.server_certificate', self.inputstream.server_certificate)
-            
+
                 streamheaders = self.get_url_headers(only_user_agent=True)
-                
+
                 if self.inputstream.license_flags:
                     li.setProperty('inputstream.adaptive.license_flags', self.inputstream.license_flags)
 
@@ -287,13 +287,17 @@ class Item(object):
                     ))
                 elif headers:
                     li.setProperty('inputstream.adaptive.license_key', '|{0}'.format(headers))
+            elif self.inputstream.addon == 'inputstream.ffmpeg':
+                li.setProperty('inputstream', 'inputstream.ffmpeg')
             elif self.inputstream.addon == 'inputstream.ffmpegdirect':
                 li.setProperty('inputstream', 'inputstream.ffmpegdirect')
-                li.setProperty('inputstream.ffmpegdirect.manifest_type', self.inputstream.manifest_type)                
-            
+                li.setProperty('inputstream.ffmpegdirect.manifest_type', self.inputstream.manifest_type)
+                li.setProperty('inputstream.ffmpegdirect.is_realtime_stream', 'true')
+                li.setProperty('inputstream.ffmpegdirect.stream_mode', 'timeshift')
+
             if self.inputstream.mimetype and not mimetype:
                 mimetype = self.inputstream.mimetype
-            
+
         if self.path and self.path.lower().startswith('http'):
             if not mimetype:
                 parse = urlparse(self.path.lower())

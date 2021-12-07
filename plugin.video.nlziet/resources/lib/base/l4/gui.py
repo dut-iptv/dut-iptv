@@ -255,41 +255,49 @@ class Item(object):
         mimetype = self.mimetype
 
         if self.inputstream and self.inputstream.check():
-            li.setProperty('inputstream', 'inputstream.adaptive')
+            if self.inputstream.addon == 'inputstream.adaptive':
+                li.setProperty('inputstream', 'inputstream.adaptive')
 
-            li.setProperty('inputstream.adaptive.manifest_type', self.inputstream.manifest_type)
+                li.setProperty('inputstream.adaptive.manifest_type', self.inputstream.manifest_type)
 
-            if self.inputstream.manifest_update_parameter:
-                li.setProperty('inputstream.adaptive.manifest_update_parameter', str(self.inputstream.manifest_update_parameter))
+                if self.inputstream.manifest_update_parameter:
+                    li.setProperty('inputstream.adaptive.manifest_update_parameter', str(self.inputstream.manifest_update_parameter))
 
-            if self.inputstream.license_type:
-                li.setProperty('inputstream.adaptive.license_type', self.inputstream.license_type)
-        
-            if self.inputstream.server_certificate:
-                li.setProperty('inputstream.adaptive.server_certificate', self.inputstream.server_certificate)
-        
-            streamheaders = self.get_url_headers(only_user_agent=True)
-            
-            if self.inputstream.license_flags:
-                li.setProperty('inputstream.adaptive.license_flags', self.inputstream.license_flags)
+                if self.inputstream.license_type:
+                    li.setProperty('inputstream.adaptive.license_type', self.inputstream.license_type)
 
-            if streamheaders:
-                li.setProperty('inputstream.adaptive.stream_headers', streamheaders)
+                if self.inputstream.server_certificate:
+                    li.setProperty('inputstream.adaptive.server_certificate', self.inputstream.server_certificate)
 
-            if self.inputstream.license_key:
-                li.setProperty('inputstream.adaptive.license_key', '{url}|Content-Type={content_type}&{headers}|{challenge}|{response}'.format(
-                    url = self.inputstream.license_key,
-                    headers = headers,
-                    content_type = self.inputstream.content_type,
-                    challenge = self.inputstream.challenge,
-                    response = self.inputstream.response,
-                ))
-            elif headers:
-                li.setProperty('inputstream.adaptive.license_key', '|{0}'.format(headers))
+                streamheaders = self.get_url_headers(only_user_agent=True)
+
+                if self.inputstream.license_flags:
+                    li.setProperty('inputstream.adaptive.license_flags', self.inputstream.license_flags)
+
+                if streamheaders:
+                    li.setProperty('inputstream.adaptive.stream_headers', streamheaders)
+
+                if self.inputstream.license_key:
+                    li.setProperty('inputstream.adaptive.license_key', '{url}|Content-Type={content_type}&{headers}|{challenge}|{response}'.format(
+                        url = self.inputstream.license_key,
+                        headers = headers,
+                        content_type = self.inputstream.content_type,
+                        challenge = self.inputstream.challenge,
+                        response = self.inputstream.response,
+                    ))
+                elif headers:
+                    li.setProperty('inputstream.adaptive.license_key', '|{0}'.format(headers))
+            elif self.inputstream.addon == 'inputstream.ffmpeg':
+                li.setProperty('inputstream', 'inputstream.ffmpeg')
+            elif self.inputstream.addon == 'inputstream.ffmpegdirect':
+                li.setProperty('inputstream', 'inputstream.ffmpegdirect')
+                li.setProperty('inputstream.ffmpegdirect.manifest_type', self.inputstream.manifest_type)
+                li.setProperty('inputstream.ffmpegdirect.is_realtime_stream', 'true')
+                li.setProperty('inputstream.ffmpegdirect.stream_mode', 'timeshift')
 
             if self.inputstream.mimetype and not mimetype:
                 mimetype = self.inputstream.mimetype
-            
+
         if self.path and self.path.lower().startswith('http'):
             if not mimetype:
                 parse = urlparse(self.path.lower())

@@ -131,8 +131,6 @@ def api_set_profile(id=''):
     download = api_download(url=switch_url, type='post', headers=headers, data=session_post_data, json_data=False, return_json=False)
     code = download['code']
 
-    log(download)
-
     if not code or not code == 204:
         return False
 
@@ -513,15 +511,22 @@ def api_vod_subscription():
 def api_watchlist_listing():
     return None
 
-def api_clean_after_playback():
+def api_clean_after_playback(stoptime):
     profile_settings = load_profile(profile_id=1)
 
     if len(str(profile_settings['ticket_id'])) > 0:
+        offset = "00:00:00"
+        
+        if stoptime > 0:
+            m, s = divmod(stoptime, 60)
+            h, m = divmod(m, 60)
+            offset = '{:02d}:{:02d}:{:02d}'.format(h, m, s)
+            
         session_post_data = {
             'action': "stop",
             'buffer_state': 0,
             'buffer_total': 1,
-            'offset': "00:00:00",
+            'offset': offset,
             'token': profile_settings['token']
         }
 
@@ -529,12 +534,12 @@ def api_clean_after_playback():
             'videoland-platform': 'videoland',
         }
 
-        stop_url = '{base_url}/api/v3/heartbeat/{ticket_id}?action=stop&offset=00:00:00'.format(base_url=CONST_BASE_URL, ticket_id=profile_settings['ticket_id'])
+        stop_url = '{base_url}/api/v3/heartbeat/{ticket_id}?action=stop&offset={offset}'.format(base_url=CONST_BASE_URL, ticket_id=profile_settings['ticket_id'], offset=offset)
 
         download = api_download(url=stop_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
 
         session_post_data['action'] = 'exit'
 
-        exit_url = '{base_url}/api/v3/heartbeat/{ticket_id}?action=exit&offset=00:00:00'.format(base_url=CONST_BASE_URL, ticket_id=profile_settings['ticket_id'])
+        exit_url = '{base_url}/api/v3/heartbeat/{ticket_id}?action=exit&offset={offset}'.format(base_url=CONST_BASE_URL, ticket_id=profile_settings['ticket_id'], offset=offset)
 
         download = api_download(url=exit_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)

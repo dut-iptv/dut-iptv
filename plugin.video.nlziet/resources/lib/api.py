@@ -736,7 +736,7 @@ def api_vod_seasons(type, id):
 def api_watchlist_listing():
     return None
 
-def api_clean_after_playback():
+def api_clean_after_playback(stoptime):
     pass
     
 def convert_to_seconds(s):

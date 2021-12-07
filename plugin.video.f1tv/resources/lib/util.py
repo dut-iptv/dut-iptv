@@ -119,6 +119,9 @@ def plugin_process_info(playdata):
                 if check_key(row['metadata'], 'duration'):
                     info['duration'] = row['metadata']['duration']
 
+                if check_key(row['metadata'], 'objectSubtype'):
+                    info['type'] = row['metadata']['objectSubtype']
+
                 epcode = ''
 
                 if check_key(row['metadata'], 'season'):
@@ -154,7 +157,16 @@ def plugin_process_playdata(playdata):
     #        license_key = playdata['license'],
     #    )
     #else:
-    item_inputstream = inputstream.HLSDirect()
+
+    try:
+        info = plugin_process_info(playdata)
+
+        if info['type'] == 'LIVE':
+            item_inputstream = inputstream.HLSFFMPEG()
+        else:
+            item_inputstream = inputstream.HLSFFMPEG()
+    except:
+        item_inputstream = inputstream.HLSFFMPEG()
 
     return item_inputstream, CDMHEADERS
 
