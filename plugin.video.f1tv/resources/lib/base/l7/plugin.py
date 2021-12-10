@@ -1,4 +1,4 @@
-import os, shutil, sys, time, xbmc, xbmcaddon, xbmcplugin
+import json, os, shutil, sys, time, xbmc, xbmcaddon, xbmcplugin
 
 from functools import wraps
 from resources.lib.api import api_clean_after_playback, api_get_info
@@ -88,6 +88,26 @@ def _settings(**kwargs):
     settings.open()
     gui.refresh()
 
+@route('_set_network_bandwidth')
+def _set_network_bandwidth(**kwargs):
+    cursetting = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"settings.GetSettingValue","params":{"setting":"network.bandwidth"},"id":1}'))
+
+    if not cursetting['result']['value'] == int(settings.getInt(key='max_bandwidth')):
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"settings.SetSettingValue","params":{"setting":"network.bandwidth","value":' + str(int(settings.getInt(key='max_bandwidth'))) + '}, "id":1}')
+        write_file('bandwidth', data=cursetting['result']['value'], isJSON=False)
+
+@route('_restore_network_bandwidth')
+def _restore_network_bandwidth(**kwargs):
+    bandwidth = load_file('bandwidth', isJSON=False)
+
+    if bandwidth:
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"settings.SetSettingValue","params":{"setting":"network.bandwidth","value":' + str(int(bandwidth)) + '}, "id":1}')
+
+    try:
+        os.remove(ADDON_PROFILE + 'bandwidth')
+    except:
+        pass
+
 @route('_set_settings_kodi')
 def _set_settings_kodi(**kwargs):
     _close()
@@ -122,29 +142,35 @@ def _reset(**kwargs):
     _close()
 
     try:
-        xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + ADDON_ID + '","enabled":false}}}}')
+        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + ADDON_ID + '","enabled":false}}}')
 
-        shutil.rmtree(ADDON_PROFILE)
+        shutil.rmtree(ADDON_PROFILE + "cache")
+        shutil.rmtree(ADDON_PROFILE + "tmp")
+        
+        for file in glob.glob(ADDON_PROFILE + "stream*"):
+            os.remove(file)
+            
+        for file in glob.glob(ADDON_PROFILE + "*.json"):
+            os.remove(file)
+            
+        for file in glob.glob(ADDON_PROFILE + "*.xml"):
+            os.remove(file)
 
-        directory = os.path.dirname(ADDON_PROFILE + os.sep + "tmp/empty.json")
+        if not os.path.isdir(ADDON_PROFILE + "cache"):
+            os.makedirs(ADDON_PROFILE + "cache")
 
-        try:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-        except:
-            pass
+        if not os.path.isdir(ADDON_PROFILE + "tmp"):
+            os.makedirs(ADDON_PROFILE + "tmp")
+            
+        if not os.path.isdir(ADDON_PROFILE + "movies"):
+            os.makedirs(ADDON_PROFILE + "movies")
 
-        directory = os.path.dirname(ADDON_PROFILE + os.sep + "cache/empty.json")
-
-        try:
-            if not os.path.exists(directory):
-                os.makedirs(directory)
-        except:
-            pass
+        if not os.path.isdir(ADDON_PROFILE + "shows"):
+            os.makedirs(ADDON_PROFILE + "shows")
     except:
         pass
 
-    xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + ADDON_ID + '","enabled":true}}}}')
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + ADDON_ID + '","enabled":true}}}')
 
     gui.notification(_.PLUGIN_RESET_OK)
     signals.emit(signals.AFTER_RESET)
@@ -178,6 +204,11 @@ class Item(gui.Item):
             device_id = load_file('device_id', isJSON=False)
 
             if not device_id:
+                cursetting = {}
+                cursetting['debug.extralogging'] = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"settings.GetSettingValue","params":{"setting":"debug.extralogging"},"id":1}'))['result']['value']
+                cursetting['debug.showloginfo'] = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"settings.GetSettingValue","params":{"setting":"debug.showloginfo"},"id":1}'))['result']['value']
+                cursetting['debug.setextraloglevel'] = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","method":"settings.GetSettingValue","params":{"setting":"debug.setextraloglevel"},"id":1}'))['result']['value']
+            
                 xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"debug.extralogging", "value":true}, "id":1}')
                 xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"debug.showloginfo", "value":true}, "id":1}')
                 xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"Settings.SetSettingValue", "params":{"setting":"debug.setextraloglevel", "value":[64]}, "id":1}')
@@ -213,7 +244,7 @@ class Item(gui.Item):
                 player.play(self.path, li)
         else:
             player.play(self.path, li)
-            
+
         currentTime = 0
 
         while player.is_active:
@@ -288,7 +319,7 @@ class Item(gui.Item):
                                     wait = calc_wait
 
             xbmc.Monitor().waitForAbort(1)
-            
+
             try:
                 currentTime = player.getTime()
             except:
@@ -297,11 +328,17 @@ class Item(gui.Item):
         if playbackStarted == True:
             api_clean_after_playback(int(currentTime))
 
+            try:
+                if settings.getInt(key='max_bandwidth') > 0:
+                    _restore_network_bandwidth()
+            except:
+                pass
+
         if ADDON_ID == 'plugin.video.betelenet':
             if not device_id:
-                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"debug.showloginfo", "value":false}, "id":1}')
-                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"Settings.SetSettingValue", "params":{"setting":"debug.setextraloglevel", "value":[]}, "id":1}')
-                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"debug.extralogging", "value":false}, "id":1}')
+                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"debug.showloginfo", "value":' + cursetting['debug.showloginfo'] + '}, "id":1}')
+                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"Settings.SetSettingValue", "params":{"setting":"debug.setextraloglevel", "value":[' + str(', '.join([str(elem) for elem in cursetting['debug.setextraloglevel']])) + ']}, "id":1}')
+                xbmc.executeJSONRPC('{"jsonrpc":"2.0", "method":"settings.SetSettingValue", "params":{"setting":"debug.extralogging", "value":' + cursetting['debug.setextraloglevel'] + '}, "id":1}')
 
 class MyPlayer(xbmc.Player):
     def __init__(self):
@@ -310,13 +347,13 @@ class MyPlayer(xbmc.Player):
 
     def onPlayBackPaused(self):
         pass
- 
+
     def onPlayBackResumed(self):
         pass
- 
+
     def onPlayBackStarted(self):
         self.is_started = True
-                 
+
     def onPlayBackEnded(self):
         self.is_active = False
 
@@ -334,7 +371,7 @@ class Folder(object):
         self.content = content
         self.updateListing = updateListing
         self.cacheToDisc = cacheToDisc
-        self.sort_methods = sort_methods or [xbmcplugin.SORT_METHOD_UNSORTED, xbmcplugin.SORT_METHOD_LABEL]
+        self.sort_methods = sort_methods or [xbmcplugin.SORT_METHOD_UNSORTED]
         self.thumb = thumb or ADDON_ICON
         self.fanart = fanart or ADDON_FANART
         self.no_items_label = no_items_label

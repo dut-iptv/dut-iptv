@@ -707,3 +707,35 @@ msgstr "Verwijderen uit Verder Kijken mislukt"
 msgctxt "#330064"
 msgid "Remove from Continue Watching"
 msgstr "Verwijderen uit Verder Kijken"
+
+msgctxt "#330065"
+msgid "Select automatically"
+msgstr "Automatisch selecteren"
+
+msgctxt "#330066"
+msgid "512 KBit/s"
+msgstr "512 KBit/s"
+
+msgctxt "#330067"
+msgid "1 MBit/s"
+msgstr "1 MBit/s"
+
+msgctxt "#330068"
+msgid "2 MBit/s"
+msgstr "2 MBit/s"
+
+msgctxt "#330069"
+msgid "4 MBit/s"
+msgstr "4 MBit/s"
+
+msgctxt "#330070"
+msgid "6 MBit/s"
+msgstr "6 MBit/s"
+
+msgctxt "#330071"
+msgid "8 MBit/s"
+msgstr "8 MBit/s"
+
+msgctxt "#330072"
+msgid "Maximum bandwidth"
+msgstr "Maximale bandbreedte"

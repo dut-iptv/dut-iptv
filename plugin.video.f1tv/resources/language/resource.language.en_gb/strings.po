@@ -697,3 +697,35 @@ msgstr ""
 msgctxt "#330064"
 msgid "Remove from Continue Watching"
 msgstr ""
+
+msgctxt "#330065"
+msgid "Select automatically"
+msgstr ""
+
+msgctxt "#330066"
+msgid "512 KBit/s"
+msgstr ""
+
+msgctxt "#330067"
+msgid "1 MBit/s"
+msgstr ""
+
+msgctxt "#330068"
+msgid "2 MBit/s"
+msgstr ""
+
+msgctxt "#330069"
+msgid "4 MBit/s"
+msgstr ""
+
+msgctxt "#330070"
+msgid "6 MBit/s"
+msgstr ""
+
+msgctxt "#330071"
+msgid "8 MBit/s"
+msgstr ""
+
+msgctxt "#330072"
+msgid "Maximum bandwidth"
+msgstr ""

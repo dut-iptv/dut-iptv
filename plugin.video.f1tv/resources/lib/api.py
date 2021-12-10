@@ -206,6 +206,38 @@ def api_vod_download(type, start=0):
             vodJSON['menu'] = {}
 
             for row in data['resultObj']['containers']:
+                if row['layout'] == 'hero':
+                    for row2 in row['retrieveItems']['resultObj']['containers']:
+                        if row2['layout'] == 'CONTENT_ITEM':
+                            if row2['metadata']['title'] in vodJSONtitles:
+                                continue
+
+                            if len(row2['metadata']['title']) < 1 and len(str(row2['metadata']['season'])) < 1:
+                                continue
+
+                            if check_key(row2, 'retrieveItems') and '2.0' in row2['retrieveItems']['uriOriginal'] and api_check_page(row2['retrieveItems']['uriOriginal']) == False:
+                                vodJSON['menu'][row2['id']] = {}
+                                vodJSON['menu'][row2['id']]['url'] = row2['retrieveItems']['uriOriginal']
+                            elif check_key(row2, 'actions') and '2.0' in row2['actions'][0]['uri'] and api_check_page(row2['actions'][0]['uri']) == False:
+                                vodJSON['menu'][row2['id']] = {}
+                                vodJSON['menu'][row2['id']]['url'] = row2['actions'][0]['uri']
+                            else:
+                                continue
+
+                            if check_key(row2['metadata'], 'title') and len(str(row2['metadata']['title'])) > 0:
+                                vodJSON['menu'][row2['id']]['label'] = row2['metadata']['title']
+
+                            vodJSONtitles.append(vodJSON['menu'][row2['id']]['label'])
+
+                            if 'CONTENT/VIDEO/' in vodJSON['menu'][row2['id']]['url']:
+                                vodJSON['menu'][row2['id']]['type'] = 'video'
+                            else:
+                                vodJSON['menu'][row2['id']]['type'] = 'content'
+
+                            if check_key(row2['metadata'], 'pictureUrl') and len(row2['metadata']['pictureUrl']) > 0:
+                                vodJSON['menu'][row2['id']]['image'] = "{image_url}/{image}?w=1920&h=1080&q=HI&o=L".format(image_url=CONST_IMAGE_URL, image=row2['metadata']['pictureUrl'])
+                            else:
+                                vodJSON['menu'][row2['id']]['image'] = ""
                 if row['layout'] == 'horizontal_thumbnail':
                     if (type == '493' and ('EXTCOLLECTION' in row['retrieveItems']['uriOriginal'] or 'EXTCOLLECTION' in row['actions'][0]['uri'])) or type == '3946':
                         for row2 in row['retrieveItems']['resultObj']['containers']:

@@ -648,7 +648,7 @@ def install_connector(**kwargs):
             VIDEO_ADDON = xbmcaddon.Addon(id=addon)
             gui.ok(message=_.DUT_IPTV_ALREADY_INSTALLED)
         except:
-            xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + addon + '","enabled":true}}}}')
+            xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + addon + '","enabled":true}}}')
 
             try:
                 VIDEO_ADDON = xbmcaddon.Addon(id=addon)
@@ -689,8 +689,7 @@ def channel_picker_menu(**kwargs):
 def disable_prefs_menu(type, **kwargs):
     disable_prefs(type=type, channels=api_get_channels())
 
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + ADDON_ID + '/?_=channel_picker_menu"]}}')
-
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + ADDON_ID + '/?_=channel_picker_menu"]}}')    
 @plugin.route()
 def channel_picker(type, **kwargs):
     if type=='live':
@@ -772,7 +771,7 @@ def change_channel(type, id, change, **kwargs):
     prefs[id] = mod_pref
     save_prefs(profile_id=1, prefs=prefs)
 
-    xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{{"window":"videos","parameters":["plugin://' + ADDON_ID + '/?_=channel_picker&type=' + type + '"]}}}}')
+    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{{"window":"videos","parameters":["plugin://' + ADDON_ID + '/?_=channel_picker&type=' + type + '"]}}}')
 
 @plugin.route()
 def reset_addon(**kwargs):
@@ -944,6 +943,12 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
         properties = playdata['properties'],
         inputstream = item_inputstream,
     )
+    
+    try:
+        if settings.getInt(key='max_bandwidth') > 0:
+            plugin._set_network_bandwidth()
+    except:
+        pass
 
     return listitem
 
