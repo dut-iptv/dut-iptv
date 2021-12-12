@@ -1,6 +1,6 @@
 import base64, json, os, random, re, string, time, xbmc
 
-from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE
+from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, CONST_DUT_EPG, SESSION_CHUNKSIZE
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
@@ -8,11 +8,11 @@ from resources.lib.base.l3.util import check_key, get_credentials, is_file_older
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download, api_get_channels
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_BASE_URL, CONST_GIGYA_URL
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_BASE_URL, CONST_IMAGES, CONST_GIGYA_URL
 from resources.lib.util import plugin_process_info
 from urllib.parse import parse_qs, urlparse, quote_plus
 
-def api_add_to_watchlist(id, type):   
+def api_add_to_watchlist(id, type):
     if not api_get_session():
         return None
 
@@ -87,6 +87,52 @@ def api_get_profiles():
 
     return return_profiles
 
+def api_get_series_nfo():
+    type = 'seriesnfo'
+    encodedBytes = base64.b32encode(type.encode("utf-8"))
+    type = str(encodedBytes, "utf-8")
+
+    vod_url = '{dut_epg_url}/{type}.zip'.format(dut_epg_url=CONST_DUT_EPG, type=type)
+    file = "cache" + os.sep + "{type}.json".format(type=type)
+    tmp = ADDON_PROFILE + 'tmp' + os.sep + "{type}.zip".format(type=type)
+
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+        data = load_file(file=file, isJSON=True)
+    else:
+        resp = Session().get(vod_url, stream=True)
+
+        if resp.status_code != 200:
+            resp.close()
+            return None
+
+        with open(tmp, 'wb') as f:
+            for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
+                f.write(chunk)
+
+        resp.close()
+
+        if os.path.isfile(tmp):
+            from zipfile import ZipFile
+
+            try:
+                with ZipFile(tmp, 'r') as zipObj:
+                    zipObj.extractall(ADDON_PROFILE + "cache" + os.sep)
+            except:
+                try:
+                    fixBadZipfile(tmp)
+
+                    with ZipFile(tmp, 'r') as zipObj:
+                        zipObj.extractall(ADDON_PROFILE + "cache" + os.sep)
+
+                except:
+                    try:
+                        from resources.lib.base.l1.zipfile import ZipFile as ZipFile2
+
+                        with ZipFile2(tmp, 'r') as zipObj:
+                            zipObj.extractall(ADDON_PROFILE + "cache" + os.sep)
+                    except:
+                        return None
+
 def api_set_profile(id=''):
     profile_settings = load_profile(profile_id=1)
     profiles = api_get_session(force=0, return_data=True)
@@ -143,7 +189,7 @@ def api_set_profile(id=''):
 
 def api_list_watchlist(continuewatch=0):
     continuewatch = int(continuewatch)
-    
+
     if not api_get_session():
         return None
 
@@ -371,14 +417,14 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
 def api_remove_from_watchlist(id, continuewatch=0):
     continuewatch = int(continuewatch)
-    
+
     if not api_get_session():
         return None
 
     headers = {
         'videoland-platform': 'videoland',
     }
-    
+
     if continuewatch == 1:
         remove_url = '{base_url}/api/v3/progress/{id}'.format(base_url=CONST_BASE_URL, id=id)
     else:
@@ -398,7 +444,7 @@ def api_search():
 def api_vod_download():
     return None
 
-def api_vod_season(series, id):
+def api_vod_season(series, id, raw=False, use_cache=True):
     if not api_get_session():
         return None
 
@@ -413,9 +459,11 @@ def api_vod_season(series, id):
     id_ar = id.split('###')
     series = id_ar[0]
     seasonstr = id_ar[1]
+    cache = 0
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5) and use_cache == True:
         data = load_file(file=file, isJSON=True)
+        cache = 1
     else:
         headers = {
             'videoland-platform': 'videoland',
@@ -429,6 +477,9 @@ def api_vod_season(series, id):
 
         if code and code == 200 and data and check_key(data, 'title'):
             write_file(file=file, data=data, isJSON=True)
+            
+    if raw == True:
+        return {'data': data, 'cache': cache}
 
     if not data or not check_key(data, 'details'):
         return None
@@ -449,7 +500,10 @@ def api_vod_season(series, id):
                 duration = row['runtime']
 
             if check_key(row, 'still'):
-                image = row['still'].replace('[format]', '1920x1080')
+                if settings.getBool('use_small_images', default=False) == True:
+                    image = row['still'].replace(CONST_IMAGES['still']['replace'], CONST_IMAGES['still']['small'])
+                else:
+                    image = row['still'].replace(CONST_IMAGES['still']['replace'], CONST_IMAGES['still']['large'])
 
             if check_key(row, 'title') and len(str(row['title'])) > 0:
                 name = row['title']
@@ -462,7 +516,7 @@ def api_vod_season(series, id):
 
     return season
 
-def api_vod_seasons(type, id):
+def api_vod_seasons(type, id, raw=False, github=False, use_cache=True):
     if not api_get_session():
         return None
 
@@ -477,22 +531,43 @@ def api_vod_seasons(type, id):
 
     ref = id
     id = id[1:]
+    cache = 0
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5) and use_cache == True:
         data = load_file(file=file, isJSON=True)
+        cache = 1
     else:
-        headers = {
-            'videoland-platform': 'videoland',
-        }
+        found = False
+    
+        if github == True and use_cache == False:
+            encodedBytes = base64.b32encode(ref.encode("utf-8"))
+            encoded_ref = str(encodedBytes, "utf-8")
 
-        seasons_url = '{base_url}/api/v3/series/{series}'.format(base_url=CONST_BASE_URL, series=id)
+            seasons_url = '{dut_epg_url}/{type}.json'.format(dut_epg_url=CONST_DUT_EPG, type=encoded_ref)
+            download = api_download(url=seasons_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+            data = download['data']
+            code = download['code']
 
-        download = api_download(url=seasons_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
-        data = download['data']
-        code = download['code']
+            if code and code == 200 and data and check_key(data, 'title'):
+                write_file(file=file, data=data, isJSON=True)
+                found = True
+    
+        if found == False:
+            headers = {
+                'videoland-platform': 'videoland',
+            }
 
-        if code and code == 200 and data and check_key(data, 'title'):
-            write_file(file=file, data=data, isJSON=True)
+            seasons_url = '{base_url}/api/v3/series/{series}'.format(base_url=CONST_BASE_URL, series=id)
+
+            download = api_download(url=seasons_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+            data = download['data']
+            code = download['code']
+
+            if code and code == 200 and data and check_key(data, 'title'):
+                write_file(file=file, data=data, isJSON=True)
+
+    if raw == True:
+        return {'data': data, 'cache': cache}
 
     if not data or not check_key(data, 'details'):
         return None
@@ -501,7 +576,12 @@ def api_vod_seasons(type, id):
         row = data['details'][currow]
 
         if check_key(row, 'type') and row['type'] == 'season':
-            seasons.append({'id': str(id) + '###' + str(row['id']), 'seriesNumber': row['title'], 'description': data['description'], 'image': data['poster'].replace('[format]', '960x1433'), 'watchlist': ref})
+            if settings.getBool('use_small_images', default=False) == True:
+                image = data['poster'].replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['small'])
+            else:
+                image = data['poster'].replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])
+        
+            seasons.append({'id': str(id) + '###' + str(row['id']), 'seriesNumber': row['title'], 'description': data['description'], 'image': image, 'watchlist': ref})
 
     return {'type': 'seasons', 'seasons': seasons}
 
@@ -516,12 +596,12 @@ def api_clean_after_playback(stoptime):
 
     if len(str(profile_settings['ticket_id'])) > 0:
         offset = "00:00:00"
-        
+
         if stoptime > 0:
             m, s = divmod(stoptime, 60)
             h, m = divmod(m, 60)
             offset = '{:02d}:{:02d}:{:02d}'.format(h, m, s)
-            
+
         session_post_data = {
             'action': "stop",
             'buffer_state': 0,

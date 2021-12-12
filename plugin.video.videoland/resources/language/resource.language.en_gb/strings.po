@@ -713,3 +713,79 @@ msgstr ""
 msgctxt "#330064"
 msgid "Remove from Continue Watching"
 msgstr ""
+
+msgctxt "#330065"
+msgid "Select automatically"
+msgstr ""
+
+msgctxt "#330066"
+msgid "512 KBit/s"
+msgstr ""
+
+msgctxt "#330067"
+msgid "1 MBit/s"
+msgstr ""
+
+msgctxt "#330068"
+msgid "2 MBit/s"
+msgstr ""
+
+msgctxt "#330069"
+msgid "4 MBit/s"
+msgstr ""
+
+msgctxt "#330070"
+msgid "6 MBit/s"
+msgstr ""
+
+msgctxt "#330071"
+msgid "8 MBit/s"
+msgstr ""
+
+msgctxt "#330072"
+msgid "Maximum bandwidth"
+msgstr ""
+
+msgctxt "#330073"
+msgid "Library"
+msgstr ""
+
+msgctxt "#330074"
+msgid "Enable library integration for movies"
+msgstr ""
+
+msgctxt "#330075"
+msgid "Enable library integration for shows"
+msgstr ""
+
+msgctxt "#330076"
+msgid "Maximum amount of shows to update per hour"
+msgstr ""
+
+msgctxt "#330077"
+msgid "Disable integration"
+msgstr ""
+
+msgctxt "#330078"
+msgid "Enable integration for movies on watchlist"
+msgstr ""
+
+msgctxt "#330079"
+msgid "Enable integration for all movies"
+msgstr ""
+
+msgctxt "#330080"
+msgid "Enable integration for shows on watchlist"
+msgstr ""
+
+msgctxt "#330081"
+msgid "Enable integration for all shows"
+msgstr ""
+
+msgctxt "#330082"
+msgid "Use small thumbnails/images"
+msgstr ""
+
+msgctxt "#330083"
+msgid "Setup Library integration"
+msgstr ""

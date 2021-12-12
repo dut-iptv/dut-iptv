@@ -1,5 +1,5 @@
 import _strptime
-import datetime, json, os, pytz, re, string, sys, time, xbmc, xbmcplugin
+import datetime, json, os, pytz, re, string, sys, time, xbmc, xbmcaddon, xbmcplugin
 
 from fuzzywuzzy import fuzz
 from resources.lib.api import api_add_to_watchlist, api_get_profiles, api_set_profile, api_list_watchlist, api_login, api_play_url, api_remove_from_watchlist, api_search, api_vod_download, api_vod_season, api_vod_seasons, api_watchlist_listing
@@ -7,12 +7,12 @@ from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, ADDON_VERSI
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import change_icon, check_key, clear_old, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, disable_prefs, get_credentials, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
+from resources.lib.base.l3.util import add_library_sources, change_icon, check_key, clear_old, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, disable_prefs, get_credentials, json_rpc, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import Error
-from resources.lib.base.l5.api import api_download, api_get_channels, api_get_connector, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
+from resources.lib.base.l5.api import api_download, api_get_channels, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
 from resources.lib.base.l7 import plugin
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_CONTINUE_WATCH, CONST_FIRST_BOOT, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_HAS_SEARCH, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_USE_PROXY, CONST_USE_PROFILES, CONST_VOD_CAPABILITY, CONST_WATCHLIST
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_CONTINUE_WATCH, CONST_FIRST_BOOT, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_HAS_SEARCH, CONST_LIBRARY, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_USE_PROXY, CONST_USE_PROFILES, CONST_VOD_CAPABILITY, CONST_WATCHLIST
 from resources.lib.util import check_devices, plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
 from urllib.parse import urlparse
 from xml.dom.minidom import parseString
@@ -49,7 +49,7 @@ def home(**kwargs):
 
         if CONST_WATCHLIST:
             folder.add_item(label=_(_.WATCHLIST, _bold=True), path=plugin.url_for(func_or_url=watchlist))
-            
+
         if CONST_CONTINUE_WATCH:
             folder.add_item(label=_(_.CONTINUE_WATCH, _bold=True), path=plugin.url_for(func_or_url=watchlist, continuewatch=1))
 
@@ -58,9 +58,9 @@ def home(**kwargs):
 
         if CONST_USE_PROFILES:
             if check_key(profile_settings, 'profile_name') and len(str(profile_settings['profile_name'])) > 0:
-                profile_txt = _.PROFILE + ': ' + str(profile_settings['profile_name'])
+                profile_txt = '{}: {}'.format(_.PROFILE, profile_settings['profile_name'])
             else:
-                profile_txt = _.PROFILE + ': ' + _.DEFAULT
+                profile_txt = '{}: {}'.format(_.PROFILE, _.DEFAULT)
 
             folder.add_item(label=_(profile_txt, _bold=True), path=plugin.url_for(func_or_url=switch_profile))
 
@@ -209,9 +209,9 @@ def replaytv_by_day(label='', image='', description='', station='', **kwargs):
         itemlabel = ''
 
         if x == 0:
-            itemlabel = _.TODAY + " - "
+            itemlabel = '{} - '.format(_.TODAY)
         elif x == 1:
-            itemlabel = _.YESTERDAY + " - "
+            itemlabel = '{} - '.format(_.YESTERDAY)
 
         if xbmc.getLanguage(xbmc.ISO_639_1) == 'nl':
             itemlabel += date_to_nl_dag(curdate=curdate) + curdate.strftime(" %d ") + date_to_nl_maand(curdate=curdate) + curdate.strftime(" %Y")
@@ -375,7 +375,7 @@ def vod_series(label, type, id, **kwargs):
 
         if seasons['type'] == "seasons":
             for season in seasons['seasons']:
-                label = _.SEASON + " " + str(season['seriesNumber']).replace('Seizoen ', '')
+                label = '{} {}'.format(_.SEASON, str(season['seriesNumber']).replace('Seizoen ', ''))
 
                 items.append(plugin.Item(
                     label = label,
@@ -462,7 +462,7 @@ def search_menu(**kwargs):
 
     if CONST_ONLINE_SEARCH:
         folder.add_item(
-            label= label + " (Online)",
+            label = str(label) + " (Online)",
             path=plugin.url_for(func_or_url=online_search)
         )
 
@@ -486,7 +486,7 @@ def search_menu(**kwargs):
                         type = 0
 
                     if type == 1:
-                        label = str(searchstr) + ' (Online)'
+                        label = '{} (Online)'.format(searchstr)
                         path = plugin.url_for(func_or_url=online_search, query=searchstr)
 
                 folder.add_item(
@@ -630,12 +630,13 @@ def settings_menu(**kwargs):
         folder.add_item(label=_.CHANNEL_PICKER, path=plugin.url_for(func_or_url=channel_picker_menu))
 
     folder.add_item(label=_.SET_KODI, path=plugin.url_for(func_or_url=plugin._set_settings_kodi))
+    folder.add_item(label=_.SETUP_LIBRARY, path=plugin.url_for(func_or_url=setup_library))
     folder.add_item(label=_.INSTALL_DUT_IPTV, path=plugin.url_for(func_or_url=install_connector))
     folder.add_item(label=_.RESET_SESSION, path=plugin.url_for(func_or_url=login, ask=0))
     folder.add_item(label=_.RESET, path=plugin.url_for(func_or_url=reset_addon))
     folder.add_item(label=_.LOGOUT, path=plugin.url_for(func_or_url=logout))
 
-    folder.add_item(label="Addon " + _.SETTINGS, path=plugin.url_for(func_or_url=plugin._settings))
+    folder.add_item(label="Addon {}".format(_.SETTINGS), path=plugin.url_for(func_or_url=plugin._settings))
 
     return folder
 
@@ -648,7 +649,8 @@ def install_connector(**kwargs):
             VIDEO_ADDON = xbmcaddon.Addon(id=addon)
             gui.ok(message=_.DUT_IPTV_ALREADY_INSTALLED)
         except:
-            xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{{"addonid":"' + addon + '","enabled":true}}}}')
+            method = 'Addons.SetAddonEnabled'
+            json_rpc(method, {"addonid": addon, "enabled": "true"})
 
             try:
                 VIDEO_ADDON = xbmcaddon.Addon(id=addon)
@@ -656,12 +658,7 @@ def install_connector(**kwargs):
             except:
                 gui.ok(message=_.DUT_IPTV_ENABLE_FROM_ADDONS)
     else:
-        if os.path.isdir(ADDONS_PATH + 'plugin.executable.dutiptv'):
-            gui.ok(message=_.DUT_IPTV_RESTART_KODI)
-        elif api_get_connector() == True:
-            gui.ok(message=_.DUT_IPTV_INSTALLED)
-        else:
-            gui.ok(message=_.DUT_IPTV_DOWNLOAD_FAILED)
+        xbmc.executebuiltin('InstallAddon({})'.format(addon), True)
 
 @plugin.route()
 def channel_picker_menu(**kwargs):
@@ -672,6 +669,10 @@ def channel_picker_menu(**kwargs):
 
     if CONST_HAS_REPLAY:
         folder.add_item(label=_.CHANNELS, path=plugin.url_for(func_or_url=channel_picker, type='replay'))
+        
+    if CONST_HAS_LIVE and CONST_HAS_REPLAY:
+        folder.add_item(label=_.LIVE_TV + ' = ' + _.CHANNELS, path=plugin.url_for(func_or_url=copy_channels, dest='live', source='replay'))
+        folder.add_item(label=_.CHANNELS + ' = ' + _.LIVE_TV, path=plugin.url_for(func_or_url=copy_channels, dest='replay', source='live'))
 
     folder.add_item(label=_.DISABLE_EROTICA, path=plugin.url_for(func_or_url=disable_prefs_menu, type='erotica'))
     folder.add_item(label=_.DISABLE_MINIMAL, path=plugin.url_for(func_or_url=disable_prefs_menu, type='minimal'))
@@ -686,8 +687,8 @@ def channel_picker_menu(**kwargs):
 def disable_prefs_menu(type, **kwargs):
     disable_prefs(type=type, channels=api_get_channels())
 
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + ADDON_ID + '/?_=channel_picker_menu"]}}')
-
+    method = 'GUI.ActivateWindow'
+    json_rpc(method, {"window": "videos", "parameters":["plugin://" + ADDON_ID + "/?_=channel_picker_menu"]})
 @plugin.route()
 def channel_picker(type, **kwargs):
     if type=='live':
@@ -719,10 +720,34 @@ def channel_picker(type, **kwargs):
         )
 
     return folder
+    
+@plugin.route()
+def copy_channels(dest, source, **kwargs):
+    live = get_live_channels(all=True)
+    replay = get_replay_channels(all=True)
+    prefs = load_prefs(profile_id=1)
+
+    if dest == 'live':
+        source_rows = replay
+        dest_rows = live
+    else:
+        source_rows = live
+        dest_rows = replay
+
+    for row in source_rows:
+        id = str(row['channel'])
+
+        if not prefs or not check_key(prefs, id) or prefs[id][source] == 1:
+            set_value = 2
+        else:
+            set_value = 1
+
+        change_channel(type=dest, id=id, change=0, set_value=set_value)
 
 @plugin.route()
-def change_channel(type, id, change, **kwargs):
+def change_channel(type, id, change, set_value=0, **kwargs):
     change = int(change)
+    set_value = int(set_value)
 
     if not id or len(str(id)) == 0 or not type or len(str(type)) == 0:
         return False
@@ -735,10 +760,12 @@ def change_channel(type, id, change, **kwargs):
 
     if data and check_key(data, id) and prefs and check_key(prefs, id) and int(prefs[id][type]) == 0:
         if type == 'replay' and int(data[id]['replay']) == 0:
-            gui.ok(message=_.EXPLAIN_NO_REPLAY)
+            if set_value == 0:
+                gui.ok(message=_.EXPLAIN_NO_REPLAY)
             return False
         elif settings.getBool(key='homeConnection') == False and int(data[id]['home_only']) == 1:
-            gui.ok(message=_.EXPLAIN_HOME_CONNECTION)
+            if set_value == 0:
+                gui.ok(message=_.EXPLAIN_HOME_CONNECTION)
             return False
 
     keys = ['live', 'replay']
@@ -754,8 +781,10 @@ def change_channel(type, id, change, **kwargs):
                 continue
 
             mod_pref[key] = prefs[id][key]
-
-    if change == 0:
+    
+    if set_value > 0:
+        mod_pref[type] = set_value - 1
+    elif change == 0:
         if not check_key(prefs, id):
             mod_pref[type] = 0
         else:
@@ -769,12 +798,60 @@ def change_channel(type, id, change, **kwargs):
     prefs[id] = mod_pref
     save_prefs(profile_id=1, prefs=prefs)
 
-    xbmc.executeJSONRPC('{{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{{"window":"videos","parameters":["plugin://' + ADDON_ID + '/?_=channel_picker&type=' + type + '"]}}}}')
+    if set_value == 0:
+        method = 'GUI.ActivateWindow'
+        json_rpc(method, {"window": "videos", "parameters":["plugin://" + ADDON_ID + "/?_=channel_picker&type=" + type]})
 
 @plugin.route()
 def reset_addon(**kwargs):
     plugin._reset()
     gui.refresh()
+
+@plugin.route()
+def setup_library(**kwargs):
+    select_list = []
+    select_list.append(_.DISABLE_INTEGRATION)
+    select_list.append(_.ENABLE_INTEGRATION_MOVIES_WATCHLIST)
+    select_list.append(_.ENABLE_INTEGRATION_MOVIES)
+    
+    selected = gui.select(_.ENABLE_LIBRARY_MOVIES, select_list)
+    
+    try:
+        settings.setInt('library_movies', selected)
+    except:
+        settings.setInt('library_movies', 0)
+        
+    for type in CONST_LIBRARY['movies']:
+        row = CONST_LIBRARY['movies'][type]        
+        
+        if not gui.yes_no(message=_.ENABLE_LIBRARY_MOVIES + ": " + getattr(_, row['label'])):
+            settings.setBool('library_movies_' + str(type), False)
+        else:
+            settings.setBool('library_movies_' + str(type), True)
+
+    select_list = []        
+    select_list.append(_.DISABLE_INTEGRATION)
+    select_list.append(_.ENABLE_INTEGRATION_SHOWS_WATCHLIST)
+    select_list.append(_.ENABLE_INTEGRATION_SHOWS)
+    
+    selected = gui.select(_.ENABLE_LIBRARY_SHOWS, select_list)
+    
+    try:
+        settings.setInt('library_shows', selected)
+    except:
+        settings.setInt('library_shows', 0)
+
+    for type in CONST_LIBRARY['shows']:
+        row = CONST_LIBRARY['shows'][type]        
+        
+        if not gui.yes_no(message=_.ENABLE_LIBRARY_SHOWS + ": " + getattr(_, row['label'])):
+            settings.setBool('library_shows_' + str(type), False)
+        else:
+            settings.setBool('library_shows_' + str(type), True)
+            
+    add_library_sources()
+    
+    gui.ok(message=_.DONE_REBOOT_REQUIRED)
 
 @plugin.route()
 def logout(**kwargs):
@@ -856,7 +933,7 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
         remove_stream_start()
 
     try:
-        os.remove(ADDON_PROFILE + 'stream_language')
+        os.remove(os.path.join(ADDON_PROFILE, 'stream_language'))
     except:
         pass
 
@@ -942,6 +1019,12 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
         inputstream = item_inputstream,
     )
 
+    try:
+        if settings.getInt(key='max_bandwidth') > 0:
+            plugin._set_network_bandwidth()
+    except:
+        pass
+
     return listitem
 
 @plugin.route()
@@ -995,7 +1078,7 @@ def watchlist(continuewatch=0, **kwargs):
                 currow = processed[ref]
 
                 progress = {}
-                
+
                 if int(currow['progress']) > 0 and int(currow['duration']) > 0:
                     progress['TotalTime'] = str(currow['duration'])
                     progress['ResumeTime'] = str(int((int(currow['progress']) / 100) * (int(currow['duration']))))
@@ -1661,6 +1744,6 @@ def check_first():
 
 def remove_stream_start():
     try:
-        os.remove(ADDON_PROFILE + 'stream_start')
+        os.remove(os.path.join(ADDON_PROFILE, 'stream_start'))
     except:
         pass

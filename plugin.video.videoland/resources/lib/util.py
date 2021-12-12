@@ -9,6 +9,7 @@ from resources.lib.base.l3.util import check_key, convert_datetime_timezone, dat
 from resources.lib.base.l4 import gui
 from resources.lib.base.l5.api import api_get_channels
 from resources.lib.base.l6 import inputstream
+from resources.lib.constants import CONST_IMAGES
 
 from urllib.parse import urlencode
 
@@ -65,11 +66,19 @@ def plugin_process_info(playdata):
         info['description'] = playdata['info']['description']
 
     if check_key(playdata['info'], 'still'):
-        info['image'] = str(playdata['info']['still']).replace('[format]', '1920x1080')
-        info['image_large'] = str(playdata['info']['still']).replace('[format]', '1920x1080')
+        if settings.getBool('use_small_images', default=False) == True:
+            info['image'] = str(playdata['info']['still']).replace(CONST_IMAGES['still']['replace'], CONST_IMAGES['still']['small'])
+            info['image_large'] = str(playdata['info']['still']).replace(CONST_IMAGES['still']['replace'], CONST_IMAGES['still']['small'])
+        else:
+            info['image'] = str(playdata['info']['still']).replace(CONST_IMAGES['still']['replace'], CONST_IMAGES['still']['large'])
+            info['image_large'] = str(playdata['info']['still']).replace(CONST_IMAGES['still']['replace'], CONST_IMAGES['still']['large'])
     elif check_key(playdata['info'], 'poster'):
-        info['image'] = str(playdata['info']['poster']).replace('[format]', '960x1433')
-        info['image_large'] = str(playdata['info']['poster']).replace('[format]', '960x1433')
+        if settings.getBool('use_small_images', default=False) == True:
+            info['image'] = str(playdata['info']['still']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['small'])
+            info['image_large'] = str(playdata['info']['still']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['small'])
+        else:
+            info['image'] = str(playdata['info']['still']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])
+            info['image_large'] = str(playdata['info']['still']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])
 
     if check_key(playdata['info'], 'year'):
         info['year'] = playdata['info']['year']
@@ -121,7 +130,7 @@ def plugin_process_watchlist(data, continuewatch=0):
     if check_key(data, 'details'):
         for row in data['details']:
             currow = data['details'][row]
-            
+
             info = plugin_process_info({'info': currow})
 
             context = []
@@ -129,7 +138,7 @@ def plugin_process_watchlist(data, continuewatch=0):
             params = []
             params.append(('_', 'remove_from_watchlist'))
             params.append(('continuewatch', continuewatch))
-            
+
             progress = 0
 
             if continuewatch == 1:
@@ -139,7 +148,7 @@ def plugin_process_watchlist(data, continuewatch=0):
                     params.append(('id', str(currow['id']) + '?series=' + str(currow['series_ref'])))
                 else:
                     params.append(('id', str(currow['id']) + '?series='))
-                    
+
                 if not currow['type'] == 'series':
                     progress = data['progress'][row]
             else:
@@ -196,7 +205,8 @@ def plugin_process_watchlist(data, continuewatch=0):
                 'path': path,
                 'playable': playable,
                 'progress': progress,
-                'context': context
+                'context': context,
+                'type': currow['type']
             }
 
     return items

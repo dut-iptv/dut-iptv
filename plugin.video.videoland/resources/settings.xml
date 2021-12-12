@@ -21,6 +21,63 @@
                     <default>true</default>
                     <control type="toggle" />
                 </setting>
+                <setting id="use_small_images" type="boolean" label="330082">
+                    <default>false</default>
+                    <control type="toggle" />
+                </setting>
+            </group>
+        </category>        
+        <category id="library" label="330073">
+            <group id="1" label="330073">
+                <setting id="library_movies" type="integer" label="330074" help="">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>                    
+                        <options>
+                            <option label="330077">0</option>
+                            <option label="330078">1</option>
+                            <option label="330079">2</option>
+                        </options>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>330074</heading>
+                    </control>
+                </setting>
+                <setting id="library_movies_movies" type="boolean" label="30011" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="library_movies_kidsmovies" type="boolean" label="30029" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting type="sep"/>
+                <setting id="library_shows" type="integer" label="330075" help="">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>                    
+                        <options>
+                            <option label="330077">0</option>
+                            <option label="330080">1</option>
+                            <option label="330081">2</option>
+                        </options>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>330075</heading>
+                    </control>
+                </setting>
+                <setting id="library_shows_series" type="boolean" label="30010" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="library_shows_kidsseries" type="boolean" label="30027" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
             </group>
         </category>
         <category id="hidden">

@@ -32,6 +32,19 @@ CONST_HAS_REPLAY = False
 
 CONST_HAS_SEARCH = True
 
+CONST_IMAGES = {
+    'still': {
+        'large': '1920x1080',
+        'small': '720x405',
+        'replace': '[format]'
+    },
+    'poster': {
+        'large': '960x1433',
+        'small': '400x600',
+        'replace': '[format]'
+    }
+}
+
 CONST_MOD_CACHE = {}
 
 CONST_ONLINE_SEARCH = False
@@ -41,6 +54,31 @@ CONST_START_FROM_BEGINNING = False
 CONST_USE_PROXY = True
 
 CONST_USE_PROFILES = True
+
+CONST_USE_LIBRARY = True
+
+CONST_LIBRARY = {
+    'shows': {
+        'series': {
+            'online': 1,
+            'label': 'SERIES' 
+        },
+        'kidsseries': {
+            'online': 1,
+            'label': 'KIDS_SERIES'
+        },
+    },
+    'movies': {
+        'movies': {
+            'online': 0,
+            'label': 'MOVIES'
+        },
+        'kidsmovies': {
+            'online': 0,
+            'label': 'KIDS_MOVIES'
+        },
+    }
+}
 
 CONST_VOD_CAPABILITY = [
     { 'file': 'series', 'label': _.SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 2 },
