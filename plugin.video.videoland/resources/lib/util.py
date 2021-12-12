@@ -74,11 +74,11 @@ def plugin_process_info(playdata):
             info['image_large'] = str(playdata['info']['still']).replace(CONST_IMAGES['still']['replace'], CONST_IMAGES['still']['large'])
     elif check_key(playdata['info'], 'poster'):
         if settings.getBool('use_small_images', default=False) == True:
-            info['image'] = str(playdata['info']['still']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['small'])
-            info['image_large'] = str(playdata['info']['still']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['small'])
+            info['image'] = str(playdata['info']['poster']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['small'])
+            info['image_large'] = str(playdata['info']['poster']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['small'])
         else:
-            info['image'] = str(playdata['info']['still']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])
-            info['image_large'] = str(playdata['info']['still']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])
+            info['image'] = str(playdata['info']['poster']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])
+            info['image_large'] = str(playdata['info']['poster']).replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])
 
     if check_key(playdata['info'], 'year'):
         info['year'] = playdata['info']['year']
