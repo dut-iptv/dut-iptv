@@ -12,7 +12,7 @@ from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
 from resources.lib.base.l7 import plugin
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_CONTINUE_WATCH, CONST_FIRST_BOOT, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_HAS_SEARCH, CONST_LIBRARY, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_USE_PROXY, CONST_USE_PROFILES, CONST_VOD_CAPABILITY, CONST_WATCHLIST
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_CONTINUE_WATCH, CONST_FIRST_BOOT, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_HAS_SEARCH, CONST_IMAGES, CONST_LIBRARY, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_USE_PROXY, CONST_USE_PROFILES, CONST_VOD_CAPABILITY, CONST_WATCHLIST
 from resources.lib.util import check_devices, plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
 from urllib.parse import urlparse
 from xml.dom.minidom import parseString
@@ -1267,16 +1267,16 @@ def process_replaytv_list(character, start=0, movies=0):
 
         label = str(row['title'])
         idtitle = str(currow)
-        icon = str(row['icon'])
-
+        image = str(str(row['icon']).replace(CONST_IMAGES['replay']['replace'], CONST_IMAGES['replay']['small'])).strip()
+        
         items.append(plugin.Item(
             label = label,
             info = {
                 'sorttitle': label.upper(),
             },
             art = {
-                'thumb': icon,
-                'fanart': icon
+                'thumb': image,
+                'fanart': image
             },
             path = plugin.url_for(func_or_url=replaytv_item, label=label, idtitle=idtitle, start=0),
         ))
@@ -1320,7 +1320,7 @@ def process_replaytv_search(search, movies=0):
         row = data[currow]
 
         title = str(row['title'])
-        icon = str(row['icon'])
+        image = str(str(row['icon']).replace(CONST_IMAGES['replay']['replace'], CONST_IMAGES['replay']['small'])).strip()
 
         fuzz_set = fuzz.token_set_ratio(title, search)
         fuzz_partial = fuzz.partial_ratio(title, search)
@@ -1336,8 +1336,8 @@ def process_replaytv_search(search, movies=0):
                     'sorttitle': label.upper(),
                 },
                 art = {
-                    'thumb': icon,
-                    'fanart': icon
+                    'thumb': image,
+                    'fanart': image
                 },
                 properties = {"fuzz_set": fuzz_set, "fuzz_sort": fuzz_sort, "fuzz_partial": fuzz_partial, "fuzz_total": fuzz_set + fuzz_partial + fuzz_sort},
                 path = plugin.url_for(func_or_url=replaytv_item, label=label, idtitle=idtitle, start=0),
@@ -1395,8 +1395,7 @@ def process_replaytv_content(station, day=0, start=0):
 
         duration = int((endT - startT).total_seconds())
 
-        program_image = str(row['icon'])
-        program_image_large = str(row['icon'])
+        image = str(str(row['icon']).replace(CONST_IMAGES['replay']['replace'], CONST_IMAGES['replay']['small'])).strip()
         program_id = str(row['program_id'])
 
         if CONST_WATCHLIST:
@@ -1413,8 +1412,8 @@ def process_replaytv_content(station, day=0, start=0):
                 'sorttitle': label.upper(),
             },
             art = {
-                'thumb': program_image,
-                'fanart': program_image_large
+                'thumb': image,
+                'fanart': image
             },
             path = plugin.url_for(func_or_url=play_video, type='program', channel=channel, id=program_id),
             context = context,
@@ -1495,8 +1494,7 @@ def process_replaytv_list_content(label, idtitle, start=0):
 
         description = str(row['description'])
         duration = int((endT - startT).total_seconds())
-        program_image = str(row['icon'])
-        program_image_large = str(row['icon'])
+        image = str(str(row['icon']).replace(CONST_IMAGES['replay']['replace'], CONST_IMAGES['replay']['small'])).strip()
         program_id = str(row['program_id'])
 
         if CONST_WATCHLIST:
@@ -1513,8 +1511,8 @@ def process_replaytv_list_content(label, idtitle, start=0):
                 'sorttitle': itemlabel.upper(),
             },
             art = {
-                'thumb': program_image,
-                'fanart': program_image_large
+                'thumb': image,
+                'fanart': image
             },
             path = plugin.url_for(func_or_url=play_video, type='program', channel=channel, id=program_id),
             playable = True,
@@ -1591,8 +1589,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
         if row['duration'] and len(str(row['duration'])) > 0:
             duration = int(row['duration'])
 
-        program_image = str(row['icon'])
-        program_image_large = str(row['icon'])
+        image = str(str(row['icon']).replace(CONST_IMAGES['vod']['replace'], CONST_IMAGES['vod']['small'])).strip()
         program_type = str(row['type'])
 
         if CONST_WATCHLIST:
@@ -1624,8 +1621,8 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
             properties = properties,
             info = info,
             art = {
-                'thumb': program_image,
-                'fanart': program_image_large
+                'thumb': image,
+                'fanart': image
             },
             path = path,
             playable = playable,
@@ -1677,7 +1674,7 @@ def process_vod_menu_content(data, start=0, search=None, type=None, character=No
         id = str(currow)
         label = str(row['label'])
         menu_type = str(row['type'])
-        program_image = str(row['image'])
+        image = str(row['image'])
 
         if menu_type == 'content':
             path = plugin.url_for(func_or_url=vod, file=id, label=label, start=0, character=character, online=online, az=0, menu=0)
@@ -1695,8 +1692,8 @@ def process_vod_menu_content(data, start=0, search=None, type=None, character=No
         items.append(plugin.Item(
             label = label,
             art = {
-                'thumb': program_image,
-                'fanart': program_image
+                'thumb': image,
+                'fanart': image
             },
             path = path,
             playable = playable,

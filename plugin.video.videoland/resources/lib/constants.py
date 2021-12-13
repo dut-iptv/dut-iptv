@@ -42,7 +42,17 @@ CONST_IMAGES = {
         'large': '960x1433',
         'small': '400x600',
         'replace': '[format]'
-    }
+    },
+    'replay': {
+        'large': '1920x1080',
+        'small': '720x405',
+        'replace': '[format]'
+    },
+    'vod': {
+        'large': '960x1433',
+        'small': '400x600',
+        'replace': '[format]'
+    },
 }
 
 CONST_MOD_CACHE = {}

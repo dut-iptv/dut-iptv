@@ -8,7 +8,8 @@ try:
     from .StringMatcher import StringMatcher as SequenceMatcher
 except ImportError:
     if platform.python_implementation() != "PyPy":
-        warnings.warn('Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning')
+        pass
+        #warnings.warn('Using slow pure-python SequenceMatcher. Install python-Levenshtein to remove this warning')
     from difflib import SequenceMatcher
 
 from . import utils

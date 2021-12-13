@@ -1,4 +1,4 @@
-import glob, hashlib, io, json, os, platform, pytz, re, requests, shutil, string, struct, time, xbmc, xbmcaddon, xbmcvfs
+import glob, hashlib, io, json, os, platform, pytz, re, requests, shutil, string, struct, time, unicodedata, xbmc, xbmcaddon, xbmcvfs
 
 from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PATH, ADDON_PROFILE, CONST_DUT_EPG_SETTINGS, PROVIDER_NAME, USERDATA_PATH
@@ -479,7 +479,7 @@ def set_credentials(username, password):
 
     save_profile(profile_id=1, profile=profile_settings)
 
-def txt2filename(txt, chr_set='printable'):
+def txt2filename(txt, chr_set='printable', no_ext=False):
     """Converts txt to a valid filename.
 
     Args:
@@ -490,7 +490,20 @@ def txt2filename(txt, chr_set='printable'):
             'universal':    For almost *any* file system. '-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     """
 
-    ext = '' if '.' not in txt else txt[txt.rfind('.'):]
+    try:
+        text = unicode(txt, 'utf-8')
+    except (TypeError, NameError):
+        text = txt
+
+    text = unicodedata.normalize('NFD', text)
+    text = text.encode('ascii', 'ignore')
+    text = text.decode("utf-8")
+    txt = str(text)
+
+    if no_ext == False:
+        ext = '' if '.' not in txt else txt[txt.rfind('.'):]
+    else:
+        ext = ''
 
     FILLER = '-'
     MAX_LEN = 255  # Maximum length of filename is 255 bytes in Windows and some *nix flavors.

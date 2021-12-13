@@ -93,10 +93,10 @@ def api_get_series_nfo():
     type = str(encodedBytes, "utf-8")
 
     vod_url = '{dut_epg_url}/{type}.zip'.format(dut_epg_url=CONST_DUT_EPG, type=type)
-    file = "cache" + os.sep + "{type}.json".format(type=type)
-    tmp = ADDON_PROFILE + 'tmp' + os.sep + "{type}.zip".format(type=type)
+    file = os.path.join("cache", "{type}.json".format(type=type))
+    tmp = os.path.join(ADDON_PROFILE, 'tmp', "{type}.zip".format(type=type))
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5):
         data = load_file(file=file, isJSON=True)
     else:
         resp = Session().get(vod_url, stream=True)
@@ -116,20 +116,20 @@ def api_get_series_nfo():
 
             try:
                 with ZipFile(tmp, 'r') as zipObj:
-                    zipObj.extractall(ADDON_PROFILE + "cache" + os.sep)
+                    zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
             except:
                 try:
                     fixBadZipfile(tmp)
 
                     with ZipFile(tmp, 'r') as zipObj:
-                        zipObj.extractall(ADDON_PROFILE + "cache" + os.sep)
+                        zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
 
                 except:
                     try:
                         from resources.lib.base.l1.zipfile import ZipFile as ZipFile2
 
                         with ZipFile2(tmp, 'r') as zipObj:
-                            zipObj.extractall(ADDON_PROFILE + "cache" + os.sep)
+                            zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
                     except:
                         return None
 
@@ -454,17 +454,20 @@ def api_vod_season(series, id, raw=False, use_cache=True):
     encodedBytes = base64.b32encode(type.encode("utf-8"))
     type = str(encodedBytes, "utf-8")
 
-    file = "cache" + os.sep + type + ".json"
+    file = os.path.join("cache", type + ".json")
 
     id_ar = id.split('###')
     series = id_ar[0]
     seasonstr = id_ar[1]
     cache = 0
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5) and use_cache == True:
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5) and use_cache == True:
         data = load_file(file=file, isJSON=True)
+        log('api_vod_season using cache for type: ' + str(type) + ' id: ' + str(id))
         cache = 1
     else:
+        log('api_vod_season no cache for type: ' + str(type) + ' id: ' + str(id))
+        
         headers = {
             'videoland-platform': 'videoland',
         }
@@ -477,7 +480,7 @@ def api_vod_season(series, id, raw=False, use_cache=True):
 
         if code and code == 200 and data and check_key(data, 'title'):
             write_file(file=file, data=data, isJSON=True)
-            
+
     if raw == True:
         return {'data': data, 'cache': cache}
 
@@ -487,7 +490,7 @@ def api_vod_season(series, id, raw=False, use_cache=True):
     seasonno = ''
 
     if check_key(data['details'], 'SN' + str(seasonstr)):
-        seasonno = data['details']['SN' + str(seasonstr)]['title']
+        seasonno = re.sub("[^0-9]", "", data['details']['SN' + str(seasonstr)]['title'])
 
     for currow in data['details']:
         row = data['details'][currow]
@@ -527,44 +530,31 @@ def api_vod_seasons(type, id, raw=False, github=False, use_cache=True):
     encodedBytes = base64.b32encode(type.encode("utf-8"))
     type = str(encodedBytes, "utf-8")
 
-    file = "cache" + os.sep + type + ".json"
+    file = os.path.join("cache", type + ".json")
 
     ref = id
     id = id[1:]
     cache = 0
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5) and use_cache == True:
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5) and use_cache == True:
         data = load_file(file=file, isJSON=True)
         cache = 1
+        log('api_vod_seasons using cache for type: ' + str(type) + ' id: ' + str(id))
     else:
-        found = False
+        log('api_vod_seasons no cache for type: ' + str(type) + ' id: ' + str(id))
     
-        if github == True and use_cache == False:
-            encodedBytes = base64.b32encode(ref.encode("utf-8"))
-            encoded_ref = str(encodedBytes, "utf-8")
+        headers = {
+            'videoland-platform': 'videoland',
+        }
 
-            seasons_url = '{dut_epg_url}/{type}.json'.format(dut_epg_url=CONST_DUT_EPG, type=encoded_ref)
-            download = api_download(url=seasons_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
-            data = download['data']
-            code = download['code']
+        seasons_url = '{base_url}/api/v3/series/{series}'.format(base_url=CONST_BASE_URL, series=id)
 
-            if code and code == 200 and data and check_key(data, 'title'):
-                write_file(file=file, data=data, isJSON=True)
-                found = True
-    
-        if found == False:
-            headers = {
-                'videoland-platform': 'videoland',
-            }
+        download = api_download(url=seasons_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
+        data = download['data']
+        code = download['code']
 
-            seasons_url = '{base_url}/api/v3/series/{series}'.format(base_url=CONST_BASE_URL, series=id)
-
-            download = api_download(url=seasons_url, type='get', headers=headers, data=None, json_data=False, return_json=True)
-            data = download['data']
-            code = download['code']
-
-            if code and code == 200 and data and check_key(data, 'title'):
-                write_file(file=file, data=data, isJSON=True)
+        if code and code == 200 and data and check_key(data, 'title'):
+            write_file(file=file, data=data, isJSON=True)
 
     if raw == True:
         return {'data': data, 'cache': cache}
@@ -580,8 +570,10 @@ def api_vod_seasons(type, id, raw=False, github=False, use_cache=True):
                 image = data['poster'].replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['small'])
             else:
                 image = data['poster'].replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])
-        
-            seasons.append({'id': str(id) + '###' + str(row['id']), 'seriesNumber': row['title'], 'description': data['description'], 'image': image, 'watchlist': ref})
+
+            title = re.sub("[^0-9]", "", row['title'])
+
+            seasons.append({'id': str(id) + '###' + str(row['id']), 'seriesNumber': title, 'description': data['description'], 'image': image, 'watchlist': ref})
 
     return {'type': 'seasons', 'seasons': seasons}
 

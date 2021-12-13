@@ -92,6 +92,8 @@ def plugin_process_info(playdata):
     if check_key(playdata['info'], 'directors'):
         info['director'] = playdata['info']['directors']
 
+    log(info)
+
     return info
 
 def plugin_process_playdata(playdata):
