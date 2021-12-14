@@ -43,9 +43,6 @@ class MPD(InputstreamItem):
     manifest_type = 'mpd'
     mimetype = 'application/dash+xml'
 
-    def __init__(self, manifest_update_parameter=None):
-        self.manifest_update_parameter = manifest_update_parameter
-
     def check(self):
         return True
 

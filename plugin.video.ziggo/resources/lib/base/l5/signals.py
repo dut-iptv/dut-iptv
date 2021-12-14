@@ -15,18 +15,21 @@ ON_CLOSE = 'on_close'
 def on(signal):
     def decorator(f):
         _signals[signal].append(f)
+
         return f
+
     return decorator
 
 def emit(signal, *args, **kwargs):
     log.debug("SIGNAL: {}".format(signal))
+
     for f in _signals.get(signal, []):
         f(*args, **kwargs)
 
 @contextmanager
 def throwable():
     try:
-        yield 
+        yield
     except Exit as e:
         pass
     except Error as e:

@@ -463,11 +463,8 @@ def api_vod_season(series, id, raw=False, use_cache=True):
 
     if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5) and use_cache == True:
         data = load_file(file=file, isJSON=True)
-        log('api_vod_season using cache for type: ' + str(type) + ' id: ' + str(id))
         cache = 1
     else:
-        log('api_vod_season no cache for type: ' + str(type) + ' id: ' + str(id))
-        
         headers = {
             'videoland-platform': 'videoland',
         }
@@ -539,10 +536,7 @@ def api_vod_seasons(type, id, raw=False, github=False, use_cache=True):
     if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5) and use_cache == True:
         data = load_file(file=file, isJSON=True)
         cache = 1
-        log('api_vod_seasons using cache for type: ' + str(type) + ' id: ' + str(id))
     else:
-        log('api_vod_seasons no cache for type: ' + str(type) + ' id: ' + str(id))
-    
         headers = {
             'videoland-platform': 'videoland',
         }
@@ -571,9 +565,7 @@ def api_vod_seasons(type, id, raw=False, github=False, use_cache=True):
             else:
                 image = data['poster'].replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])
 
-            title = re.sub("[^0-9]", "", row['title'])
-
-            seasons.append({'id': str(id) + '###' + str(row['id']), 'seriesNumber': title, 'description': data['description'], 'image': image, 'watchlist': ref})
+            seasons.append({'id': str(id) + '###' + str(row['id']), 'seriesNumber': row['title'], 'description': data['description'], 'image': image, 'watchlist': ref})
 
     return {'type': 'seasons', 'seasons': seasons}
 

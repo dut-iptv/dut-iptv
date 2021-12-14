@@ -2,6 +2,7 @@ import sys
 
 from resources.lib.base.l1.constants import ADDON_ID
 from resources.lib.base.l2.log import log
+from resources.lib.base.l3.util import encode_obj
 from resources.lib.base.l3.language import _
 from resources.lib.base.l4.exceptions import RouterError
 from resources.lib.base.l5 import signals
@@ -84,29 +85,3 @@ def dispatch(url):
         function(**params)
 
     signals.emit(signals.AFTER_DISPATCH)
-
-def encode_obj(in_obj):
-    def encode_list(in_list):
-        out_list = []
-        for el in in_list:
-            out_list.append(encode_obj(el))
-        return out_list
-
-    def encode_dict(in_dict):
-        out_dict = {}
-
-        for k, v in in_dict.items():
-            out_dict[k] = encode_obj(v)
-
-        return out_dict
-
-    if isinstance(in_obj, str):
-        return in_obj.encode('utf-8')
-    elif isinstance(in_obj, list):
-        return encode_list(in_obj)
-    elif isinstance(in_obj, tuple):
-        return tuple(encode_list(in_obj))
-    elif isinstance(in_obj, dict):
-        return encode_dict(in_obj)
-
-    return in_obj

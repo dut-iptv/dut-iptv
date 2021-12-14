@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve. Please post in English
-title: "[**ALL or ADDON**][**VERSION**] **TITLE**"
+title: "[ALL or ADDON][VERSION] TITLE"
 labels: bug
 assignees: dut-iptv
 
@@ -26,8 +26,8 @@ If applicable, add screenshots to help explain your problem.
 **Device (please complete the following information):**
 - Type: [e.g. Android TV Box / PC / Smartphone]
  - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+ - Kodi Version [e.g. 19.3]
+ - Addon Version [e.g. 1.3.4]
 
 **Additional context**
 Add any other context about the problem here.

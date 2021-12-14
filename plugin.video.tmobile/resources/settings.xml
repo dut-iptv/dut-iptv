@@ -41,6 +41,10 @@
                     <default>true</default>
                     <control type="toggle" />
                 </setting>
+                <setting id="use_small_images" type="boolean" label="330082">
+                    <default>false</default>
+                    <control type="toggle" />
+                </setting>
                 <setting id="add_duration" type="integer" label="32092">
                     <default>900</default>
                     <control type="edit" format="integer" />

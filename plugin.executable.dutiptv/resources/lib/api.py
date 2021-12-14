@@ -7,22 +7,22 @@ from resources.lib.base.l3.util import check_key, fixBadZipfile, is_file_older_t
 from resources.lib.util import clear_cache_connector
 
 def api_get_channels():
-    directory = os.path.dirname(ADDON_PROFILE + 'tmp' + os.sep + 'a.channels.zip')
+    directory = os.path.dirname(os.path.join(ADDON_PROFILE, 'tmp', 'a.channels.zip'))
 
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    directory = os.path.dirname(ADDON_PROFILE + "cache" + os.sep + "a.channels.json")
+    directory = os.path.dirname(os.path.join(ADDON_PROFILE, "cache", "a.channels.json"))
 
     if not os.path.exists(directory):
         os.makedirs(directory)
 
     channels_url = '{dut_epg_url}/a.channels.zip'.format(dut_epg_url=CONST_DUT_EPG_BASE)
 
-    file = "cache" + os.sep + "a.channels.json"
-    tmp = ADDON_PROFILE + 'tmp' + os.sep + 'a.channels.zip'
+    file = os.path.join("cache", "a.channels.json")
+    tmp = os.path.join(ADDON_PROFILE, 'tmp', 'a.channels.zip')
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=1):
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=1):
         return True
     else:
         resp = requests.get(channels_url, stream=True)
@@ -42,19 +42,19 @@ def api_get_channels():
 
             try:
                 with ZipFile(tmp, 'r') as zipObj:
-                    zipObj.extractall(ADDON_PROFILE + "cache" + os.sep)
+                    zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
             except:
                 try:
                     fixBadZipfile(tmp)
 
                     with ZipFile(tmp, 'r') as zipObj:
-                        zipObj.extractall(ADDON_PROFILE + "cache" + os.sep)
+                        zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
                 except:
                     try:
                         from resources.lib.base.l1.zipfile import ZipFile as ZipFile2
 
                         with ZipFile2(tmp, 'r') as zipObj:
-                            zipObj.extractall(ADDON_PROFILE + "cache" + os.sep)
+                            zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
                     except:
                         return False
         else:
@@ -87,18 +87,18 @@ def api_get_all_epg():
 
 def api_get_epg_by_addon(addon):
     type = addon[0]
-    directory = os.path.dirname(ADDON_PROFILE + 'tmp' + os.sep + 'epg.zip')
+    directory = os.path.dirname(os.path.join(ADDON_PROFILE, 'tmp', 'epg.zip'))
 
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-    directory = os.path.dirname(ADDON_PROFILE + "cache" + os.sep + str(addon) + os.sep + 'epg.zip')
+    directory = os.path.dirname(os.path.join(ADDON_PROFILE, "cache", str(addon), 'epg.zip'))
 
     if not os.path.exists(directory):
         os.makedirs(directory)
 
     epg_url = '{dut_epg_url}/{type}.epg.zip'.format(dut_epg_url=CONST_DUT_EPG_BASE, type=type)
-    tmp = ADDON_PROFILE + 'tmp' + os.sep + '{type}.epg.zip'.format(type=type)
+    tmp = os.path.join(ADDON_PROFILE, 'tmp', '{type}.epg.zip'.format(type=type))
 
     if not is_file_older_than_x_days(file=tmp, days=0.5):
         return False
@@ -120,19 +120,19 @@ def api_get_epg_by_addon(addon):
 
             try:
                 with ZipFile(tmp, 'r') as zipObj:
-                    zipObj.extractall(ADDON_PROFILE + "cache" + os.sep + str(addon) + os.sep)
+                    zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", str(addon), ""))
             except:
                 try:
                     fixBadZipfile(tmp)
 
                     with ZipFile(tmp, 'r') as zipObj:
-                        zipObj.extractall(ADDON_PROFILE + "cache" + os.sep + str(addon) + os.sep)
+                        zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", str(addon), ""))
                 except:
                     try:
                         from resources.lib.base.l1.zipfile import ZipFile as ZipFile2
 
                         with ZipFile2(tmp, 'r') as zipObj:
-                            zipObj.extractall(ADDON_PROFILE + "cache" + os.sep + str(addon) + os.sep)
+                            zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", str(addon), ""))
                     except:
                         return False
         else:

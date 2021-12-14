@@ -799,3 +799,15 @@ msgstr "Gebruik kleine thumbnails/afbeeldingen"
 msgctxt "#330083"
 msgid "Setup Library integration"
 msgstr "Bibliotheek integratie instellen"
+
+msgctxt "#330084"
+msgid "Library reset"
+msgstr "Bibliotheek resetten"
+
+msgctxt "#330085"
+msgid "Reset Library"
+msgstr "Bibliotheek gereset"
+
+msgctxt "#330086"
+msgid "Reset Cache"
+msgstr "Cache verwijderen"

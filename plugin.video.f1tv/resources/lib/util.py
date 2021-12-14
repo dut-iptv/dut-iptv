@@ -1,18 +1,27 @@
 import _strptime
 import datetime, sys, time, xbmc
 
-from resources.lib.api import api_vod_subscription
-from resources.lib.base.l1.constants import DEFAULT_USER_AGENT
+from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, load_file, write_file
+from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, encode_obj, load_file, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l6 import inputstream
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_IMAGE_URL
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_IMAGE_URL, CONST_IMAGES
+from urllib.parse import urlencode
 
 def check_devices():
     pass
+
+def check_entitlements():
+    return
+
+def get_image(prefix, content):
+    return ''
+
+def get_play_url(content):
+    return {'play_url': '', 'locator': ''}
 
 def plugin_ask_for_creds(creds):
     if str(creds['username']).isnumeric():
@@ -22,14 +31,12 @@ def plugin_ask_for_creds(creds):
 
     if not len(str(username)) > 0:
         gui.ok(message=_.EMPTY_USER2, heading=_.LOGIN_ERROR_TITLE)
-
         return {'result': False, 'username': '', 'password': ''}
 
     password = str(gui.input(message=_.ASK_PASSWORD2, hide_input=True)).strip()
 
     if not len(str(password)) > 0:
         gui.ok(message=_.EMPTY_PASS2, heading=_.LOGIN_ERROR_TITLE)
-
         return {'result': False, 'username': '', 'password': ''}
 
     return {'result': True, 'username': username, 'password': password}
@@ -173,9 +180,6 @@ def plugin_process_playdata(playdata):
 def plugin_renew_token(data):
     return None
 
-def plugin_vod_subscription_filter():
-    return None
-
 def plugin_process_watchlist(data, continuewatch=0):
     items = []
 
@@ -185,3 +189,6 @@ def plugin_process_watchlist_listing(data, id=None, continuewatch=0):
     items = []
 
     return items
+    
+def plugin_vod_subscription_filter():
+    return None

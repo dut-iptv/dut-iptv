@@ -82,6 +82,14 @@ sudo python3 -m pip install wheel
 sudo python3 -m pip install pycryptodomex
 ```
 
+### Known Bugs
+
+- See [Known Bugs](https://github.com/dut-iptv/dut-iptv/discussions/1)
+
+### Wanted Features / Enhancements
+
+- See [Wanted Features](https://github.com/dut-iptv/dut-iptv/discussions/2)
+
 ### Source code / Release information / Issues / PR's / Discussions
 
 - See https://github.com/dut-iptv/dut-iptv

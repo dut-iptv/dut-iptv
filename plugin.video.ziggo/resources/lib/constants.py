@@ -177,11 +177,30 @@ CONST_DEFAULT_CLIENTID = '4.23.13'
 
 CONST_FIRST_BOOT = True
 
+CONST_HAS_DUTIPTV = True
+
+CONST_HAS_LIBRARY = False
+
 CONST_HAS_LIVE = True
 
 CONST_HAS_REPLAY = True
 
 CONST_HAS_SEARCH = True
+
+CONST_IMAGES = {
+    'replay': {
+        'large': '',
+        'small': '',
+        'replace': '[format]'
+    },
+    'vod': {
+        'large': '',
+        'small': '',
+        'replace': '[format]'
+    },
+}
+
+CONST_LIBRARY = {}
 
 CONST_MOD_CACHE = {}
 

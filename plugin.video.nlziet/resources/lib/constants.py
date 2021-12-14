@@ -27,17 +27,36 @@ CONST_CONTINUE_WATCH = False
 
 CONST_FIRST_BOOT = True
 
+CONST_HAS_DUTIPTV = True
+
+CONST_HAS_LIBRARY = False
+
 CONST_HAS_LIVE = True
 
 CONST_HAS_REPLAY = True
 
 CONST_HAS_SEARCH = True
 
-CONST_MOD_CACHE = {}
-
 CONST_ID_URL = 'https://id.nlziet.nl'
 
+CONST_IMAGES = {
+    'replay': {
+        'large': '',
+        'small': '',
+        'replace': '[format]'
+    },
+    'vod': {
+        'large': '',
+        'small': '',
+        'replace': '[format]'
+    },
+}
+
 CONST_IMAGE_URL = 'https://nlzietprodstorage.blob.core.windows.net'
+
+CONST_LIBRARY = {}
+
+CONST_MOD_CACHE = {}
 
 CONST_ONLINE_SEARCH = False
 
@@ -48,7 +67,6 @@ CONST_USE_PROXY = True
 CONST_USE_PROFILES = False
 
 CONST_VOD_CAPABILITY = [
-    #{ 'file': 'series', 'label': _.SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 1 },
     { 'file': 'tipfeednpo', 'label': _.RECOMMENDED + ' NPO', 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
     { 'file': 'tipfeed', 'label': _.RECOMMENDED, 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
     { 'file': 'watchaheadnpo', 'label': _.WATCHAHEAD + ' NPO', 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },

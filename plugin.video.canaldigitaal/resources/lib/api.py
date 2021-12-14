@@ -1,6 +1,6 @@
 import base64, datetime, os, re, time, uuid, xbmc
 
-from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, DEFAULT_BROWSER_NAME, DEFAULT_BROWSER_VERSION, DEFAULT_OS_NAME, DEFAULT_OS_VERSION
+from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, CONST_DUT_EPG, DEFAULT_BROWSER_NAME, DEFAULT_BROWSER_VERSION, DEFAULT_OS_NAME, DEFAULT_OS_VERSION, SESSION_CHUNKSIZE
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
@@ -8,7 +8,7 @@ from resources.lib.base.l3.util import check_key, get_credentials, is_file_older
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_BASE_URL, CONST_DEFAULT_API, CONST_LOGIN_HEADERS, CONST_LOGIN_URL
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_BASE_URL, CONST_DEFAULT_API, CONST_IMAGES, CONST_LOGIN_HEADERS, CONST_LOGIN_URL
 from resources.lib.util import plugin_process_info
 from urllib.parse import parse_qs, urlparse, quote_plus
 
@@ -63,6 +63,52 @@ def api_get_session(force=0):
 
 def api_get_profiles():
     return None
+
+def api_get_series_nfo():
+    type = 'seriesnfo'
+    encodedBytes = base64.b32encode(type.encode("utf-8"))
+    type = str(encodedBytes, "utf-8")
+
+    vod_url = '{dut_epg_url}/{type}.zip'.format(dut_epg_url=CONST_DUT_EPG, type=type)
+    file = os.path.join("cache", "{type}.json".format(type=type))
+    tmp = os.path.join(ADDON_PROFILE, 'tmp', "{type}.zip".format(type=type))
+
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5):
+        data = load_file(file=file, isJSON=True)
+    else:
+        resp = Session().get(vod_url, stream=True)
+
+        if resp.status_code != 200:
+            resp.close()
+            return None
+
+        with open(tmp, 'wb') as f:
+            for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
+                f.write(chunk)
+
+        resp.close()
+
+        if os.path.isfile(tmp):
+            from zipfile import ZipFile
+
+            try:
+                with ZipFile(tmp, 'r') as zipObj:
+                    zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
+            except:
+                try:
+                    fixBadZipfile(tmp)
+
+                    with ZipFile(tmp, 'r') as zipObj:
+                        zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
+
+                except:
+                    try:
+                        from resources.lib.base.l1.zipfile import ZipFile as ZipFile2
+
+                        with ZipFile2(tmp, 'r') as zipObj:
+                            zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
+                    except:
+                        return None
 
 def api_set_profile(id=''):
     return None

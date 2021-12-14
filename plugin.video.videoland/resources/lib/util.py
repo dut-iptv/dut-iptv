@@ -5,30 +5,35 @@ from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, load_file, load_profile, write_file
+from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, encode_obj, load_file, load_profile, write_file
 from resources.lib.base.l4 import gui
-from resources.lib.base.l5.api import api_get_channels
 from resources.lib.base.l6 import inputstream
 from resources.lib.constants import CONST_IMAGES
-
 from urllib.parse import urlencode
 
 def check_devices():
     pass
+
+def check_entitlements():
+    return
+
+def get_image(prefix, content):
+    return ''
+
+def get_play_url(content):
+    return {'play_url': '', 'locator': ''}
 
 def plugin_ask_for_creds(creds):
     username = str(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
 
     if not len(str(username)) > 0:
         gui.ok(message=_.EMPTY_USER, heading=_.LOGIN_ERROR_TITLE)
-
         return {'result': False, 'username': '', 'password': ''}
 
     password = str(gui.input(message=_.ASK_PASSWORD, hide_input=True)).strip()
 
     if not len(str(password)) > 0:
         gui.ok(message=_.EMPTY_PASS, heading=_.LOGIN_ERROR_TITLE)
-
         return {'result': False, 'username': '', 'password': ''}
 
     return {'result': True, 'username': username, 'password': password}
@@ -92,8 +97,6 @@ def plugin_process_info(playdata):
     if check_key(playdata['info'], 'directors'):
         info['director'] = playdata['info']['directors']
 
-    log(info)
-
     return info
 
 def plugin_process_playdata(playdata):
@@ -119,9 +122,6 @@ def plugin_process_playdata(playdata):
     return item_inputstream, CDMHEADERS
 
 def plugin_renew_token(data):
-    return None
-
-def plugin_vod_subscription_filter():
     return None
 
 def plugin_process_watchlist(data, continuewatch=0):
@@ -219,29 +219,6 @@ def plugin_process_watchlist_listing(data, id=None, continuewatch=0):
     items = []
 
     return items
-
-def encode_obj(in_obj):
-    def encode_list(in_list):
-        out_list = []
-        for el in in_list:
-            out_list.append(encode_obj(el))
-        return out_list
-
-    def encode_dict(in_dict):
-        out_dict = {}
-
-        for k, v in in_dict.items():
-            out_dict[k] = encode_obj(v)
-
-        return out_dict
-
-    if isinstance(in_obj, str):
-        return in_obj.encode('utf-8')
-    elif isinstance(in_obj, list):
-        return encode_list(in_obj)
-    elif isinstance(in_obj, tuple):
-        return tuple(encode_list(in_obj))
-    elif isinstance(in_obj, dict):
-        return encode_dict(in_obj)
-
-    return in_obj
+    
+def plugin_vod_subscription_filter():
+    return None

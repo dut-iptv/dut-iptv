@@ -26,6 +26,10 @@ CONST_DEFAULT_API = 'https://api.formula1.com/v2/account'
 
 CONST_FIRST_BOOT = False
 
+CONST_HAS_DUTIPTV = False
+
+CONST_HAS_LIBRARY = False
+
 CONST_HAS_LIVE = False
 
 CONST_HAS_REPLAY = False
@@ -33,6 +37,16 @@ CONST_HAS_REPLAY = False
 CONST_HAS_SEARCH = False
 
 CONST_IMAGE_URL = 'https://f1tv.formula1.com/image-resizer/image'
+
+CONST_IMAGES = {
+    'vod': {
+        'large': '',
+        'small': '',
+        'replace': '[format]'
+    },
+}
+
+CONST_LIBRARY = {}
 
 CONST_MAIN_VOD_AR = ['395', '1510', '392', '2128', '2130', '493', '410', '413', '3675', '3673', '3946', '804']
 

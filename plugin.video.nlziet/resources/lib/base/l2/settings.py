@@ -1,37 +1,37 @@
 import json, xbmcaddon
 from resources.lib.base.l1.constants import ADDON_ID
 
-def open():
-    xbmcaddon.Addon(ADDON_ID).openSettings()
+def open(addon=ADDON_ID):
+    xbmcaddon.Addon(addon).openSettings()
 
-def getDict(key, default=None):
+def getDict(key, default=None, addon=ADDON_ID):
     try:
-        return json.loads(get(key))
+        return json.loads(get(key, addon=addon))
     except:
         return default
 
-def setDict(key, value):
-    set(key, json.dumps(value))
+def setDict(key, value, addon=ADDON_ID):
+    set(key, json.dumps(value), addon=addon)
 
-def getInt(key, default=None):
+def getInt(key, default=None, addon=ADDON_ID):
     try:
-        return int(get(key))
+        return int(get(key, addon=addon))
     except:
         return default
 
-def setInt(key, value):
-    set(key, int(value))
+def setInt(key, value, addon=ADDON_ID):
+    set(key, int(value), addon=addon)
 
-def getBool(key, default=False):
-    value = get(key).lower()
+def getBool(key, default=False, addon=ADDON_ID):
+    value = get(key, addon=addon).lower()
 
     if not value:
         return default
     else:
         return value == 'true'
 
-def getEnum(key, choices=None, default=None):
-    index = getInt(key)
+def getEnum(key, choices=None, default=None, addon=ADDON_ID):
+    index = getInt(key, addon=addon)
 
     if index == None or not choices:
         return default
@@ -41,14 +41,14 @@ def getEnum(key, choices=None, default=None):
     except KeyError:
         return default
 
-def remove(key):
-    set(key, '')
+def remove(key, addon=ADDON_ID):
+    set(key, '', addon=addon)
 
-def setBool(key, value=True):
-    set(key, 'true' if value else 'false')
+def setBool(key, value=True, addon=ADDON_ID):
+    set(key, 'true' if value else 'false', addon=addon)
 
-def get(key, default=''):
-    return str(xbmcaddon.Addon(ADDON_ID).getSetting(key)) or str(default)
+def get(key, default='', addon=ADDON_ID):
+    return str(xbmcaddon.Addon(addon).getSetting(key)) or str(default)
 
-def set(key, value=''):
-    xbmcaddon.Addon(ADDON_ID).setSetting(key, str(value))
+def set(key, value='', addon=ADDON_ID):
+    xbmcaddon.Addon(addon).setSetting(key, str(value))

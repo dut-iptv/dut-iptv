@@ -95,7 +95,7 @@ def add_library_sources():
             rows = db.execute(query)
 
             if rows.rowcount == 0:
-                query = "INSERT INTO path (strPath, strContent, strScraper, scanRecursive, useFolderNames, strSettings, noUpdate, exclude, dateAdded, idParentPath, allAudio) VALUES ('{}', 'shows', 'metadata.local', 0, 0, '', 0, 0, NULL, NULL, 0)".format(os.path.join(ADDON_PROFILE, 'shows', ''))
+                query = "INSERT INTO path (strPath, strContent, strScraper, scanRecursive, useFolderNames, strSettings, noUpdate, exclude, dateAdded, idParentPath, allAudio) VALUES ('{}', 'tvshows', 'metadata.local', 0, 0, '', 0, 0, NULL, NULL, 0)".format(os.path.join(ADDON_PROFILE, 'shows', ''))
                 db.execute(query)
         except:
             pass
@@ -165,6 +165,39 @@ def change_icon():
         db.commit()
         db.close()
 
+def remove_library(type):
+    from sqlite3 import dbapi2 as sqlite
+
+    shutil.rmtree(os.path.join(ADDON_PROFILE, type))
+    clean_library(show_dialog=False)
+
+    for file in glob.glob(xbmcvfs.translatePath("special://database") + os.sep + "*MyVideos*.db"):
+        db = sqlite.connect(file)
+
+        if type == 'movies':
+            query = "DELETE FROM movie WHERE ROWID IN (SELECT b.ROWID FROM movie b INNER JOIN files c ON b.idFile=c.idFile WHERE c.ROWID IN (SELECT d.ROWID FROM files d INNER JOIN path e ON d.idPath=e.idPath WHERE e.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM files WHERE ROWID IN (SELECT b.ROWID FROM files b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM path WHERE strPath LIKE '%{}%';".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+        elif type == 'shows':
+            query = "DELETE FROM episode WHERE ROWID IN (SELECT b.ROWID FROM episode b INNER JOIN files c ON b.idFile=c.idFile WHERE c.ROWID IN (SELECT d.ROWID FROM files d INNER JOIN path e ON d.idPath=e.idPath WHERE e.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM files WHERE ROWID IN (SELECT b.ROWID FROM files b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM seasons WHERE ROWID IN (SELECT b.ROWID FROM seasons b INNER JOIN tvshow c ON b.idShow=c.idShow WHERE c.ROWID IN (SELECT d.ROWID FROM tvshow d INNER JOIN tvshowlinkpath e ON d.idShow=e.idShow WHERE e.ROWID IN (SELECT f.ROWID FROM tvshowlinkpath f INNER JOIN path g ON f.idPath=g.idPath WHERE g.strPath LIKE '%{}%')));".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM tvshow WHERE ROWID IN (SELECT d.ROWID FROM tvshow d INNER JOIN tvshowlinkpath e ON d.idShow=e.idShow WHERE e.ROWID IN (SELECT f.ROWID FROM tvshowlinkpath f INNER JOIN path g ON f.idPath=g.idPath WHERE g.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM tvshowlinkpath WHERE ROWID IN (SELECT b.ROWID FROM tvshowlinkpath b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM path WHERE strPath LIKE '%{}%';".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+
+        db.commit()
+        db.close()
+
 def check_addon(addon):
     if xbmc.getCondVisibility('System.HasAddon({addon})'.format(addon=addon)) == 1:
         try:
@@ -198,20 +231,39 @@ def check_loggedin(addon):
         except:
             return False
 
-def clear_cache():
+def clear_cache(clear_all=0):
+    clear_all = int(clear_all)
+
     if not os.path.isdir(os.path.join(ADDON_PROFILE, "cache")):
         os.makedirs(os.path.join(ADDON_PROFILE, "cache"))
 
     for file in glob.glob(os.path.join(ADDON_PROFILE, "cache", "*.json")):
-        if is_file_older_than_x_days(file=file, days=1):
+        if clear_all==True or is_file_older_than_x_days(file=file, days=1):
             os.remove(file)
 
     if not os.path.isdir(os.path.join(ADDON_PROFILE, "tmp")):
         os.makedirs(os.path.join(ADDON_PROFILE, "tmp"))
 
     for file in glob.glob(os.path.join(ADDON_PROFILE, "tmp", "*.zip")):
-        if is_file_older_than_x_days(file=file, days=1):
+        if clear_all==True or is_file_older_than_x_days(file=file, days=1):
             os.remove(file)
+
+def clean_library(show_dialog=False, path=''):
+    method = 'VideoLibrary.Clean'
+    params = {'content': 'video',
+              'showdialogs': show_dialog}
+    if path:
+        params['directory'] = xbmcvfs.makeLegalFilename(xbmcvfs.translatePath(path))
+
+    while xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic'):
+        xbmc.Monitor().waitForAbort(1)
+
+    result = json_rpc(method, params)
+
+    while xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic'):
+        xbmc.Monitor().waitForAbort(1)
+
+    return result
 
 def clear_old():
     if os.path.isfile(os.path.join(ADDON_PROFILE, 'settings.db')):
@@ -279,6 +331,32 @@ def disable_prefs(type, channels):
                 prefs[str(currow)] = mod_pref
 
     save_prefs(profile_id=1, prefs=prefs)
+
+def encode_obj(in_obj):
+    def encode_list(in_list):
+        out_list = []
+        for el in in_list:
+            out_list.append(encode_obj(el))
+        return out_list
+
+    def encode_dict(in_dict):
+        out_dict = {}
+
+        for k, v in in_dict.items():
+            out_dict[k] = encode_obj(v)
+
+        return out_dict
+
+    if isinstance(in_obj, str):
+        return in_obj.encode('utf-8')
+    elif isinstance(in_obj, list):
+        return encode_list(in_obj)
+    elif isinstance(in_obj, tuple):
+        return tuple(encode_list(in_obj))
+    elif isinstance(in_obj, dict):
+        return encode_dict(in_obj)
+
+    return in_obj
 
 def fixBadZipfile(zipFile):
     f = open(zipFile, 'r+b')
@@ -458,6 +536,24 @@ def md5sum(filepath):
         return None
 
     return hashlib.md5(open(filepath,'rb').read()).hexdigest()
+
+def scan_library(show_dialog=True, path=''):
+    method = 'VideoLibrary.Scan'
+
+    params = {'showdialogs': show_dialog}
+
+    if path:
+        params['directory'] = xbmcvfs.makeLegalFilename(xbmcvfs.translatePath(path))
+
+    while xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic'):
+        xbmc.Monitor().waitForAbort(1)
+
+    result = json_rpc(method, params)
+
+    while xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic'):
+        xbmc.Monitor().waitForAbort(1)
+
+    return result
 
 def set_credentials(username, password):
     profile_settings = load_profile(profile_id=1)

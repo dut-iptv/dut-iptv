@@ -12,10 +12,10 @@ class Credentials(object):
         encoded_username = ''
         encoded_password = ''
 
-        if len(str(username)) > 0:
+        if username and len(str(username)) > 0:
             encoded_username = self.encode(raw=username)
 
-        if len(str(password)) > 0:
+        if password and len(str(password)) > 0:
             encoded_password = self.encode(raw=password)
 
         return {

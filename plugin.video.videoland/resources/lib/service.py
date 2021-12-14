@@ -1,10 +1,10 @@
-import glob, hashlib, io, json, os, re, requests, shutil, time, xbmc, xbmcvfs
+import glob, hashlib, io, json, os, re, requests, shutil, time, xbmc, xbmcgui, xbmcvfs
 
 from resources.lib.api import api_get_series_nfo, api_list_watchlist, api_vod_season, api_vod_seasons
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, PROVIDER_NAME
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
-from resources.lib.base.l3.util import check_addon, check_loggedin, check_key, json_rpc, load_file, md5sum, txt2filename, write_file
+from resources.lib.base.l3.util import check_addon, check_loggedin, check_key, clean_library, encode_obj, json_rpc, load_file, md5sum, scan_library, txt2filename, write_file
 from resources.lib.base.l5.api import api_get_vod_by_type
 from resources.lib.constants import CONST_IMAGES, CONST_LIBRARY
 from resources.lib.util import plugin_process_watchlist, plugin_vod_subscription_filter
@@ -88,13 +88,15 @@ def update_library():
 
             if not filename in movie_list:
                 movies_removed = True
-                
+
                 try:
                     os.remove(file)
                 except:
                     pass
 
         shows_list = []
+        remove_shows = []
+        remove_shows2 = []
 
         if librarysettings['library_shows'] > 0:
             if librarysettings['library_shows'] == 2:
@@ -113,9 +115,10 @@ def update_library():
 
             if not filename in shows_list:
                 shows_removed = True
-                
+
                 try:
-                    shutil.rmtree(file)
+                    os.remove(os.path.join(ADDON_PROFILE, "shows", filename, 'tvshow.nfo'))
+                    remove_shows.append(os.path.join(ADDON_PROFILE, "shows", filename, ""))
                 except:
                     pass
 
@@ -124,7 +127,7 @@ def update_library():
 
             if not filename in shows_list:
                 shows_removed = True
-                
+
                 try:
                     os.remove(file)
                 except:
@@ -139,59 +142,49 @@ def update_library():
 
                 try:
                     os.removedirs(newDir)
+                    remove_shows2.append(os.path.join(newDir, ""))
                     shows_removed = True
                 except:
                     pass
 
+        for removal in remove_shows:
+            clean_library(show_dialog=False, path=removal)
+            #Manual DB removal?
+
+        for removal2 in remove_shows2:
+            clean_library(show_dialog=False, path=removal2)
+            #Manual DB removal?
+
         if movies_added == True or shows_added == True:
-            while xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic'):
-                xbmc.Monitor().waitForAbort(10)
-
             if movies_added == True:
-                scan_library(show_dialog=True, path=os.path.join(ADDON_PROFILE, "movies", ""))
-
-                while xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic'):
-                    xbmc.Monitor().waitForAbort(10)
+                scan_library(show_dialog=False, path=os.path.join(ADDON_PROFILE, "movies", ""))
 
             if shows_added == True:
-                scan_library(show_dialog=True, path=os.path.join(ADDON_PROFILE, "shows", ""))
+                scan_library(show_dialog=False, path=os.path.join(ADDON_PROFILE, "shows", ""))
 
-                while xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic'):
-                    xbmc.Monitor().waitForAbort(10)
-
-    if movies_removed == True:
-        clean_library(show_dialog=False, path=os.path.join(ADDON_PROFILE, "movies", ""))
-
-    if shows_removed == True:
-        clean_library(show_dialog=False, path=os.path.join(ADDON_PROFILE, "shows", ""))
-
-def scan_library(show_dialog=True, path=''):
-    method = 'VideoLibrary.Scan'
-
-    params = {'showdialogs': show_dialog}
-
-    if path:
-        params['directory'] = xbmcvfs.makeLegalFilename(xbmcvfs.translatePath(path))
-
-    return json_rpc(method, params)
-
-def clean_library(show_dialog=False, path=''):
-    method = 'VideoLibrary.Clean'
-    params = {'content': 'video',
-              'showdialogs': show_dialog}
-    if path:
-        params['directory'] = xbmcvfs.makeLegalFilename(xbmcvfs.translatePath(path))
-
-    return json_rpc(method, params)
+    if movies_removed == True or shows_removed == True:
+        clean_library(show_dialog=False)
+        #clean_library(show_dialog=False, path=os.path.join(ADDON_PROFILE, "movies", ""))
+        #clean_library(show_dialog=False, path=os.path.join(ADDON_PROFILE, "shows", ""))
 
 def create_stream(type, type2, skip, skiplist):
     return_list = []
     subscription_filter = plugin_vod_subscription_filter()
     data = api_get_vod_by_type(type=type, character=None, genre=None, subscription_filter=subscription_filter, menu=0)
     count = 0
+    progress_abs = 0
+    progress_rel = 0
+    total = 0
     add = False
 
     if data:
+        #pDialog = xbmcgui.DialogProgressBG()
+        #pDialog.create(str(PROVIDER_NAME).capitalize(), 'Update {}...'.format(type))
+        total = len(data)
+
+        if skip == 1 and skiplist:
+            total = len(skiplist)
+
         for currow in data:
             row = data[currow]
 
@@ -202,8 +195,7 @@ def create_stream(type, type2, skip, skiplist):
             label = str(row['title'])
             year = 0
 
-            filename = str(label)
-            filename = txt2filename(txt=filename, chr_set='printable', no_ext=True)
+            filename = txt2filename(txt=str(label), chr_set='printable', no_ext=True)
 
             if check_key(row, 'datum'):
                 if len(str(row['datum'])) > 0:
@@ -239,7 +231,9 @@ def create_stream(type, type2, skip, skiplist):
                     seriesinfo['description'] = ''
                     seriesinfo['category'] = ''
                     seriesinfo['datum'] = ''
-                    seriesinfo['icon'] = ''
+                    seriesinfo['icon_poster'] = ''
+                    seriesinfo['icon_still'] = ''
+                    seriesinfo['allnumeric'] = 1
 
                     if check_key(data2['data'], 'description'):
                         seriesinfo['description'] = data2['data']['description']
@@ -250,10 +244,11 @@ def create_stream(type, type2, skip, skiplist):
                     if check_key(data2['data'], 'year'):
                         seriesinfo['datum'] = str(data2['data']['year']) + '0101'
 
-                    if check_key(data2['data'], 'still'):
-                        seriesinfo['icon'] = data2['data']['still']
+                    if check_key(data2['data'], 'poster'):
+                        seriesinfo['icon_poster'] = data2['data']['poster']
 
-                    create_nfo_file(os.path.join(ADDON_PROFILE, "shows", filename, 'tvshow'), seriesinfo, 'show')
+                    if check_key(data2['data'], 'still'):
+                        seriesinfo['icon_still'] = data2['data']['still']
 
                     for item in data2['data']['details']:
                         row = data2['data']['details'][item]
@@ -266,12 +261,13 @@ def create_stream(type, type2, skip, skiplist):
                             episodes[row['ref']]['position'] = ''
                             episodes[row['ref']]['description'] = ''
                             episodes[row['ref']]['duration'] = ''
-                            episodes[row['ref']]['icon'] = ''
+                            episodes[row['ref']]['icon_poster'] = ''
+                            episodes[row['ref']]['icon_still'] = ''
                             episodes[row['ref']]['datum'] = ''
 
                             if check_key(row, 'position'):
                                 episodes[row['ref']]['position'] = re.sub("[^0-9]", "", str(row['position']))
-                                
+
                             if len(str(episodes[row['ref']]['position'])) == 0:
                                 episodes[row['ref']]['position'] = 1
 
@@ -281,8 +277,11 @@ def create_stream(type, type2, skip, skiplist):
                             if check_key(row, 'runtime'):
                                 episodes[row['ref']]['duration'] = row['runtime']
 
+                            if check_key(row, 'poster'):
+                                episodes[row['ref']]['icon_poster'] = row['poster']
+
                             if check_key(row, 'still'):
-                                episodes[row['ref']]['icon'] = row['still']
+                                episodes[row['ref']]['icon_still'] = row['still']
 
                         elif row['type'] == 'season':
                             if not check_key(row, 'refs'):
@@ -302,12 +301,13 @@ def create_stream(type, type2, skip, skiplist):
                                         episodes[row2['ref']]['position'] = ''
                                         episodes[row2['ref']]['description'] = ''
                                         episodes[row2['ref']]['duration'] = ''
-                                        episodes[row2['ref']]['icon'] = ''
+                                        episodes[row2['ref']]['icon_poster'] = ''
+                                        episodes[row2['ref']]['icon_still'] = ''
                                         episodes[row2['ref']]['datum'] = ''
 
                                         if check_key(row2, 'position'):
                                             episodes[row2['ref']]['position'] = re.sub("[^0-9]", "", str(row2['position']))
-                                            
+
                                         if len(str(episodes[row2['ref']]['position'])) == 0:
                                             episodes[row2['ref']]['position'] = 1
 
@@ -317,57 +317,89 @@ def create_stream(type, type2, skip, skiplist):
                                         if check_key(row2, 'runtime'):
                                             episodes[row2['ref']]['duration'] = row2['runtime']
 
+                                        if check_key(row2, 'poster'):
+                                            episodes[row2['ref']]['icon_poster'] = row2['poster']
+
                                         if check_key(row2, 'still'):
-                                            episodes[row2['ref']]['icon'] = row2['still']
+                                            episodes[row2['ref']]['icon_still'] = row2['still']
+
                                     elif row['type'] == 'season':
                                         if check_key(row2, 'refs') and row['id'] == row2['id']:
                                             row['refs'] = row2['refs']
 
                             if check_key(row, 'refs'):
                                 seasons[row['ref']] = {}
-                                seasons[row['ref']]['title'] = re.sub("[^0-9]", "", str(row['title']))
-                                
+                                seasons[row['ref']]['title'] = re.sub("[^0-9]", "", str(row['title']).strip())
+                                seasons[row['ref']]['origtitle'] = str(row['title']).strip()
+
+                                if not str(row['title']).strip() == str(seasons[row['ref']]['title']).strip():
+                                    seriesinfo['allnumeric'] = 0
+
                                 if len(str(seasons[row['ref']]['title'])) == 0:
                                     seasons[row['ref']]['title'] = 1
-                                
+
+                                if len(str(seasons[row['ref']]['origtitle'])) == 0:
+                                    seasons[row['ref']]['origtitle'] = 1
+
                                 seasons[row['ref']]['refs'] = row['refs']
                                 seasons[row['ref']]['id'] = row['id']
-                            
-                                if not os.path.isdir(os.path.join(ADDON_PROFILE, "shows", filename, 'Season ' + str(seasons[row['ref']]['title']))):
-                                    os.makedirs(os.path.join(ADDON_PROFILE, "shows", filename, 'Season ' + str(seasons[row['ref']]['title'])))
+                                seasons[row['ref']]['position'] = row['position']
 
                     if len(seasons) == 0:
                         shutil.rmtree(os.path.join(ADDON_PROFILE, "shows", filename))
+                    else:
+                        seriesinfo['seasons'] = {}
 
-                    for season in seasons:
-                        row = seasons[season]
+                        for season in seasons:
+                            row = seasons[season]
 
-                        for ref in row['refs']:
-                            season_ep = '.'
-                            filename_ep = filename
-                        
-                            if len(str(row['title'])) > 0:
-                                season_ep += 'S{:02d}'.format(int(row['title']))
-                                
-                            if len(str(episodes[ref]['position'])) > 0:
-                                season_ep += 'E{:02d}'.format(int(episodes[ref]['position']))
-                        
-                            if len(str(season_ep)) > 1:
-                                filename_ep += str(season_ep)
+                            if seriesinfo['allnumeric'] == 1:
+                                season_path = os.path.join(ADDON_PROFILE, "shows", filename, 'Season ' + str(row['origtitle']))
+                            else:
+                                season_path = os.path.join(ADDON_PROFILE, "shows", filename, 'Season ' + str(row['position']))
 
-                            return_list.append(filename_ep + '.strm')
-                            return_list.append(filename_ep + '.nfo')
-                            filename_ep = os.path.join(ADDON_PROFILE, "shows", filename, 'Season ' + str(row['title']), filename_ep)
+                            if not os.path.isdir(season_path):
+                                os.makedirs(season_path)
 
-                            if create_strm_file(filename_ep, 'E' + str(seriesid) + '###' + str(row['id']) + '###' + str(episodes[ref]['id']), episodes[ref]['title']) == True:
-                                add = True
+                            for ref in row['refs']:
+                                season_ep = '.'
+                                filename_ep = filename
 
-                            episodes[ref]['season'] = row['title']
-                            create_nfo_file(filename_ep, episodes[ref], 'episode')
+                                if len(str(row['title'])) > 0:
+                                    if seriesinfo['allnumeric'] == 1:
+                                        season_title = str(row['origtitle'])
+                                    else:
+                                        season_title = str(row['position'])
 
-                    if not data2['cache'] == 1:
-                        xbmc.Monitor().waitForAbort(3)
-                        count += 1
+                                    if season_title.isnumeric():
+                                        season_ep += 'S{:02d}'.format(int(season_title))
+                                    else:
+                                        season_ep += 'S{}'.format(season_title)
+
+                                if len(str(episodes[ref]['position'])) > 0:
+                                    season_ep += 'E{:02d}'.format(int(episodes[ref]['position']))
+
+                                if len(str(season_ep)) > 1:
+                                    filename_ep += str(season_ep)
+
+                                return_list.append(filename_ep + '.strm')
+                                return_list.append(filename_ep + '.nfo')
+                                filename_ep = os.path.join(season_path, filename_ep)
+                                seriesinfo['seasons'][str(row['position'])] = str(row['origtitle'])
+
+                                if create_strm_file(filename_ep, 'E' + str(seriesid) + '###' + str(row['id']) + '###' + str(episodes[ref]['id']), episodes[ref]['title']) == True:
+                                    add = True
+
+                                episodes[ref]['season'] = row['title']
+                                if create_nfo_file(filename_ep, episodes[ref], 'episode') == True:
+                                    add = True
+
+                        if not data2['cache'] == 1:
+                            xbmc.Monitor().waitForAbort(3)
+                            count += 1
+
+                        if create_nfo_file(os.path.join(ADDON_PROFILE, "shows", filename, 'tvshow'), seriesinfo, 'show') == True:
+                            add = True
             else:
                 return_list.append(filename + '.strm')
                 return_list.append(filename + '.nfo')
@@ -376,8 +408,20 @@ def create_stream(type, type2, skip, skiplist):
                 if create_strm_file(filename, id, label) == True:
                     add = True
 
+                if not check_key(row, 'icon_poster'):
+                    row['icon_poster'] = row['icon']
+
+                if not check_key(row, 'icon_still'):
+                    row['icon_still'] = row['icon']
+
                 if create_nfo_file(filename, row, 'movie') == True:
                     add = True
+
+            progress_abs += 1
+            progress_rel = int((progress_abs / total) * 100)
+            #pDialog.update(progress_rel)
+
+    #pDialog.close()
 
     return {'add': add, 'list': return_list }
 
@@ -434,6 +478,20 @@ def create_nfo_file(filename, data, type):
                 nodeText = doc.createTextNode(str(genre).strip())
                 tempChild.appendChild(nodeText)
 
+    if check_key(data, 'seasons'):
+        for season in data['seasons']:
+            origtitle = data['seasons'][season]
+            tempChild = doc.createElement('namedseason')
+
+            if str(origtitle).strip().isnumeric():
+                nodeText = doc.createTextNode('Seizoen ' + str(origtitle).strip())
+            else:
+                nodeText = doc.createTextNode(str(origtitle).strip())
+
+            tempChild.appendChild(nodeText)
+            tempChild.setAttribute("number", season)
+            root.appendChild(tempChild)
+
     tempChild = doc.createElement('thumb')
 
     if type == 'movie' or type == 'show':
@@ -443,10 +501,16 @@ def create_nfo_file(filename, data, type):
 
     root.appendChild(tempChild)
 
-    if settings.getBool('use_small_images', default=False) == True:
-        nodeText = doc.createTextNode(str(data['icon'].replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['small'])).strip())
-    else:
-        nodeText = doc.createTextNode(str(data['icon'].replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])).strip())
+    if len(str(data['icon_poster'])) > 0:
+        if settings.getBool('use_small_images', default=False) == True:
+            nodeText = doc.createTextNode(str(data['icon_poster'].replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['small'])).strip())
+        else:
+            nodeText = doc.createTextNode(str(data['icon_poster'].replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])).strip())
+    elif len(str(data['icon_still'])) > 0:
+        if settings.getBool('use_small_images', default=False) == True:
+            nodeText = doc.createTextNode(str(data['icon_still'].replace(CONST_IMAGES['still']['replace'], CONST_IMAGES['still']['small'])).strip())
+        else:
+            nodeText = doc.createTextNode(str(data['icon_still'].replace(CONST_IMAGES['still']['replace'], CONST_IMAGES['still']['large'])).strip())
 
     tempChild.appendChild(nodeText)
 
@@ -514,29 +578,3 @@ def create_strm_file(filename, id, label):
         return True
     else:
         return False
-
-def encode_obj(in_obj):
-    def encode_list(in_list):
-        out_list = []
-        for el in in_list:
-            out_list.append(encode_obj(el))
-        return out_list
-
-    def encode_dict(in_dict):
-        out_dict = {}
-
-        for k, v in in_dict.items():
-            out_dict[k] = encode_obj(v)
-
-        return out_dict
-
-    if isinstance(in_obj, str):
-        return in_obj.encode('utf-8')
-    elif isinstance(in_obj, list):
-        return encode_list(in_obj)
-    elif isinstance(in_obj, tuple):
-        return tuple(encode_list(in_obj))
-    elif isinstance(in_obj, dict):
-        return encode_dict(in_obj)
-
-    return in_obj

@@ -1,14 +1,111 @@
-import glob, hashlib, io, json, os, platform, pytz, re, requests, shutil, string, struct, time, xbmc, xbmcaddon, xbmcvfs
+import glob, hashlib, io, json, os, platform, pytz, re, requests, shutil, string, struct, time, unicodedata, xbmc, xbmcaddon, xbmcvfs
 
 from collections import OrderedDict
-from resources.lib.base.l1.constants import ADDON_ID, ADDON_PATH, ADDON_PROFILE, CONST_DUT_EPG_SETTINGS, PROVIDER_NAME
+from resources.lib.base.l1.constants import ADDON_ID, ADDON_PATH, ADDON_PROFILE, CONST_DUT_EPG_SETTINGS, PROVIDER_NAME, USERDATA_PATH
 from resources.lib.base.l1.encrypt import Credentials
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
+from xml.dom.minidom import parse
+
+def add_library_sources():
+    movies_path = os.path.join(ADDON_ID, 'movies')
+    shows_path = os.path.join(ADDON_ID, 'shows')
+
+    dom1 = parse(os.path.join(USERDATA_PATH, 'sources.xml'))
+
+    root = dom1.getElementsByTagName("video")[0]
+    sources = root.getElementsByTagName("source")
+
+    movies_found = False
+    shows_found = False
+
+    for source in sources:
+        path = source.getElementsByTagName("path")[0].firstChild.nodeValue
+
+        if movies_path in path:
+            movies_found = True
+
+        if shows_path in path:
+            shows_found = True
+
+    if movies_found == False:
+        tempChild = dom1.createElement('source')
+
+        tempChild2 = dom1.createElement('name')
+        nodeText = dom1.createTextNode('{} Movies'.format(PROVIDER_NAME).title())
+        tempChild2.appendChild(nodeText)
+        tempChild.appendChild(tempChild2)
+
+        tempChild3 = dom1.createElement('path')
+        tempChild3.setAttribute("pathversion", '1')
+        nodeText2 = dom1.createTextNode(os.path.join(ADDON_PROFILE, 'movies', ''))
+        tempChild3.appendChild(nodeText2)
+        tempChild.appendChild(tempChild3)
+
+        tempChild4 = dom1.createElement('allowsharing')
+        nodeText3 = dom1.createTextNode('true')
+        tempChild4.appendChild(nodeText3)
+        tempChild.appendChild(tempChild4)
+
+        root.appendChild(tempChild)
+
+    if shows_found == False:
+        tempChild5 = dom1.createElement('source')
+
+        tempChild6 = dom1.createElement('name')
+        nodeText5 = dom1.createTextNode('{} Shows'.format(PROVIDER_NAME).title())
+        tempChild6.appendChild(nodeText5)
+        tempChild5.appendChild(tempChild6)
+
+        tempChild7 = dom1.createElement('path')
+        tempChild7.setAttribute("pathversion", '1')
+        nodeText6 = dom1.createTextNode(os.path.join(ADDON_PROFILE, 'shows', ''))
+        tempChild7.appendChild(nodeText6)
+        tempChild5.appendChild(tempChild7)
+
+        tempChild8 = dom1.createElement('allowsharing')
+        nodeText7 = dom1.createTextNode('true')
+        tempChild8.appendChild(nodeText7)
+        tempChild5.appendChild(tempChild8)
+
+        root.appendChild(tempChild5)
+
+    if movies_found == False or shows_found == False:
+        write_file(os.path.join(USERDATA_PATH, 'sources.xml'), data=dom1.toprettyxml(), ext=True, isJSON=False)
+
+    from sqlite3 import dbapi2 as sqlite
+
+    for file in glob.glob(os.path.join(xbmcvfs.translatePath("special://database"), "*MyVideos*.db")):
+        db = sqlite.connect(file)
+
+        query = "UPDATE path SET strContent='movies', strScraper='metadata.local', scanRecursive=0, useFolderNames=0, strSettings='', noUpdate=0, exclude=0, dateAdded=NULL, idParentPath=NULL, allAudio=0 WHERE strPath='{}';".format(os.path.join(ADDON_PROFILE, 'movies', ''))
+
+        try:
+            rows = db.execute(query)
+
+            if rows.rowcount == 0:
+                query = "INSERT INTO path (strPath, strContent, strScraper, scanRecursive, useFolderNames, strSettings, noUpdate, exclude, dateAdded, idParentPath, allAudio) VALUES ('{}', 'movies', 'metadata.local', 0, 0, '', 0, 0, NULL, NULL, 0)".format(os.path.join(ADDON_PROFILE, 'movies', ''))
+                db.execute(query)
+        except:
+            pass
+
+        query = "UPDATE path SET strContent='tvshows', strScraper='metadata.local', scanRecursive=0, useFolderNames=0, strSettings='', noUpdate=0, exclude=0, dateAdded=NULL, idParentPath=NULL, allAudio=0 WHERE strPath='{}';".format(os.path.join(ADDON_PROFILE, 'shows', ''))
+
+        try:
+            rows = db.execute(query)
+
+            if rows.rowcount == 0:
+                query = "INSERT INTO path (strPath, strContent, strScraper, scanRecursive, useFolderNames, strSettings, noUpdate, exclude, dateAdded, idParentPath, allAudio) VALUES ('{}', 'tvshows', 'metadata.local', 0, 0, '', 0, 0, NULL, NULL, 0)".format(os.path.join(ADDON_PROFILE, 'shows', ''))
+                db.execute(query)
+        except:
+            pass
+
+        db.commit()
+        db.close()
 
 def change_icon():
-    addon_icon = ADDON_PATH + os.sep + "icon.png"
-    settings_file = ADDON_PROFILE + os.sep + 'settings.json'
+    addon_icon = os.path.join(ADDON_PATH, "icon.png")
+    settings_file = os.path.join(ADDON_PROFILE, 'settings.json')
 
     if is_file_older_than_x_days(file=settings_file, days=14):
         r = requests.get(CONST_DUT_EPG_SETTINGS, stream=True)
@@ -26,7 +123,7 @@ def change_icon():
             r.close()
 
     settingsJSON = load_file(file='settings.json', isJSON=True)
-    
+
     if not settingsJSON or not check_key(settingsJSON, 'icon') or not check_key(settingsJSON['icon'], 'md5') or not check_key(settingsJSON['icon'], 'url'):
         return
 
@@ -47,7 +144,7 @@ def change_icon():
 
     from sqlite3 import dbapi2 as sqlite
 
-    for file in glob.glob(xbmcvfs.translatePath("special://database") + os.sep + "*Textures*.db"):    
+    for file in glob.glob(xbmcvfs.translatePath("special://database") + os.sep + "*Textures*.db"):
         db = sqlite.connect(file)
         query = "SELECT cachedurl FROM texture WHERE url LIKE '%addons%" + ADDON_ID + "%icon.png';"
 
@@ -65,6 +162,39 @@ def change_icon():
         query = "DELETE FROM texture WHERE url LIKE '%addons%{addon}%icon.png';".format(addon=ADDON_ID)
 
         db.execute(query)
+        db.commit()
+        db.close()
+
+def remove_library(type):
+    from sqlite3 import dbapi2 as sqlite
+
+    shutil.rmtree(os.path.join(ADDON_PROFILE, type))
+    clean_library(show_dialog=False)
+
+    for file in glob.glob(xbmcvfs.translatePath("special://database") + os.sep + "*MyVideos*.db"):
+        db = sqlite.connect(file)
+
+        if type == 'movies':
+            query = "DELETE FROM movie WHERE ROWID IN (SELECT b.ROWID FROM movie b INNER JOIN files c ON b.idFile=c.idFile WHERE c.ROWID IN (SELECT d.ROWID FROM files d INNER JOIN path e ON d.idPath=e.idPath WHERE e.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM files WHERE ROWID IN (SELECT b.ROWID FROM files b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM path WHERE strPath LIKE '%{}%';".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+        elif type == 'shows':
+            query = "DELETE FROM episode WHERE ROWID IN (SELECT b.ROWID FROM episode b INNER JOIN files c ON b.idFile=c.idFile WHERE c.ROWID IN (SELECT d.ROWID FROM files d INNER JOIN path e ON d.idPath=e.idPath WHERE e.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM files WHERE ROWID IN (SELECT b.ROWID FROM files b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM seasons WHERE ROWID IN (SELECT b.ROWID FROM seasons b INNER JOIN tvshow c ON b.idShow=c.idShow WHERE c.ROWID IN (SELECT d.ROWID FROM tvshow d INNER JOIN tvshowlinkpath e ON d.idShow=e.idShow WHERE e.ROWID IN (SELECT f.ROWID FROM tvshowlinkpath f INNER JOIN path g ON f.idPath=g.idPath WHERE g.strPath LIKE '%{}%')));".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM tvshow WHERE ROWID IN (SELECT d.ROWID FROM tvshow d INNER JOIN tvshowlinkpath e ON d.idShow=e.idShow WHERE e.ROWID IN (SELECT f.ROWID FROM tvshowlinkpath f INNER JOIN path g ON f.idPath=g.idPath WHERE g.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM tvshowlinkpath WHERE ROWID IN (SELECT b.ROWID FROM tvshowlinkpath b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+            query = "DELETE FROM path WHERE strPath LIKE '%{}%';".format(os.path.join(ADDON_PROFILE, type))
+            db.execute(query)
+
         db.commit()
         db.close()
 
@@ -88,7 +218,7 @@ def check_key(object, key):
 def check_loggedin(addon):
     VIDEO_ADDON_PROFILE = ADDON_PROFILE.replace(ADDON_ID, addon)
 
-    profile = load_file(VIDEO_ADDON_PROFILE + 'profile.json', ext=True, isJSON=True)
+    profile = load_file(os.path.join(VIDEO_ADDON_PROFILE, 'profile.json'), ext=True, isJSON=True)
 
     if not profile:
         return False
@@ -101,30 +231,49 @@ def check_loggedin(addon):
         except:
             return False
 
-def clear_cache():
-    if not os.path.isdir(ADDON_PROFILE + "cache"):
-        os.makedirs(ADDON_PROFILE + "cache")
+def clear_cache(clear_all=0):
+    clear_all = int(clear_all)
 
-    for file in glob.glob(ADDON_PROFILE + "cache" + os.sep + "*.json"):
-        if is_file_older_than_x_days(file=file, days=1):
+    if not os.path.isdir(os.path.join(ADDON_PROFILE, "cache")):
+        os.makedirs(os.path.join(ADDON_PROFILE, "cache"))
+
+    for file in glob.glob(os.path.join(ADDON_PROFILE, "cache", "*.json")):
+        if clear_all==True or is_file_older_than_x_days(file=file, days=1):
             os.remove(file)
 
-    if not os.path.isdir(ADDON_PROFILE + "tmp"):
-        os.makedirs(ADDON_PROFILE + "tmp")
+    if not os.path.isdir(os.path.join(ADDON_PROFILE, "tmp")):
+        os.makedirs(os.path.join(ADDON_PROFILE, "tmp"))
 
-    for file in glob.glob(ADDON_PROFILE + "tmp" + os.sep + "*.zip"):
-        if is_file_older_than_x_days(file=file, days=1):
+    for file in glob.glob(os.path.join(ADDON_PROFILE, "tmp", "*.zip")):
+        if clear_all==True or is_file_older_than_x_days(file=file, days=1):
             os.remove(file)
+
+def clean_library(show_dialog=False, path=''):
+    method = 'VideoLibrary.Clean'
+    params = {'content': 'video',
+              'showdialogs': show_dialog}
+    if path:
+        params['directory'] = xbmcvfs.makeLegalFilename(xbmcvfs.translatePath(path))
+
+    while xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic'):
+        xbmc.Monitor().waitForAbort(1)
+
+    result = json_rpc(method, params)
+
+    while xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic'):
+        xbmc.Monitor().waitForAbort(1)
+
+    return result
 
 def clear_old():
-    if os.path.isfile(ADDON_PROFILE + 'settings.db'):
+    if os.path.isfile(os.path.join(ADDON_PROFILE, 'settings.db')):
         shutil.rmtree(ADDON_PROFILE)
 
-        if not os.path.isdir(ADDON_PROFILE + "tmp"):
-            os.makedirs(ADDON_PROFILE + "tmp")
+        if not os.path.isdir(os.path.join(ADDON_PROFILE, "tmp")):
+            os.makedirs(os.path.join(ADDON_PROFILE, "tmp"))
 
-        if not os.path.isdir(ADDON_PROFILE + "cache"):
-            os.makedirs(ADDON_PROFILE + "cache")
+        if not os.path.isdir(os.path.join(ADDON_PROFILE, "cache")):
+            os.makedirs(os.path.join(ADDON_PROFILE, "cache"))
 
 def convert_datetime_timezone(dt, tz1, tz2):
     tz1 = pytz.timezone(tz1)
@@ -183,17 +332,43 @@ def disable_prefs(type, channels):
 
     save_prefs(profile_id=1, prefs=prefs)
 
+def encode_obj(in_obj):
+    def encode_list(in_list):
+        out_list = []
+        for el in in_list:
+            out_list.append(encode_obj(el))
+        return out_list
+
+    def encode_dict(in_dict):
+        out_dict = {}
+
+        for k, v in in_dict.items():
+            out_dict[k] = encode_obj(v)
+
+        return out_dict
+
+    if isinstance(in_obj, str):
+        return in_obj.encode('utf-8')
+    elif isinstance(in_obj, list):
+        return encode_list(in_obj)
+    elif isinstance(in_obj, tuple):
+        return tuple(encode_list(in_obj))
+    elif isinstance(in_obj, dict):
+        return encode_dict(in_obj)
+
+    return in_obj
+
 def fixBadZipfile(zipFile):
     f = open(zipFile, 'r+b')
     data = f.read()
 
     try:
-        pos = data.find(b'\x50\x4b\x05\x06') # End of central directory signature
+        pos = data.find(b'\x50\x4b\x05\x06')
     except:
         pos = data.find('\x50\x4b\x05\x06')
 
     if (pos > 0):
-        f.seek(pos + 22)   # size of 'ZIP end of central directory record'
+        f.seek(pos + 22)
         f.truncate()
         f.close()
 
@@ -210,8 +385,9 @@ def get_credentials():
     else:
         password = profile_settings['pswd']
 
-    if len(username) < 50 and len(password) < 50:
+    if len(str(username)) < 50 and len(str(password)) < 50:
         set_credentials(username, password)
+
         return {'username' : username, 'password' : password }
 
     return Credentials().decode_credentials(username, password)
@@ -243,13 +419,11 @@ def get_system_arch():
     #64bit kernel with 32bit userland
     if ('aarch64' in arch or 'arm64' in arch) and (struct.calcsize("P") * 8) == 32:
         arch = 'armv7'
-
     elif 'arm' in arch:
         if 'v6' in arch:
             arch = 'armv6'
         else:
             arch = 'armv7'
-
     elif arch == 'i686':
         arch = 'i386'
 
@@ -262,7 +436,7 @@ def is_file_older_than_x_days(file, days=1):
     totaltime = int(time.time()) - int(os.path.getmtime(file))
     totalhours = float(totaltime) / float(3600)
 
-    if totalhours > 24*days:
+    if totalhours > 24 * days:
         return True
     else:
         return False
@@ -279,8 +453,17 @@ def is_file_older_than_x_minutes(file, minutes=1):
     else:
         return False
 
+def json_rpc(method, params=None):
+    request_data = {'jsonrpc': '2.0', 'method': method, 'id': 1,
+                    'params': params or {}}
+    request = json.dumps(request_data)
+    raw_response = xbmc.executeJSONRPC(request)
+    response = json.loads(raw_response)
+
+    return response['result']
+
 def load_channels(type):
-    return load_file(file='cache' + os.sep + type[0] + '.channels.json', ext=False, isJSON=True)
+    return load_file(file=os.path.join('cache', type[0], '.channels.json'), ext=False, isJSON=True)
 
 def load_file(file, ext=False, isJSON=False):
     if ext:
@@ -294,7 +477,7 @@ def load_file(file, ext=False, isJSON=False):
         if ext:
             full_path = file
         else:
-            full_path = ADDON_PROFILE + file
+            full_path = os.path.join(ADDON_PROFILE, file)
 
         if not os.path.isfile(full_path):
             return None
@@ -354,6 +537,24 @@ def md5sum(filepath):
 
     return hashlib.md5(open(filepath,'rb').read()).hexdigest()
 
+def scan_library(show_dialog=True, path=''):
+    method = 'VideoLibrary.Scan'
+
+    params = {'showdialogs': show_dialog}
+
+    if path:
+        params['directory'] = xbmcvfs.makeLegalFilename(xbmcvfs.translatePath(path))
+
+    while xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic'):
+        xbmc.Monitor().waitForAbort(1)
+
+    result = json_rpc(method, params)
+
+    while xbmc.getCondVisibility('Library.IsScanningVideo') or xbmc.getCondVisibility('Library.IsScanningMusic'):
+        xbmc.Monitor().waitForAbort(1)
+
+    return result
+
 def set_credentials(username, password):
     profile_settings = load_profile(profile_id=1)
 
@@ -374,7 +575,7 @@ def set_credentials(username, password):
 
     save_profile(profile_id=1, profile=profile_settings)
 
-def txt2filename(txt, chr_set='printable'):
+def txt2filename(txt, chr_set='printable', no_ext=False):
     """Converts txt to a valid filename.
 
     Args:
@@ -385,7 +586,20 @@ def txt2filename(txt, chr_set='printable'):
             'universal':    For almost *any* file system. '-.0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     """
 
-    ext = '' if '.' not in txt else txt[txt.rfind('.'):]
+    try:
+        text = unicode(txt, 'utf-8')
+    except (TypeError, NameError):
+        text = txt
+
+    text = unicodedata.normalize('NFD', text)
+    text = text.encode('ascii', 'ignore')
+    text = text.decode("utf-8")
+    txt = str(text)
+
+    if no_ext == False:
+        ext = '' if '.' not in txt else txt[txt.rfind('.'):]
+    else:
+        ext = ''
 
     FILLER = '-'
     MAX_LEN = 255  # Maximum length of filename is 255 bytes in Windows and some *nix flavors.
@@ -474,7 +688,7 @@ def write_file(file, data, ext=False, isJSON=False):
     if ext:
         full_path = file
     else:
-        full_path = ADDON_PROFILE + file
+        full_path = os.path.join(ADDON_PROFILE, file)
 
     directory = os.path.dirname(full_path)
 

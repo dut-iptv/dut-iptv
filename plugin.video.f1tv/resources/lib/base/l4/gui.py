@@ -1,6 +1,6 @@
 import sys, traceback, xbmc, xbmcgui
-from contextlib import contextmanager
 
+from contextlib import contextmanager
 from resources.lib.base.l1.constants import ADDON_ICON, ADDON_ID, ADDON_NAME
 from resources.lib.base.l3.language import _
 from urllib.parse import quote, urlparse
@@ -25,6 +25,7 @@ def select(heading=None, options=None, autoclose=None, **kwargs):
         kwargs['autoclose'] = autoclose
 
     _options = []
+
     for option in options:
         if issubclass(type(option), Item):
             option = option.get_li()
@@ -43,6 +44,7 @@ def exception(heading=None):
     exc_type, exc_value, exc_traceback = sys.exc_info()
 
     tb = []
+
     for trace in reversed(traceback.extract_tb(exc_traceback)):
         if ADDON_ID in trace[0]:
             trace = list(trace)
@@ -56,6 +58,7 @@ def exception(heading=None):
 class Progress(object):
     def __init__(self, message, heading=None, percent=0, background=False):
         heading = _make_heading(heading)
+
         if background:
             self._dialog = xbmcgui.DialogProgressBG()
         else:
@@ -111,10 +114,12 @@ def numeric(message, default='', type=0, **kwargs):
 
 def error(message, heading=None):
     heading = heading or _(_.PLUGIN_ERROR, addon=ADDON_NAME)
+
     return ok(message, heading)
 
 def ok(message, heading=None):
     heading = _make_heading(heading)
+
     return xbmcgui.Dialog().ok(heading, message)
 
 def text(message, heading=None, **kwargs):
@@ -180,6 +185,7 @@ class Item(object):
 
         if self.cookies:
             string += 'Cookie='
+
             for key in self.cookies:
                 string += u'{0}%3D{1}; '.format(key, quote(u'{}'.format(self.cookies[key]).encode('utf8')))
 
@@ -301,6 +307,7 @@ class Item(object):
         if self.path and self.path.lower().startswith('http'):
             if not mimetype:
                 parse = urlparse(self.path.lower())
+
                 if parse.path.endswith('.m3u') or parse.path.endswith('.m3u8'):
                     mimetype = 'application/vnd.apple.mpegurl'
                 elif parse.path.endswith('.mpd'):

@@ -21,6 +21,10 @@
                         <heading>330072</heading>
                     </control>
                 </setting>
+                <setting id="use_small_images" type="boolean" label="330082">
+                    <default>false</default>
+                    <control type="toggle" />
+                </setting>
             </group>
         </category>    
         <category id="hidden">

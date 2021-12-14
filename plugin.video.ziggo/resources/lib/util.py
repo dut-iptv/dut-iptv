@@ -5,11 +5,11 @@ from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, get_credentials, load_file, load_profile, write_file
+from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, encode_obj, get_credentials, load_file, load_profile, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l5.api import api_download, api_get_channels
 from resources.lib.base.l6 import inputstream
-from resources.lib.constants import CONST_API_URLS, CONST_DEFAULT_CLIENTID
+from resources.lib.constants import CONST_API_URLS, CONST_DEFAULT_CLIENTID, CONST_IMAGES
 from urllib.parse import urlencode
 
 def check_devices():
@@ -77,36 +77,6 @@ def check_entitlements():
     settings.setBool(key='showMoviesSeries', value=True)
 
     return
-
-def encode_obj(in_obj):
-    def encode_list(in_list):
-        out_list = []
-        for el in in_list:
-            out_list.append(encode_obj(el))
-        return out_list
-
-    def encode_dict(in_dict):
-        out_dict = {}
-
-        if sys.version_info < (3, 0):
-            for k, v in in_dict.iteritems():
-                out_dict[k] = encode_obj(v)
-        else:
-            for k, v in in_dict.items():
-                out_dict[k] = encode_obj(v)
-
-        return out_dict
-
-    if isinstance(in_obj, str):
-        return in_obj.encode('utf-8')
-    elif isinstance(in_obj, list):
-        return encode_list(in_obj)
-    elif isinstance(in_obj, tuple):
-        return tuple(encode_list(in_obj))
-    elif isinstance(in_obj, dict):
-        return encode_dict(in_obj)
-
-    return in_obj
 
 def get_image(prefix, content):
     best_image = 0
@@ -305,9 +275,6 @@ def plugin_process_playdata(playdata):
 
     item_inputstream = inputstream.Widevine(
         license_key = playdata['license'],
-        #media_renewal_url = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params))),
-        #media_renewal_time = 60,
-        #manifest_update_parameter = 'full',
     )
 
     return item_inputstream, CDMHEADERS

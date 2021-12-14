@@ -789,3 +789,15 @@ msgstr ""
 msgctxt "#330083"
 msgid "Setup Library integration"
 msgstr ""
+
+msgctxt "#330084"
+msgid "Library reset"
+msgstr ""
+
+msgctxt "#330085"
+msgid "Reset Library"
+msgstr ""
+
+msgctxt "#330086"
+msgid "Reset Cache"
+msgstr ""

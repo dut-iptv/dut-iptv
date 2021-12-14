@@ -57,8 +57,6 @@ class Session(requests.Session):
         rngattempts = list(range(1, attempts+1))
 
         for i in rngattempts:
-            #log.debug('Attempt {}/{}: {} {} {}'.format(i, attempts, method, url, kwargs if method.lower() != 'post' else ""))
-
             try:
                 if CONST_BASE_DOMAIN_MOD:
                     override_dns(CONST_BASE_DOMAIN, CONST_BASE_IP)

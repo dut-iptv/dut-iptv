@@ -2,8 +2,10 @@ import base64, glob, hashlib, io, json, os, re, time, xbmc, xbmcaddon
 
 from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PATH, ADDON_PROFILE
+from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.util import clear_cache, check_key, is_file_older_than_x_days, load_channels, load_file, load_order, load_prefs, load_profile, load_radio_order, load_radio_prefs, write_file
+from resources.lib.constants import CONST_IMAGES
 
 def clear_cache_connector():
     clear_cache()
@@ -12,7 +14,7 @@ def clear_cache_connector():
 
     for addon in addonlist:
         try:
-            for file in glob.glob(ADDON_PROFILE + "cache" + os.sep + addon + os.sep + "*.xml"):
+            for file in glob.glob(os.path.join(ADDON_PROFILE, "cache", addon, "*.xml")):
                 if is_file_older_than_x_days(file=file, days=1):
                     os.remove(file)
         except:
@@ -26,6 +28,7 @@ def create_epg():
     new_xml_end = '</tv>'
     new_xml_channels = ''
     new_xml_epg = ''
+    addon_id = ''
 
     for currow in order:
         try:
@@ -53,19 +56,30 @@ def create_epg():
                 replay_addonid = str(row['replay_addonid'])
 
             if replay == 1 and len(replay_id) > 0 and len(replay_addonid) > 0:
-                directory = "cache" + os.sep + replay_addonid.replace('plugin.video.', '') + os.sep
+                directory = os.path.join("cache", replay_addonid.replace('plugin.video.', ''), "")
                 encodedBytes = base64.b32encode(replay_id.encode("utf-8"))
                 replay_id = str(encodedBytes, "utf-8")
 
-                data = load_file(directory + replay_id + '.xml', ext=False, isJSON=False)
+                addon_id = replay_addonid
+                data = load_file(os.path.join(directory, replay_id + '.xml'), ext=False, isJSON=False)
             else:
-                directory = "cache" + os.sep + str(row['live_addonid'].replace('plugin.video.', '')) + os.sep
+                directory = os.path.join("cache", str(row['live_addonid'].replace('plugin.video.', '')), "")
                 encodedBytes = base64.b32encode(live_id.encode("utf-8"))
                 live_id = str(encodedBytes, "utf-8")
 
-                data = load_file(directory + live_id + '.xml', ext=False, isJSON=False)
+                addon_id = row['live_addonid']
+                data = load_file(os.path.join(directory, live_id + '.xml'), ext=False, isJSON=False)
 
             if data:
+                if len(addond_id) > 0:
+                    try:
+                        if settings.getBool('use_small_images', default=False, addon=addon_id):
+                            data = data.replace(CONST_IMAGES[addon_id]['replace'], CONST_IMAGES[addon_id]['small'])
+                        else:
+                            data = data.replace(CONST_IMAGES[addon_id]['replace'], CONST_IMAGES[addon_id]['large'])
+                    except:
+                        pass
+
                 new_xml_epg += data
 
                 try:
@@ -101,7 +115,7 @@ def create_playlist():
                     image = ''
                 else:
                     image = row['channelicon']
-                    
+
                 if not check_key(row, 'group') or len(str(row['group'])) == 0:
                     group = 'TV'
                 else:
@@ -162,7 +176,7 @@ def create_playlist():
                         image = radio[id]['icon']
                     else:
                         image = ''
-                        
+
                     if not check_key(row, 'group') or len(str(row['group'])) == 0:
                         group = 'Radio'
                     else:

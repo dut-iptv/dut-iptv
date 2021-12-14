@@ -211,9 +211,11 @@ class BaseLanguage(object):
     ENABLE_INTEGRATION_MOVIES = 330079
     ENABLE_INTEGRATION_SHOWS_WATCHLIST = 330080
     ENABLE_INTEGRATION_SHOWS = 330081
-    SMALL_IMAGES = 330082
-    
+    SMALL_IMAGES = 330082    
     SETUP_LIBRARY = 330083
+    ASK_RESET_LIBRARY = 330084
+    LIBRARY_RESET = 330085
+    REMOVE_TEMP = 330086
         
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)

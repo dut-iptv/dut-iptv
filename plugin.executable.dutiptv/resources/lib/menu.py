@@ -1,13 +1,14 @@
 import collections, json, os, string, sys, xbmc, xbmcaddon
 
 from resources.lib.api import api_get_channels, api_get_all_epg
-from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, CONST_ADDONS
+from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_addon, check_key, check_loggedin, load_channels, load_file, load_profile, load_prefs, load_order, load_radio_prefs, load_radio_order, save_profile, save_prefs, save_order, save_radio_order, save_radio_prefs, write_file
+from resources.lib.base.l3.util import check_addon, check_key, check_loggedin, json_rpc, load_channels, load_file, load_profile, load_prefs, load_order, load_radio_prefs, load_radio_order, save_profile, save_prefs, save_order, save_radio_order, save_radio_prefs, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l7 import plugin
+from resources.lib.constants import CONST_ADDONS
 from resources.lib.util import create_epg, create_playlist
 
 @plugin.route('')
@@ -94,6 +95,8 @@ def groups_menu(type, **kwargs):
 
 @plugin.route()
 def add_group(type, **kwargs):
+    type = str(type)
+
     groups = load_file(type + '_groups.json', ext=False, isJSON=True)
 
     if not groups:
@@ -108,10 +111,13 @@ def add_group(type, **kwargs):
         groups = sorted(groups)
         write_file(type + '_groups.json', data=groups, ext=False, isJSON=True)
 
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=groups_menu&type=' + str(type) + '"]}}')
+        method = 'GUI.ActivateWindow'
+        json_rpc(method, {"window": "videos", "parameters":["plugin://" + ADDON_ID + "/?_=groups_menu&type=" + type]})
 
 @plugin.route()
 def remove_group(type, name, **kwargs):
+    type = str(type)
+
     if not gui.yes_no(_.REMOVE_GROUP + '?'):
         return
 
@@ -125,8 +131,9 @@ def remove_group(type, name, **kwargs):
     groups.remove(name)
 
     write_file(type + '_groups.json', data=groups, ext=False, isJSON=True)
-
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=groups_menu&type=' + str(type) + '"]}}')
+    
+    method = 'GUI.ActivateWindow'
+    json_rpc(method, {"window": "videos", "parameters":["plugin://" + ADDON_ID + "/?_=groups_menu&type=" + type]})
 
 @plugin.route()
 def primary(addons, **kwargs):
@@ -136,7 +143,7 @@ def primary(addons, **kwargs):
     addons2 = []
 
     for entry in addons:
-        if entry['addonid'] != 'plugin.video.betelenet':
+        if not entry['addonid'] == 'plugin.video.betelenet':
             addons2.append(entry)
 
     desc = _.SELECT_PRIMARY_DESC
@@ -390,10 +397,11 @@ def finish_setup(setup=0, **kwargs):
     create_playlist()
     create_epg()
 
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{"addonid":"pvr.iptvsimple","enabled":false}}')
+    method = 'Addons.SetAddonEnabled'
+    json_rpc(method, {"addonid": "pvr.iptvsimple", "enabled": "false"})
     xbmc.sleep(2000)
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{"addonid":"pvr.iptvsimple","enabled":true}}')
-
+    json_rpc(method, {"addonid": "pvr.iptvsimple", "enabled": "true"})
+    
     if setup == 1:
         setup_iptv()
 
@@ -622,7 +630,8 @@ def change_channel(id, type_tv_radio, **kwargs):
         prefs[id] = mod_pref
         save_radio_prefs(profile_id=1, prefs=prefs)
 
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=channel_picker_menu&type_tv_radio=radio&save_all=0"]}}')
+        method = 'GUI.ActivateWindow'
+        json_rpc(method, {"window": "videos", "parameters":['plugin://' + str(ADDON_ID) + '/?_=channel_picker_menu&type_tv_radio=radio&save_all=0']})
     else:
         profile_settings = load_profile(profile_id=1)
         prefs = load_prefs(profile_id=1)
@@ -705,7 +714,8 @@ def change_channel(id, type_tv_radio, **kwargs):
             prefs[id] = mod_pref
             save_prefs(profile_id=1, prefs=prefs)
 
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=channel_picker_menu&type_tv_radio=' + type_tv_radio + '&save_all=0"]}}')
+        method = 'GUI.ActivateWindow'
+        json_rpc(method, {"window": "videos", "parameters":['plugin://' + str(ADDON_ID) + '/?_=channel_picker_menu&type_tv_radio=' + type_tv_radio + '&save_all=0']})
 
 @plugin.route()
 def change_group(id, type_tv_radio, **kwargs):
@@ -746,7 +756,8 @@ def change_group(id, type_tv_radio, **kwargs):
     else:
         save_prefs(profile_id=1, prefs=prefs)
 
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=group_picker_menu&type_tv_radio=' + type_tv_radio + '"]}}')
+    method = 'GUI.ActivateWindow'
+    json_rpc(method, {"window": "videos", "parameters":['plugin://' + str(ADDON_ID) + '/?_=group_picker_menu&type_tv_radio=' + type_tv_radio]})
 
 @plugin.route()
 def change_order(id, type_tv_radio, **kwargs):
@@ -784,7 +795,8 @@ def change_order(id, type_tv_radio, **kwargs):
     if double:
         double_query = '&double={double}&primary={primary}'.format(double=double, primary=id)
 
-    xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"GUI.ActivateWindow","params":{"window":"videos","parameters":["plugin://' + str(ADDON_ID) + '/?_=order_picker_menu' + double_query + '&type_tv_radio=' + type_tv_radio + '"]}}')
+    method = 'GUI.ActivateWindow'
+    json_rpc(method, {"window": "videos", "parameters":['plugin://' + str(ADDON_ID) + '/?_=order_picker_menu' + double_query + '&type_tv_radio=' + type_tv_radio]})
 
 def setup_iptv():
     try:
@@ -869,8 +881,9 @@ def setup_iptv():
         if IPTV_SIMPLE.getSettingInt("m3uRefreshHour") != 4:
             IPTV_SIMPLE.setSettingInt("m3uRefreshHour", 4)
 
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{"addonid":"{}","enabled":false}}'.format(IPTV_SIMPLE_ADDON_ID))
+        method = 'Addons.SetAddonEnabled'
+        json_rpc(method, {"addonid": "pvr.iptvsimple", "enabled": "false"})
         xbmc.sleep(2000)
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Addons.SetAddonEnabled","params":{"addonid":"{}","enabled":true}}'.format(IPTV_SIMPLE_ADDON_ID))
+        json_rpc(method, {"addonid": "pvr.iptvsimple", "enabled": "true"})
     except:
         pass
