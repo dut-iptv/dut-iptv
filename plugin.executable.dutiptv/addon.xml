@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.executable.dutiptv" name="Dut-IPTV Simple IPTV Connector" provider-name="Anon" version="1.3.6+matrix.1">
+<addon id="plugin.executable.dutiptv" name="Dut-IPTV Simple IPTV Connector" provider-name="Anon" version="1.3.7+matrix.1">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="inputstream.adaptive" version="19.0.0"/>

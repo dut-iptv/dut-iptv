@@ -172,7 +172,7 @@ def remove_library(type):
         shutil.rmtree(os.path.join(ADDON_PROFILE, type))
     except:
         pass
-    
+
     clean_library(show_dialog=False)
 
     for file in glob.glob(xbmcvfs.translatePath("special://database") + os.sep + "*MyVideos*.db"):
@@ -464,7 +464,10 @@ def json_rpc(method, params=None):
     raw_response = xbmc.executeJSONRPC(request)
     response = json.loads(raw_response)
 
-    return response['result']
+    if check_key(response, 'result'):
+        return response['result']
+    else:
+        return response
 
 def load_channels(type):
     return load_file(file=os.path.join('cache', type[0] + '.channels.json'), ext=False, isJSON=True)

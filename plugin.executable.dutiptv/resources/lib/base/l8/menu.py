@@ -1584,10 +1584,10 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
         return {'items': items, 'count': item_count, 'count2': count, 'total': 0}
 
     for currow in data:
-        if not online == 1:
-            row = data[currow]
-        else:
-            row = currow
+        #if not online == 1:
+        row = data[currow]
+        #else:
+        #    row = currow
 
         if item_count == settings.getInt('item_count'):
             break
@@ -1701,10 +1701,10 @@ def process_vod_menu_content(data, start=0, search=None, type=None, character=No
         return {'items': items, 'count': item_count, 'count2': count, 'total': 0}
 
     for currow in data['menu']:
-        if not online == 1:
-            row = data['menu'][currow]
-        else:
-            row = currow
+        #if not online == 1:
+        row = data['menu'][currow]
+        #else:
+        #    row = currow
 
         id = str(currow)
         label = str(row['label'])
