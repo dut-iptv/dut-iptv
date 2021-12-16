@@ -71,7 +71,7 @@ def create_epg():
                 data = load_file(os.path.join(directory, live_id + '.xml'), ext=False, isJSON=False)
 
             if data:
-                if len(addond_id) > 0:
+                if len(addon_id) > 0:
                     try:
                         if settings.getBool('use_small_images', default=False, addon=addon_id):
                             data = data.replace(CONST_IMAGES[addon_id]['replace'], CONST_IMAGES[addon_id]['small'])
