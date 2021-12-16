@@ -168,7 +168,11 @@ def change_icon():
 def remove_library(type):
     from sqlite3 import dbapi2 as sqlite
 
-    shutil.rmtree(os.path.join(ADDON_PROFILE, type))
+    try:
+        shutil.rmtree(os.path.join(ADDON_PROFILE, type))
+    except:
+        pass
+    
     clean_library(show_dialog=False)
 
     for file in glob.glob(xbmcvfs.translatePath("special://database") + os.sep + "*MyVideos*.db"):
@@ -463,7 +467,7 @@ def json_rpc(method, params=None):
     return response['result']
 
 def load_channels(type):
-    return load_file(file=os.path.join('cache', type[0], '.channels.json'), ext=False, isJSON=True)
+    return load_file(file=os.path.join('cache', type[0] + '.channels.json'), ext=False, isJSON=True)
 
 def load_file(file, ext=False, isJSON=False):
     if ext:

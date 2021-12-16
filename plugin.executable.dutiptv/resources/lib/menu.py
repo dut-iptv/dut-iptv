@@ -467,7 +467,7 @@ def save_all_prefs(type_tv_radio):
                     video_addon = profile_settings['addon' + str(x)]
 
                     type_channels = load_channels(type=video_addon.replace('plugin.video.', ''))
-
+                    
                     VIDEO_ADDON_PROFILE = ADDON_PROFILE.replace(ADDON_ID, video_addon)
                     addon_prefs = load_file(VIDEO_ADDON_PROFILE + 'prefs.json', ext=True, isJSON=True)
 

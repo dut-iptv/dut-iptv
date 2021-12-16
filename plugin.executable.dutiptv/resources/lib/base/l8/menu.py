@@ -13,7 +13,7 @@ from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
 from resources.lib.base.l7 import plugin
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_CONTINUE_WATCH, CONST_FIRST_BOOT, CONST_HAS_DUTIPTV, CONST_HAS_LIBRARY, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_HAS_SEARCH, CONST_IMAGES, CONST_LIBRARY, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_USE_PROXY, CONST_USE_PROFILES, CONST_VOD_CAPABILITY, CONST_WATCHLIST
-from resources.lib.util import check_devices, plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
+from resources.lib.util import check_devices, plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_vod, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
 from urllib.parse import urlparse
 from xml.dom.minidom import parseString
 
@@ -1574,6 +1574,9 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
             data = api_search(query=search)
         else:
             data = api_vod_download(type=data, start=start)
+            
+            if data:
+                data = plugin_process_vod(data=data, start=start)
     else:
         data = api_get_vod_by_type(type=data, character=character, genre=genre, subscription_filter=subscription_filter, menu=0)
 
@@ -1688,6 +1691,9 @@ def process_vod_menu_content(data, start=0, search=None, type=None, character=No
             data = api_search(query=search)
         else:
             data = api_vod_download(type=data, start=start)
+            
+            if data:
+                data = plugin_process_vod(data=data, start=start)
     else:
         data = api_get_vod_by_type(type=data, character=character, genre=genre, subscription_filter=subscription_filter, menu=1)
 
