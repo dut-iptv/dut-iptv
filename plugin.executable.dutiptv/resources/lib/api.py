@@ -6,6 +6,13 @@ from resources.lib.base.l2.log import log
 from resources.lib.base.l3.util import check_key, fixBadZipfile, is_file_older_than_x_days, load_file, load_profile, write_file
 from resources.lib.util import clear_cache_connector
 
+#Included from base.l7.plugin
+#api_clean_after_playback
+#api_get_info
+
+def api_clean_after_playback(stoptime):
+    pass
+
 def api_get_channels():
     directory = os.path.dirname(os.path.join(ADDON_PROFILE, 'tmp', 'a.channels.zip'))
 
@@ -139,6 +146,3 @@ def api_get_epg_by_addon(addon):
             return False
 
     return True
-    
-def api_clean_after_playback(stoptime):
-    pass

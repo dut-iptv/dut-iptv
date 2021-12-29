@@ -12,20 +12,28 @@ CONST_ADDONS = [
 CONST_BASE_DOMAIN = ''
 CONST_BASE_DOMAIN_MOD = False
 CONST_BASE_IP = ''
-CONST_BASE_URL = ''
+
 CONST_BASE_HEADERS = {}
-CONST_CONTINUE_WATCH = False
 
-CONST_DEFAULT_API = ''
+CONST_FIRST_BOOT = {
+    'erotica': False,
+    'minimal': False,
+    'regional': False,
+    'home': False
+}
 
-CONST_FIRST_BOOT = False
-
-CONST_HAS_DUTIPTV = False
-CONST_HAS_LIBRARY = False
-CONST_HAS_LIVE = False
-CONST_HAS_REPLAY = False
-CONST_HAS_SEARCH = False
-CONST_IMAGE_URL = ''
+CONST_HAS = {
+    'dutiptv': False,
+    'library': False,
+    'live': False,
+    'onlinesearch': False,
+    'profiles': False,
+    'proxy': False,
+    'replay': False,
+    'search': False,
+    'startfrombeginning': False,
+    'upnext': False,
+}
 
 CONST_IMAGES = {
     'plugin.video.betelenet': {
@@ -62,9 +70,6 @@ CONST_IMAGES = {
 
 CONST_LIBRARY = {}
 CONST_MOD_CACHE = {}
-CONST_ONLINE_SEARCH = False
-CONST_START_FROM_BEGINNING = False
-CONST_USE_PROXY = False
-CONST_USE_PROFILES = False
 CONST_VOD_CAPABILITY = []
-CONST_WATCHLIST = False
+CONST_WATCHLIST = {}
+CONST_WATCHLIST_CAPABILITY = {}

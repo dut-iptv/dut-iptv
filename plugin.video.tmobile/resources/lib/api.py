@@ -1,19 +1,40 @@
 import base64, json, os, random, re, string, time, xbmc
 
-from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, CONST_DUT_EPG, SESSION_CHUNKSIZE
+from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, get_credentials, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
+from resources.lib.base.l3.util import check_key, get_credentials, encode32, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download, api_get_channels
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_BASE_URL, CONST_IMAGES
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_URLS, CONST_IMAGES
 from resources.lib.util import plugin_process_info
 from urllib.parse import parse_qs, urlparse, quote_plus
 
-def api_add_to_watchlist():
+#Included from base.l7.plugin
+#api_clean_after_playback
+#api_get_info
+
+#Included from base.l8.menu
+#api_add_to_watchlist
+#api_get_profiles
+#api_list_watchlist
+#api_login
+#api_play_url
+#api_remove_from_watchlist
+#api_search
+#api_set_profile
+#api_vod_download
+#api_vod_season
+#api_vod_seasons
+#api_watchlist_listing
+
+def api_add_to_watchlist(id, series='', season='', program_type='', type='watchlist'):
     return None
+
+def api_clean_after_playback(stoptime):
+    pass
 
 def api_getCookies(cookie_jar, domain):
     cookie_dict = json.loads(cookie_jar)
@@ -47,7 +68,7 @@ def api_get_info(id, channel=''):
         }
     }
 
-    channel_url = '{base_url}/VSP/V3/QueryPlaybillListStcProps?SID=queryPlaybillListStcProps3&DEVICE=PC&DID={deviceID}&from=throughMSAAccess'.format(base_url=CONST_BASE_URL, deviceID=profile_settings['devicekey'])
+    channel_url = '{base_url}/VSP/V3/QueryPlaybillListStcProps?SID=queryPlaybillListStcProps3&DEVICE=PC&DID={deviceID}&from=throughMSAAccess'.format(base_url=CONST_URLS['base'], deviceID=profile_settings['devicekey'])
 
     download = api_download(url=channel_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
     data = download['data']
@@ -64,7 +85,7 @@ def api_get_info(id, channel=''):
         'isReturnAllMedia': '1',
     }
 
-    program_url = '{base_url}/VSP/V3/QueryPlaybill?from=throughMSAAccess'.format(base_url=CONST_BASE_URL)
+    program_url = '{base_url}/VSP/V3/QueryPlaybill?from=throughMSAAccess'.format(base_url=CONST_URLS['base'])
 
     download = api_download(url=program_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
     data = download['data']
@@ -79,11 +100,11 @@ def api_get_info(id, channel=''):
 
     return info
 
-def api_get_session(force=0):
+def api_get_session(force=0, return_data=False):
     force = int(force)
     profile_settings = load_profile(profile_id=1)
 
-    heartbeat_url = '{base_url}/VSP/V3/OnLineHeartbeat?from=inMSAAccess'.format(base_url=CONST_BASE_URL)
+    heartbeat_url = '{base_url}/VSP/V3/OnLineHeartbeat?from=inMSAAccess'.format(base_url=CONST_URLS['base'])
 
     headers = {'Content-Type': 'application/json', 'X_CSRFToken': profile_settings['csrf_token']}
 
@@ -97,6 +118,9 @@ def api_get_session(force=0):
         login_result = api_login()
 
         if not login_result['result']:
+            if return_data == True:
+                return {'result': False, 'data': login_result['data'], 'code': login_result['code']}
+
             return False
 
     profile_settings = load_profile(profile_id=1)
@@ -104,70 +128,24 @@ def api_get_session(force=0):
     profile_settings['last_login_time'] = int(time.time())
     save_profile(profile_id=1, profile=profile_settings)
 
+    if return_data == True:
+        return {'result': True, 'data': data, 'code': code}
+
     return True
 
 def api_get_profiles():
     return None
 
-def api_get_series_nfo():
-    type = 'seriesnfo'
-    encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = str(encodedBytes, "utf-8")
-
-    vod_url = '{dut_epg_url}/{type}.zip'.format(dut_epg_url=CONST_DUT_EPG, type=type)
-    file = os.path.join("cache", "{type}.json".format(type=type))
-    tmp = os.path.join(ADDON_PROFILE, 'tmp', "{type}.zip".format(type=type))
-
-    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5):
-        data = load_file(file=file, isJSON=True)
-    else:
-        resp = Session().get(vod_url, stream=True)
-
-        if resp.status_code != 200:
-            resp.close()
-            return None
-
-        with open(tmp, 'wb') as f:
-            for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
-                f.write(chunk)
-
-        resp.close()
-
-        if os.path.isfile(tmp):
-            from zipfile import ZipFile
-
-            try:
-                with ZipFile(tmp, 'r') as zipObj:
-                    zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
-            except:
-                try:
-                    fixBadZipfile(tmp)
-
-                    with ZipFile(tmp, 'r') as zipObj:
-                        zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
-
-                except:
-                    try:
-                        from resources.lib.base.l1.zipfile import ZipFile as ZipFile2
-
-                        with ZipFile2(tmp, 'r') as zipObj:
-                            zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
-                    except:
-                        return None
-
-def api_set_profile(id=''):
-    return None
-    
-def api_list_watchlist(continuewatch=0):
+def api_list_watchlist(type='watchlist'):
     return None
 
-def api_login(selected=None):
+def api_login():
     creds = get_credentials()
     username = creds['username']
     password = creds['password']
 
     try:
-        os.remove(ADDON_PROFILE + 'stream_cookies')
+        os.remove(os.path.join(ADDON_PROFILE, 'stream_cookies'))
     except:
         pass
 
@@ -181,7 +159,7 @@ def api_login(selected=None):
 
     save_profile(profile_id=1, profile=profile_settings)
 
-    login_url = '{base_url}/VSP/V3/Authenticate?from=throughMSAAccess'.format(base_url=CONST_BASE_URL)
+    login_url = '{base_url}/VSP/V3/Authenticate?from=throughMSAAccess'.format(base_url=CONST_URLS['base'])
 
     session_post_data = {
         "authenticateBasic": {
@@ -242,7 +220,7 @@ def api_login(selected=None):
                         save_profile(profile_id=1, profile=profile_settings)
 
                         return api_login()
-                        
+
             for row in data['devices']:
                 if check_key(row, 'status') and check_key(row, 'onlineState') and check_key(row, 'physicalDeviceID'):
                     if row['status'] == '1':
@@ -317,7 +295,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
                 }
             }
 
-            channel_url = '{base_url}/VSP/V3/QueryPlaybillListStcProps?SID=queryPlaybillListStcProps3&DEVICE=PC&DID={deviceID}&from=throughMSAAccess'.format(base_url=CONST_BASE_URL, deviceID=profile_settings['devicekey'])
+            channel_url = '{base_url}/VSP/V3/QueryPlaybillListStcProps?SID=queryPlaybillListStcProps3&DEVICE=PC&DID={deviceID}&from=throughMSAAccess'.format(base_url=CONST_URLS['base'], deviceID=profile_settings['devicekey'])
 
             download = api_download(url=channel_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
             data = download['data']
@@ -334,7 +312,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
                 'isReturnAllMedia': '1',
             }
 
-            program_url = '{base_url}/VSP/V3/QueryPlaybill?from=throughMSAAccess'.format(base_url=CONST_BASE_URL)
+            program_url = '{base_url}/VSP/V3/QueryPlaybill?from=throughMSAAccess'.format(base_url=CONST_URLS['base'])
 
             download = api_download(url=program_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
             data = download['data']
@@ -363,7 +341,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
                 'isReturnAllMedia': '1',
             }
 
-            program_url = '{base_url}/VSP/V3/QueryPlaybill?from=throughMSAAccess'.format(base_url=CONST_BASE_URL)
+            program_url = '{base_url}/VSP/V3/QueryPlaybill?from=throughMSAAccess'.format(base_url=CONST_URLS['base'])
 
             download = api_download(url=program_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
             data = download['data']
@@ -390,7 +368,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
             'VODID': id
         }
 
-        program_url = '{base_url}/VSP/V3/QueryVOD?from=throughMSAAccess'.format(base_url=CONST_BASE_URL)
+        program_url = '{base_url}/VSP/V3/QueryVOD?from=throughMSAAccess'.format(base_url=CONST_URLS['base'])
 
         download = api_download(url=program_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
         data = download['data']
@@ -423,9 +401,9 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         return playdata
 
     if type == 'vod':
-        play_url_path = '{base_url}/VSP/V3/PlayVOD?from=throughMSAAccess'.format(base_url=CONST_BASE_URL)
+        play_url_path = '{base_url}/VSP/V3/PlayVOD?from=throughMSAAccess'.format(base_url=CONST_URLS['base'])
     else:
-        play_url_path = '{base_url}/VSP/V3/PlayChannel?from=throughMSAAccess'.format(base_url=CONST_BASE_URL)
+        play_url_path = '{base_url}/VSP/V3/PlayChannel?from=throughMSAAccess'.format(base_url=CONST_URLS['base'])
 
     download = api_download(url=play_url_path, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
     data = download['data']
@@ -456,29 +434,31 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     return playdata
 
-def api_remove_from_watchlist(id, continuewatch=0):
+def api_remove_from_watchlist(id, type='watchlist'):
     return None
 
-def api_search():
+def api_search(query):
+    return None
+
+def api_set_profile(id=''):
     return None
 
 def api_vod_download():
     return None
 
-def api_vod_season(series, id):
+def api_vod_season(series, id, use_cache=True):
     if not api_get_session():
         return None
 
-    season = []
+    type = "vod_season_{id}".format(id=id)
+    type = encode32(type)
 
-    type = "vod_season_" + str(id)
-    encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = str(encodedBytes, "utf-8")
+    file = os.path.join("cache", "{type}.json".format(type=type))
+    cache = 0
 
-    file = "cache" + os.sep + type + ".json"
-
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5) and use_cache == True:
         data = load_file(file=file, isJSON=True)
+        cache = 1
     else:
         profile_settings = load_profile(profile_id=1)
 
@@ -490,7 +470,7 @@ def api_vod_season(series, id):
             'count': '35',
         }
 
-        seasons_url = '{base_url}/VSP/V3/QueryEpisodeList?from=throughMSAAccess'.format(base_url=CONST_BASE_URL)
+        seasons_url = '{base_url}/VSP/V3/QueryEpisodeList?from=throughMSAAccess'.format(base_url=CONST_URLS['base'])
 
         download = api_download(url=seasons_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
         data = download['data']
@@ -499,44 +479,21 @@ def api_vod_season(series, id):
         if code and code == 200 and data and check_key(data, 'result') and check_key(data['result'], 'retCode') and data['result']['retCode'] == '000000000' and check_key(data, 'episodes'):
             write_file(file=file, data=data, isJSON=True)
 
-    if not data or not check_key(data, 'episodes'):
-        return None
-
-    for row in data['episodes']:
-        if check_key(row, 'VOD') and check_key(row['VOD'], 'ID') and check_key(row['VOD'], 'name') and check_key(row, 'sitcomNO'):
-            image = ''
-            duration = 0
-
-            if not check_key(row['VOD'], 'mediaFiles') or not check_key(row['VOD']['mediaFiles'][0], 'ID'):
-                continue
-
-            if check_key(row['VOD']['mediaFiles'][0], 'elapseTime'):
-                duration = row['VOD']['mediaFiles'][0]['elapseTime']
-
-            if check_key(row['VOD'], 'picture') and check_key(row['VOD']['picture'], 'posters'):
-                image = row['VOD']['picture']['posters'][0]
-
-            label = '{episode} - {title}'.format(episode=row['sitcomNO'], title=row['VOD']['name'])
-
-            season.append({'label': label, 'id': row['VOD']['ID'], 'media_id': row['VOD']['mediaFiles'][0]['ID'], 'duration': duration, 'title': row['VOD']['name'], 'episodeNumber': row['sitcomNO'], 'description': '', 'image': image})
-
-    return season
+    return {'data': data, 'cache': cache}
 
 def api_vod_seasons(type, id):
     if not api_get_session():
         return None
 
-    seasons = []
+    type = "vod_seasons_{id}".format(id=id)
+    type = encode32(type)
 
-    type = "vod_seasons_" + str(id)
+    file = os.path.join("cache", "{type}.json".format(type=type))
+    cache = 0
 
-    encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = str(encodedBytes, "utf-8")
-
-    file = "cache" + os.sep + type + ".json"
-
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5) and use_cache == True:
         data = load_file(file=file, isJSON=True)
+        cache = 1
     else:
         profile_settings = load_profile(profile_id=1)
 
@@ -548,7 +505,7 @@ def api_vod_seasons(type, id):
             'count': '50',
         }
 
-        seasons_url = '{base_url}/VSP/V3/QueryEpisodeList?from=throughMSAAccess'.format(base_url=CONST_BASE_URL)
+        seasons_url = '{base_url}/VSP/V3/QueryEpisodeList?from=throughMSAAccess'.format(base_url=CONST_URLS['base'])
 
         download = api_download(url=seasons_url, type='post', headers=headers, data=session_post_data, json_data=True, return_json=True)
         data = download['data']
@@ -557,25 +514,10 @@ def api_vod_seasons(type, id):
         if code and code == 200 and data and check_key(data, 'result') and check_key(data['result'], 'retCode') and data['result']['retCode'] == '000000000' and check_key(data, 'episodes'):
             write_file(file=file, data=data, isJSON=True)
 
-    if not data or not check_key(data, 'episodes'):
-        return None
-
-    for row in data['episodes']:
-        if check_key(row, 'VOD') and check_key(row['VOD'], 'ID') and check_key(row, 'sitcomNO'):
-            image = ''
-
-            if check_key(row['VOD'], 'picture') and check_key(row['VOD']['picture'], 'posters'):
-                image = row['VOD']['picture']['posters'][0]
-
-            seasons.append({'id': row['VOD']['ID'], 'seriesNumber': row['sitcomNO'], 'description': '', 'image': image})
-
-    return {'type': 'seasons', 'seasons': seasons}
+    return {'data': data, 'cache': cache}
 
 def api_vod_subscription():
     return None
 
 def api_watchlist_listing():
     return None
-
-def api_clean_after_playback(stoptime):
-    pass

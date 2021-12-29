@@ -1,11 +1,12 @@
 import glob, hashlib, io, json, os, re, requests, shutil, time, xbmc, xbmcgui, xbmcvfs
 
-from resources.lib.api import api_get_series_nfo, api_list_watchlist, api_vod_season, api_vod_seasons
+from collections import OrderedDict
+from resources.lib.api import api_list_watchlist, api_vod_season, api_vod_seasons
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, PROVIDER_NAME
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.util import check_addon, check_loggedin, check_key, clean_library, encode_obj, json_rpc, load_file, md5sum, scan_library, txt2filename, write_file
-from resources.lib.base.l5.api import api_get_vod_by_type
+from resources.lib.base.l5.api import api_get_series_nfo, api_get_vod_by_type
 from resources.lib.constants import CONST_IMAGES, CONST_LIBRARY
 from resources.lib.util import plugin_process_watchlist, plugin_vod_subscription_filter
 from urllib.parse import urlencode
@@ -58,10 +59,10 @@ def update_library():
         skiplist2 = []
 
         if librarysettings['library_movies'] == 1 or librarysettings['library_shows'] == 1:
-            data = api_list_watchlist(continuewatch=0)
+            data = api_list_watchlist(type='watchlist')
 
             if data:
-                processed = plugin_process_watchlist(data=data, continuewatch=0)
+                processed = plugin_process_watchlist(data=data, type='watchlist')
 
                 if processed:
                     for ref in processed:
@@ -207,10 +208,10 @@ def create_stream(type, type2, skip, skiplist):
 
             if type2 == 'shows':
                 if row['id'] in skiplist:
-                    data2 = api_vod_seasons(type=type, id=id, raw=True, github=False, use_cache=False)
+                    data2 = api_vod_seasons(type=type, id=id, use_cache=False)
                     no_cache = True
                 else:
-                    data2 = api_vod_seasons(type=type, id=id, raw=True, github=True)
+                    data2 = api_vod_seasons(type=type, id=id)
                     no_cache = False
 
                 if data2:
@@ -286,9 +287,9 @@ def create_stream(type, type2, skip, skiplist):
                         elif row['type'] == 'season':
                             if not check_key(row, 'refs'):
                                 if no_cache == True:
-                                    data3 = api_vod_season(series=id, id=str(seriesid) + '###' + str(row['id']), raw=True, use_cache=False)
+                                    data3 = api_vod_season(series=id, id=str(seriesid) + '###' + str(row['id']), use_cache=False)
                                 else:
-                                    data3 = api_vod_season(series=id, id=str(seriesid) + '###' + str(row['id']), raw=True)
+                                    data3 = api_vod_season(series=id, id=str(seriesid) + '###' + str(row['id']))
 
                                 for item in data3['data']['details']:
                                     row2 = data3['data']['details'][item]
@@ -387,7 +388,7 @@ def create_stream(type, type2, skip, skiplist):
                                 filename_ep = os.path.join(season_path, filename_ep)
                                 seriesinfo['seasons'][str(row['position'])] = str(row['origtitle'])
 
-                                if create_strm_file(filename_ep, 'E' + str(seriesid) + '###' + str(row['id']) + '###' + str(episodes[ref]['id']), episodes[ref]['title']) == True:
+                                if create_strm_file(filename_ep, 'E' + str(seriesid) + '###' + str(row['id']) + '###' + str(episodes[ref]['id']), episodes[ref]['title'], episodes[ref]) == True:
                                     add = True
 
                                 episodes[ref]['season'] = row['title']
@@ -405,7 +406,7 @@ def create_stream(type, type2, skip, skiplist):
                 return_list.append(filename + '.nfo')
                 filename = os.path.join(ADDON_PROFILE, "movies", filename)
 
-                if create_strm_file(filename, id, label) == True:
+                if create_strm_file(filename, id, label, row) == True:
                     add = True
 
                 if not check_key(row, 'icon_poster'):
@@ -564,10 +565,10 @@ def create_nfo_file(filename, data, type):
         else:
             return False
 
-def create_strm_file(filename, id, label):
+def create_strm_file(filename, id, label, data):
     if not os.path.isfile(filename + '.strm'):
         params = []
-        params.append(('_', 'play_video'))
+        params.append(('_', 'play_video'))        
         params.append(('type', 'vod'))
         params.append(('channel', None))
 

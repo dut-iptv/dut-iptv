@@ -53,7 +53,6 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting type="sep"/>
                 <setting id="library_shows" type="integer" label="330075" help="">
                     <level>0</level>
                     <default>0</default>
@@ -74,6 +73,11 @@
                     <control type="toggle"/>
                 </setting>
                 <setting id="library_shows_kidsseries" type="boolean" label="30027" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="upnext_enabled" type="boolean" label="330091" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>

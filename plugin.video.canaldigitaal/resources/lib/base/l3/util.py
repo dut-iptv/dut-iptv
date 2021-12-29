@@ -1,4 +1,4 @@
-import glob, hashlib, io, json, os, platform, pytz, re, requests, shutil, string, struct, time, unicodedata, xbmc, xbmcaddon, xbmcvfs
+import base64, glob, hashlib, io, json, os, platform, pytz, re, requests, shutil, struct, time, unicodedata, xbmc, xbmcaddon, xbmcvfs
 
 from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PATH, ADDON_PROFILE, CONST_DUT_EPG_SETTINGS, PROVIDER_NAME, USERDATA_PATH
@@ -20,7 +20,12 @@ def add_library_sources():
     shows_found = False
 
     for source in sources:
-        path = source.getElementsByTagName("path")[0].firstChild.nodeValue
+        path = ''
+
+        try:
+            path = source.getElementsByTagName("path")[0].firstChild.nodeValue
+        except:
+            pass
 
         if movies_path in path:
             movies_found = True
@@ -144,56 +149,124 @@ def change_icon():
 
     from sqlite3 import dbapi2 as sqlite
 
-    for file in glob.glob(xbmcvfs.translatePath("special://database") + os.sep + "*Textures*.db"):
+    for file in glob.glob(os.path.join(xbmcvfs.translatePath("special://database"), "*Textures*.db")):
         db = sqlite.connect(file)
-        query = "SELECT cachedurl FROM texture WHERE url LIKE '%addons%" + ADDON_ID + "%icon.png';"
 
-        rows = db.execute(query)
+        query = "SELECT cachedurl FROM texture WHERE url LIKE '%addons%{addon_id}%icon.png';".format(addon_id=ADDON_ID)
 
-        for row in rows:
-            thumb = os.path.join(xbmcvfs.translatePath("special://thumbnails"), str(row[0]))
+        try:
+            rows = db.execute(query)
 
-            if os.path.isfile(thumb):
-                try:
-                    os.remove(thumb)
-                except:
-                    pass
+            for row in rows:
+                thumb = os.path.join(xbmcvfs.translatePath("special://thumbnails"), row['cachedurl'])
+                remove_file(file=thumb, ext=True)
+        except:
+            pass
 
         query = "DELETE FROM texture WHERE url LIKE '%addons%{addon}%icon.png';".format(addon=ADDON_ID)
 
-        db.execute(query)
+        try:
+            db.execute(query)
+        except:
+            pass
+
         db.commit()
         db.close()
+
+def encode32(txt=''):
+    encodedBytes = base64.b32encode(txt.encode("utf-8"))
+    return str(encodedBytes, "utf-8")
+
+def remove_dir(directory, ext=False):
+    if ext == False:
+        directory = os.path.join(ADDON_PROFILE, directory)
+
+    if os.path.isdir(directory):
+        try:
+            shutil.rmtree(directory)
+            return True
+        except:
+            return False
+
+    return False
+
+def remove_file(file, ext=False):
+    if ext == False:
+        file = os.path.join(ADDON_PROFILE, file)
+
+    if os.path.isfile(file):
+        try:
+            os.remove(file)
+            return True
+        except:
+            return False
+
+    return False
 
 def remove_library(type):
     from sqlite3 import dbapi2 as sqlite
 
-    shutil.rmtree(os.path.join(ADDON_PROFILE, type))
+    remove_dir(directory=type, ext=False)
+
     clean_library(show_dialog=False)
 
     for file in glob.glob(xbmcvfs.translatePath("special://database") + os.sep + "*MyVideos*.db"):
         db = sqlite.connect(file)
 
         if type == 'movies':
-            query = "DELETE FROM movie WHERE ROWID IN (SELECT b.ROWID FROM movie b INNER JOIN files c ON b.idFile=c.idFile WHERE c.ROWID IN (SELECT d.ROWID FROM files d INNER JOIN path e ON d.idPath=e.idPath WHERE e.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
-            db.execute(query)
-            query = "DELETE FROM files WHERE ROWID IN (SELECT b.ROWID FROM files b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
-            db.execute(query)
-            query = "DELETE FROM path WHERE strPath LIKE '%{}%';".format(os.path.join(ADDON_PROFILE, type))
-            db.execute(query)
+            try:
+                query = "DELETE FROM movie WHERE ROWID IN (SELECT b.ROWID FROM movie b INNER JOIN files c ON b.idFile=c.idFile WHERE c.ROWID IN (SELECT d.ROWID FROM files d INNER JOIN path e ON d.idPath=e.idPath WHERE e.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
+                db.execute(query)
+            except:
+                pass
+
+            try:
+                query = "DELETE FROM files WHERE ROWID IN (SELECT b.ROWID FROM files b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
+                db.execute(query)
+            except:
+                pass
+
+            try:
+                query = "DELETE FROM path WHERE strPath LIKE '%{}%';".format(os.path.join(ADDON_PROFILE, type))
+                db.execute(query)
+            except:
+                pass
         elif type == 'shows':
-            query = "DELETE FROM episode WHERE ROWID IN (SELECT b.ROWID FROM episode b INNER JOIN files c ON b.idFile=c.idFile WHERE c.ROWID IN (SELECT d.ROWID FROM files d INNER JOIN path e ON d.idPath=e.idPath WHERE e.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
-            db.execute(query)
-            query = "DELETE FROM files WHERE ROWID IN (SELECT b.ROWID FROM files b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
-            db.execute(query)
-            query = "DELETE FROM seasons WHERE ROWID IN (SELECT b.ROWID FROM seasons b INNER JOIN tvshow c ON b.idShow=c.idShow WHERE c.ROWID IN (SELECT d.ROWID FROM tvshow d INNER JOIN tvshowlinkpath e ON d.idShow=e.idShow WHERE e.ROWID IN (SELECT f.ROWID FROM tvshowlinkpath f INNER JOIN path g ON f.idPath=g.idPath WHERE g.strPath LIKE '%{}%')));".format(os.path.join(ADDON_PROFILE, type))
-            db.execute(query)
-            query = "DELETE FROM tvshow WHERE ROWID IN (SELECT d.ROWID FROM tvshow d INNER JOIN tvshowlinkpath e ON d.idShow=e.idShow WHERE e.ROWID IN (SELECT f.ROWID FROM tvshowlinkpath f INNER JOIN path g ON f.idPath=g.idPath WHERE g.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
-            db.execute(query)
-            query = "DELETE FROM tvshowlinkpath WHERE ROWID IN (SELECT b.ROWID FROM tvshowlinkpath b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
-            db.execute(query)
-            query = "DELETE FROM path WHERE strPath LIKE '%{}%';".format(os.path.join(ADDON_PROFILE, type))
-            db.execute(query)
+            try:
+                query = "DELETE FROM episode WHERE ROWID IN (SELECT b.ROWID FROM episode b INNER JOIN files c ON b.idFile=c.idFile WHERE c.ROWID IN (SELECT d.ROWID FROM files d INNER JOIN path e ON d.idPath=e.idPath WHERE e.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
+                db.execute(query)
+            except:
+                pass
+
+            try:
+                query = "DELETE FROM files WHERE ROWID IN (SELECT b.ROWID FROM files b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
+                db.execute(query)
+            except:
+                pass
+
+            try:
+                query = "DELETE FROM seasons WHERE ROWID IN (SELECT b.ROWID FROM seasons b INNER JOIN tvshow c ON b.idShow=c.idShow WHERE c.ROWID IN (SELECT d.ROWID FROM tvshow d INNER JOIN tvshowlinkpath e ON d.idShow=e.idShow WHERE e.ROWID IN (SELECT f.ROWID FROM tvshowlinkpath f INNER JOIN path g ON f.idPath=g.idPath WHERE g.strPath LIKE '%{}%')));".format(os.path.join(ADDON_PROFILE, type))
+                db.execute(query)
+            except:
+                pass
+
+            try:
+                query = "DELETE FROM tvshow WHERE ROWID IN (SELECT d.ROWID FROM tvshow d INNER JOIN tvshowlinkpath e ON d.idShow=e.idShow WHERE e.ROWID IN (SELECT f.ROWID FROM tvshowlinkpath f INNER JOIN path g ON f.idPath=g.idPath WHERE g.strPath LIKE '%{}%'));".format(os.path.join(ADDON_PROFILE, type))
+                db.execute(query)
+            except:
+                pass
+
+            try:
+                query = "DELETE FROM tvshowlinkpath WHERE ROWID IN (SELECT b.ROWID FROM tvshowlinkpath b INNER JOIN path c ON b.idPath=c.idPath WHERE c.strPath LIKE '%{}%');".format(os.path.join(ADDON_PROFILE, type))
+                db.execute(query)
+            except:
+                pass
+
+            try:
+                query = "DELETE FROM path WHERE strPath LIKE '%{}%';".format(os.path.join(ADDON_PROFILE, type))
+                db.execute(query)
+            except:
+                pass
 
         db.commit()
         db.close()
@@ -224,7 +297,7 @@ def check_loggedin(addon):
         return False
     else:
         try:
-            if len(str(profile['pswd'])) > 0 and int(profile['last_login_success']) == 1:
+            if check_key(profile, 'pswd') and len(str(profile['pswd'])) > 0 and check_key(profile, 'last_login_success') and int(profile['last_login_success']) == 1:
                 return True
             else:
                 return False
@@ -239,14 +312,14 @@ def clear_cache(clear_all=0):
 
     for file in glob.glob(os.path.join(ADDON_PROFILE, "cache", "*.json")):
         if clear_all==True or is_file_older_than_x_days(file=file, days=1):
-            os.remove(file)
+            remove_file(file=file, ext=True)
 
     if not os.path.isdir(os.path.join(ADDON_PROFILE, "tmp")):
         os.makedirs(os.path.join(ADDON_PROFILE, "tmp"))
 
     for file in glob.glob(os.path.join(ADDON_PROFILE, "tmp", "*.zip")):
         if clear_all==True or is_file_older_than_x_days(file=file, days=1):
-            os.remove(file)
+            remove_file(file=file, ext=True)
 
 def clean_library(show_dialog=False, path=''):
     method = 'VideoLibrary.Clean'
@@ -264,16 +337,6 @@ def clean_library(show_dialog=False, path=''):
         xbmc.Monitor().waitForAbort(1)
 
     return result
-
-def clear_old():
-    if os.path.isfile(os.path.join(ADDON_PROFILE, 'settings.db')):
-        shutil.rmtree(ADDON_PROFILE)
-
-        if not os.path.isdir(os.path.join(ADDON_PROFILE, "tmp")):
-            os.makedirs(os.path.join(ADDON_PROFILE, "tmp"))
-
-        if not os.path.isdir(os.path.join(ADDON_PROFILE, "cache")):
-            os.makedirs(os.path.join(ADDON_PROFILE, "cache"))
 
 def convert_datetime_timezone(dt, tz1, tz2):
     tz1 = pytz.timezone(tz1)
@@ -295,7 +358,10 @@ def date_to_nl_dag(curdate):
         "Sun": "Zondag"
     }
 
-    return dag.get(curdate.strftime("%a"), "")
+    try:
+        return dag.get(curdate.strftime("%a"), "")
+    except:
+        return curdate
 
 def date_to_nl_maand(curdate):
     maand = {
@@ -313,7 +379,10 @@ def date_to_nl_maand(curdate):
         "December": "december"
     }
 
-    return maand.get(curdate.strftime("%B"), "")
+    try:
+        return maand.get(curdate.strftime("%B"), "")
+    except:
+        return curdate
 
 def disable_prefs(type, channels):
     prefs = load_prefs(profile_id=1)
@@ -357,6 +426,31 @@ def encode_obj(in_obj):
         return encode_dict(in_obj)
 
     return in_obj
+
+def extract_zip(file, dest):
+    if os.path.isfile(file):
+        from zipfile import ZipFile
+
+        try:
+            with ZipFile(file, 'r') as zipObj:
+                zipObj.extractall(dest)
+        except:
+            try:
+                fixBadZipfile(file)
+
+                with ZipFile(file, 'r') as zipObj:
+                    zipObj.extractall(dest)
+
+            except:
+                try:
+                    from resources.lib.base.l1.zipfile import ZipFile as ZipFile2
+
+                    with ZipFile2(file, 'r') as zipObj:
+                        zipObj.extractall(dest)
+                except:
+                    return None
+
+    return True
 
 def fixBadZipfile(zipFile):
     f = open(zipFile, 'r+b')
@@ -460,16 +554,19 @@ def json_rpc(method, params=None):
     raw_response = xbmc.executeJSONRPC(request)
     response = json.loads(raw_response)
 
-    return response['result']
+    if check_key(response, 'result'):
+        return response['result']
+    else:
+        return response
 
 def load_channels(type):
-    return load_file(file=os.path.join('cache', type[0], '.channels.json'), ext=False, isJSON=True)
+    return load_file(file=os.path.join('cache', type[0] + '.channels.json'), ext=False, isJSON=True)
 
 def load_file(file, ext=False, isJSON=False):
     if ext:
         full_path = file
     else:
-        full_path = ADDON_PROFILE + file
+        full_path = os.path.join(ADDON_PROFILE, file)
 
     if not os.path.isfile(full_path):
         file = re.sub(r'[^a-z0-9.]+', '_', file).lower()
@@ -668,6 +765,46 @@ def update_prefs(profile_id=1, channels=None):
                 prefs[str(currow)] = mod_pref
 
     save_prefs(profile_id=1, prefs=prefs)
+
+def upnext_signal(sender, next_info=None):
+    """Send a signal to Kodi using JSON RPC"""
+
+    data = [upnext_to_unicode(base64.b64encode(json.dumps(next_info).encode()))]
+    upnext_notify(sender=sender + '.SIGNAL', message='upnext_data', data=data)
+
+def upnext_notify(sender, message, data):
+    """Send a notification to Kodi using JSON RPC"""
+
+    result = upnext_jsonrpc(method='JSONRPC.NotifyAll', params=dict(
+        sender=sender,
+        message=message,
+        data=data,
+    ))
+
+    if result.get('result') != 'OK':
+        log('Failed to send notification: ' + result.get('error').get('message'))
+        return False
+
+    return True
+
+def upnext_jsonrpc(**kwargs):
+    """Perform JSONRPC calls"""
+
+    if kwargs.get('id') is None:
+        kwargs.update(id=0)
+
+    if kwargs.get('jsonrpc') is None:
+        kwargs.update(jsonrpc='2.0')
+
+    return json.loads(xbmc.executeJSONRPC(json.dumps(kwargs)))
+
+def upnext_to_unicode(text, encoding='utf-8', errors='strict'):
+    """Force text to unicode"""
+    
+    if isinstance(text, bytes):
+        return text.decode(encoding, errors=errors)
+        
+    return text
 
 def save_prefs(profile_id=1, prefs=None):
     write_file('prefs.json', data=prefs, ext=False, isJSON=True)

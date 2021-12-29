@@ -801,3 +801,23 @@ msgstr ""
 msgctxt "#330086"
 msgid "Reset Cache"
 msgstr ""
+
+msgctxt "#330087"
+msgid "Added to Continue Watching"
+msgstr ""
+
+msgctxt "#330088"
+msgid "Add to Continue Watching failed"
+msgstr ""
+
+msgctxt "#330089"
+msgid "Add to Continue Watching"
+msgstr ""
+
+msgctxt "#330090"
+msgid "Setup UpNext"
+msgstr ""
+
+msgctxt "#330091"
+msgid "Enable UpNext integration"
+msgstr ""

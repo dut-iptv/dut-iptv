@@ -1,6 +1,7 @@
 import _strptime
 import datetime, os, sys, time, xbmc
 
+from collections import OrderedDict
 from resources.lib.api import api_vod_subscription
 from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
@@ -9,20 +10,26 @@ from resources.lib.base.l3.language import _
 from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, encode_obj, load_file, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l6 import inputstream
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_IMAGE_URL, CONST_IMAGES
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_URLS, CONST_IMAGES
 from urllib.parse import urlencode
 
-def check_devices():
-    pass
+#Included from base.l7.plugin
+#plugin_get_device_id
 
-def check_entitlements():
-    return
-
-def get_image(prefix, content):
-    return ''
-
-def get_play_url(content):
-    return {'play_url': '', 'locator': ''}
+#Included from base.l8.menu
+#plugin_ask_for_creds
+#plugin_check_devices
+#plugin_login_error
+#plugin_post_login
+#plugin_process_info
+#plugin_process_playdata
+#plugin_process_vod
+#plugin_process_vod_season
+#plugin_process_vod_seasons
+#plugin_process_watchlist
+#plugin_process_watchlist_listing
+#plugin_renew_token
+#plugin_vod_subscription_filter
 
 def plugin_ask_for_creds(creds):
     email_or_pin = settings.getBool(key='email_instead_of_customer')
@@ -60,6 +67,12 @@ def plugin_ask_for_creds(creds):
         return {'result': False, 'username': '', 'password': ''}
 
     return {'result': True, 'username': username, 'password': password}
+
+def plugin_check_devices():
+    pass
+
+def plugin_get_device_id():
+    return 'NOTNEEDED'
 
 def plugin_login_error(login_result):
     email_or_pin = settings.getBool(key='email_instead_of_customer')
@@ -134,8 +147,8 @@ def plugin_process_info(playdata):
                     imgtype = 'epg'
 
                 if check_key(row['metadata'], 'pictureUrl'):
-                    info['image'] = "{image_url}/{imgtype}/{image}/1920x1080.jpg?blurred=false".format(image_url=CONST_IMAGE_URL, imgtype=imgtype, image=row['metadata']['pictureUrl'])
-                    info['image_large'] = "{image_url}/{imgtype}/{image}/1920x1080.jpg?blurred=false".format(image_url=CONST_IMAGE_URL, imgtype=imgtype, image=row['metadata']['pictureUrl'])
+                    info['image'] = "{image_url}/{imgtype}/{image}/1920x1080.jpg?blurred=false".format(image_url=CONST_URLS['image'], imgtype=imgtype, image=row['metadata']['pictureUrl'])
+                    info['image_large'] = "{image_url}/{imgtype}/{image}/1920x1080.jpg?blurred=false".format(image_url=CONST_URLS['image'], imgtype=imgtype, image=row['metadata']['pictureUrl'])
 
                 if check_key(row['metadata'], 'actors'):
                     for castmember in row['metadata']['actors']:
@@ -195,18 +208,61 @@ def plugin_process_playdata(playdata):
 
     return item_inputstream, CDMHEADERS
 
+def plugin_process_vod(data, start=0):
+    items = []
+
+    return data
+
+def plugin_process_vod_season(series, id, data):
+    season = []
+    episodes = []
+
+    if not data or not check_key(data['resultObj'], 'containers'):
+        return None
+
+    for row in data['resultObj']['containers']:
+        for currow in row['containers']:
+            if check_key(currow, 'metadata') and check_key(currow['metadata'], 'season') and str(currow['metadata']['contentSubtype']) == 'EPISODE' and not str(currow['metadata']['episodeNumber']) in episodes:
+                asset_id = ''
+
+                for asset in currow['assets']:
+                    if check_key(asset, 'videoType') and asset['videoType'] == 'SD_DASH_PR' and check_key(asset, 'assetType') and asset['assetType'] == 'MASTER':
+                        asset_id = str(asset['assetId'])
+                        break
+
+                episodes.append(str(currow['metadata']['episodeNumber']))
+
+                label = '{season}.{episode} - {title}'.format(season=str(currow['metadata']['season']), episode=str(currow['metadata']['episodeNumber']), title=str(currow['metadata']['episodeTitle']))
+
+                season.append({'label': label, 'id': str(currow['metadata']['contentId']), 'assetid': asset_id, 'duration': currow['metadata']['duration'], 'title': str(currow['metadata']['episodeTitle']), 'episodeNumber': '{season}.{episode}'.format(season=str(currow['metadata']['season']), episode=str(currow['metadata']['episodeNumber'])), 'description': str(currow['metadata']['shortDescription']), 'image': "{image_url}/vod/{image}/1920x1080.jpg?blurred=false".format(image_url=CONST_URLS['image'], image=str(currow['metadata']['pictureUrl']))})
+
+    return season
+
+def plugin_process_vod_seasons(id, data):
+    seasons = []
+
+    if not data or not check_key(data['resultObj'], 'containers'):
+        return None
+
+    for row in data['resultObj']['containers']:
+        for currow in row['containers']:
+            if check_key(currow, 'metadata') and check_key(currow['metadata'], 'season') and str(currow['metadata']['contentSubtype']) == 'SEASON':
+                seasons.append({'id': str(currow['metadata']['contentId']), 'seriesNumber': str(currow['metadata']['season']), 'description': str(currow['metadata']['shortDescription']), 'image': "{image_url}/vod/{image}/1920x1080.jpg?blurred=false".format(image_url=CONST_URLS['image'], image=str(currow['metadata']['pictureUrl']))})
+
+    return {'type': 'seasons', 'seasons': seasons}
+
+def plugin_process_watchlist(data, type='watchlist'):
+    items = {}
+
+    return items
+
+def plugin_process_watchlist_listing(data, id=None, type='watchlist'):
+    items = {}
+
+    return items
+
 def plugin_renew_token(data):
     return None
-
-def plugin_process_watchlist(data, continuewatch=0):
-    items = []
-
-    return items
-
-def plugin_process_watchlist_listing(data, id=None, continuewatch=0):
-    items = []
-
-    return items
     
 def plugin_vod_subscription_filter():
     api_vod_subscription()

@@ -1,25 +1,44 @@
 import base64, json, os, re, requests, sys, time, xbmc
 
-from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, CONST_DUT_EPG, DEFAULT_USER_AGENT, SESSION_CHUNKSIZE
+from collections import OrderedDict
+from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, get_credentials, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
+from resources.lib.base.l3.util import check_key, get_credentials, encode32, is_file_older_than_x_days, is_file_older_than_x_minutes, load_file, load_profile, load_prefs, save_profile, save_prefs, set_credentials, write_file
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l4.session import Session
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_vod_by_type
-from resources.lib.constants import CONST_API_URLS, CONST_DEFAULT_CLIENTID, CONST_IMAGES, CONST_VOD_CAPABILITY
+from resources.lib.constants import CONST_URLS, CONST_DEFAULT_CLIENTID, CONST_IMAGES, CONST_VOD_CAPABILITY
 from resources.lib.util import get_image, get_play_url, plugin_process_info
 from urllib.parse import parse_qs, urlparse, quote_plus
 
-def api_add_to_watchlist(id, type):
+#Included from base.l7.plugin
+#api_clean_after_playback
+#api_get_info
+
+#Included from base.l8.menu
+#api_add_to_watchlist
+#api_get_profiles
+#api_list_watchlist
+#api_login
+#api_play_url
+#api_remove_from_watchlist
+#api_search
+#api_set_profile
+#api_vod_download
+#api_vod_season
+#api_vod_seasons
+#api_watchlist_listing
+
+def api_add_to_watchlist(id, series='', season='', program_type='', type='watchlist'):
     if not api_get_session():
         return None
 
     profile_settings = load_profile(profile_id=1)
 
     if type == "item":
-        mediaitems_url = '{listings_url}/{id}'.format(listings_url=CONST_API_URLS['listings_url'], id=id)
+        mediaitems_url = '{listings_url}/{id}'.format(listings_url=CONST_URLS['listings_url'], id=id)
         download = api_download(url=mediaitems_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']
@@ -29,7 +48,7 @@ def api_add_to_watchlist(id, type):
 
         id = data['mediaGroupId']
 
-    watchlist_url = '{watchlist_url}/{watchlist_id}/entries/{id}?sharedProfile=true'.format(watchlist_url=CONST_API_URLS['watchlist_url'], watchlist_id=profile_settings['watchlist_id'], id=id)
+    watchlist_url = '{watchlist_url}/{watchlist_id}/entries/{id}?sharedProfile=true'.format(watchlist_url=CONST_URLS['watchlist_url'], watchlist_id=profile_settings['watchlist_id'], id=id)
 
     download = api_download(url=watchlist_url, type='post', headers=api_get_headers(), data={"mediaGroup": {'id': id}}, json_data=True, return_json=False)
     data = download['data']
@@ -40,41 +59,55 @@ def api_add_to_watchlist(id, type):
 
     return True
 
+def api_clean_after_playback(stoptime):
+    if not api_get_session():
+        return None
+
+    profile_settings = load_profile(profile_id=1)
+
+    headers = api_get_headers()
+    headers['Content-type'] = 'application/json'
+
+    download = api_download(url=CONST_URLS['clearstreams_url'], type='post', headers=headers, data='{}', json_data=False, return_json=False)
+
 def api_get_headers():
     creds = get_credentials()
     username = creds['username']
 
     profile_settings = load_profile(profile_id=1)
 
-    HEADERS = {
+    headers = {
         'User-Agent': DEFAULT_USER_AGENT,
-        'X-Client-Id': CONST_DEFAULT_CLIENTID + '||' + DEFAULT_USER_AGENT,
+        'X-Client-Id': '{clientid}||{defaultagent}'.format(clientid=CONST_DEFAULT_CLIENTID, defaultagent=DEFAULT_USER_AGENT),
         'X-OESP-Token': profile_settings['access_token'],
         'X-OESP-Username': username,
     }
 
     if check_key(profile_settings, 'betelenet_profile_id') and len(str(profile_settings['betelenet_profile_id'])) > 0:
-        HEADERS['X-OESP-Profile-Id'] = profile_settings['betelenet_profile_id']
+        headers['X-OESP-Profile-Id'] = profile_settings['betelenet_profile_id']
 
-    return HEADERS
+    return headers
 
 def api_get_info(id, channel=''):
     profile_settings = load_profile(profile_id=1)
 
     info = {}
-    base_listing_url = CONST_API_URLS['listings_url']
+    base_listing_url = CONST_URLS['listings_url']
 
-    listing_url = '{listings_url}?byEndTime={time}~&byStationId={channel}&range=1-1&sort=startTime'.format(listings_url=base_listing_url, time=int(time.time() * 1000), channel=id)
-    download = api_download(url=listing_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
-    data = download['data']
-    code = download['code']
+    try:
+        listing_url = '{listings_url}?byEndTime={time}~&byStationId={channel}&range=1-1&sort=startTime'.format(listings_url=base_listing_url, time=int(time.time() * 1000), channel=id)
+        download = api_download(url=listing_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
+        data = download['data']
+        code = download['code']
 
-    if code and code == 200 and data and check_key(data, 'listings'):
-        for row in data['listings']:
-            if check_key(row, 'program'):
-                info = row['program']
+        if code and code == 200 and data and check_key(data, 'listings'):
+            for row in data['listings']:
+                if check_key(row, 'program'):
+                    info = row['program']
 
-    info = plugin_process_info({'title': '', 'channel': channel, 'info': info})
+        info = plugin_process_info({'title': '', 'channel': channel, 'info': info})
+    except:
+        pass
 
     return info
 
@@ -102,7 +135,7 @@ def api_get_play_token(locator=None, path=None, force=0):
         else:
             jsondata = {"contentLocator": locator}
 
-        download = api_download(url=CONST_API_URLS['token_url'], type='post', headers=api_get_headers(), data=jsondata, json_data=True, return_json=True)
+        download = api_download(url=CONST_URLS['token_url'], type='post', headers=api_get_headers(), data=jsondata, json_data=True, return_json=True)
         data = download['data']
         code = download['code']
 
@@ -129,11 +162,11 @@ def api_get_play_token(locator=None, path=None, force=0):
     else:
         return profile_settings['drm_token']
 
-def api_get_session(force=0):
+def api_get_session(force=0, return_data=False):
     force = int(force)
     profile_settings = load_profile(profile_id=1)
 
-    devices_url = CONST_API_URLS['devices_url'] + profile_settings['household_id'] + '/devices'
+    devices_url = '{devices_url}{household_id}/devices'.format(devices_url=CONST_URLS['devices_url'], household_id=profile_settings['household_id'])
 
     download = api_download(url=devices_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
@@ -146,6 +179,9 @@ def api_get_session(force=0):
             login_result = api_get_session_token()
 
         if not login_result['result']:
+            if return_data == True:
+                return {'result': False, 'data': login_result['data'], 'code': login_result['code']}
+
             return False
 
     profile_settings = load_profile(profile_id=1)
@@ -153,63 +189,16 @@ def api_get_session(force=0):
     profile_settings['last_login_time'] = int(time.time())
     save_profile(profile_id=1, profile=profile_settings)
 
+    if return_data == True:
+        return {'result': True, 'data': data, 'code': code}
+
     return True
 
 def api_get_profiles():
     return None
 
-def api_get_series_nfo():
-    type = 'seriesnfo'
-    encodedBytes = base64.b32encode(type.encode("utf-8"))
-    type = str(encodedBytes, "utf-8")
-
-    vod_url = '{dut_epg_url}/{type}.zip'.format(dut_epg_url=CONST_DUT_EPG, type=type)
-    file = os.path.join("cache", "{type}.json".format(type=type))
-    tmp = os.path.join(ADDON_PROFILE, 'tmp', "{type}.zip".format(type=type))
-
-    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5):
-        data = load_file(file=file, isJSON=True)
-    else:
-        resp = Session().get(vod_url, stream=True)
-
-        if resp.status_code != 200:
-            resp.close()
-            return None
-
-        with open(tmp, 'wb') as f:
-            for chunk in resp.iter_content(chunk_size=SESSION_CHUNKSIZE):
-                f.write(chunk)
-
-        resp.close()
-
-        if os.path.isfile(tmp):
-            from zipfile import ZipFile
-
-            try:
-                with ZipFile(tmp, 'r') as zipObj:
-                    zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
-            except:
-                try:
-                    fixBadZipfile(tmp)
-
-                    with ZipFile(tmp, 'r') as zipObj:
-                        zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
-
-                except:
-                    try:
-                        from resources.lib.base.l1.zipfile import ZipFile as ZipFile2
-
-                        with ZipFile2(tmp, 'r') as zipObj:
-                            zipObj.extractall(os.path.join(ADDON_PROFILE, "cache", ""))
-                    except:
-                        return None
-
-
-def api_set_profile(id=''):
-    return None
-
 def api_list_devices():
-    download = api_download(url=CONST_API_URLS['devices_digital_url'] + '/status', type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
+    download = api_download(url='{devices_url}/status'.format(devices_url=CONST_URLS['devices_digital_url']), type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
     code = download['code']
 
@@ -226,10 +215,10 @@ def api_new_device(new_id):
         "deviceClass":"Desktop"
     }
 
-    HEADERS = api_get_headers()
-    HEADERS['Content-Type'] = 'application/json'
+    headers = api_get_headers()
+    headers['Content-Type'] = 'application/json'
 
-    download = requests.post(url=CONST_API_URLS['devices_digital_url'], headers=HEADERS, json=jsondata)
+    download = requests.post(url=CONST_URLS['devices_digital_url'], headers=headers, json=jsondata)
     data = download.text
     code = download.status_code
 
@@ -240,17 +229,6 @@ def api_new_device(new_id):
 
     return True
 
-def get_server_certificate(locator, token):
-    HEADERS = api_get_headers()
-    HEADERS["Content-Type"] = "application/octet-stream"
-    HEADERS["X-OESP-Content-Locator"] = locator
-    HEADERS["X-OESP-DRM-SchemeIdUri"] = "urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed"
-    HEADERS["X-OESP-License-Token"] = token
-    HEADERS["X-OESP-License-Token-Type"]= "velocix"
-
-    download = requests.post(url=CONST_API_URLS['widevine_url'], headers=HEADERS, data="\b\x04")
-    return base64.b64encode(download.content)
-
 def api_replace_device(old_id, new_id):
     jsondata = {
         "deviceId": new_id,
@@ -259,10 +237,10 @@ def api_replace_device(old_id, new_id):
         "deviceClass":"Desktop"
     }
 
-    HEADERS = api_get_headers()
-    HEADERS['Content-Type'] = 'application/json'
+    headers = api_get_headers()
+    headers['Content-Type'] = 'application/json'
 
-    download = requests.put(url=CONST_API_URLS['devices_digital_url'] + '/' + str(old_id), headers=HEADERS, json=jsondata)
+    download = requests.put(url='{devices_url}/{old_id}'.format(devices_url=CONST_URLS['devices_digital_url'], old_id=old_id), headers=headers, json=jsondata)
     code = download.status_code
 
     if not code or not code == 200:
@@ -278,12 +256,12 @@ def api_get_session_token():
 
     profile_settings = load_profile(profile_id=1)
 
-    HEADERS = {
+    headers = {
         'User-Agent':  DEFAULT_USER_AGENT,
         'X-Client-Id': CONST_DEFAULT_CLIENTID + "||" + DEFAULT_USER_AGENT,
     }
 
-    download = api_download(url=CONST_API_URLS['session_url'] + '?token=true', type='post', headers=HEADERS, data={"username": username, "refreshToken": profile_settings['refresh_token']}, json_data=True, return_json=True)
+    download = api_download(url='{session_url}?token=true'.format(session_url=CONST_URLS['session_url']), type='post', headers=headers, data={"username": username, "refreshToken": profile_settings['refresh_token']}, json_data=True, return_json=True)
     data = download['data']
     code = download['code']
 
@@ -327,7 +305,7 @@ def api_get_watchlist_id():
 
     profile_settings = load_profile(profile_id=1)
 
-    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&maxResults=1&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_API_URLS['watchlist_url'], profile_id=profile_settings['betelenet_profile_id'])
+    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&maxResults=1&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_URLS['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
 
     download = api_download(url=watchlist_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
@@ -341,13 +319,13 @@ def api_get_watchlist_id():
 
     return True
 
-def api_list_watchlist(continuewatch=0):
+def api_list_watchlist(type='watchlist'):
     if not api_get_session():
         return None
 
     profile_settings = load_profile(profile_id=1)
 
-    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_API_URLS['watchlist_url'], profile_id=profile_settings['betelenet_profile_id'])
+    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_URLS['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
 
     download = api_download(url=watchlist_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
@@ -364,7 +342,7 @@ def api_login():
     password = creds['password']
 
     try:
-        os.remove(ADDON_PROFILE + 'stream_cookies')
+        os.remove(os.path.join(ADDON_PROFILE, 'stream_cookies'))
     except:
         pass
 
@@ -378,12 +356,12 @@ def api_login():
     profile_settings['watchlist_id'] = ''
     save_profile(profile_id=1, profile=profile_settings)
 
-    HEADERS = {
+    headers = {
         'User-Agent':  DEFAULT_USER_AGENT,
-        'X-Client-Id': CONST_DEFAULT_CLIENTID + "||" + DEFAULT_USER_AGENT,
+        'X-Client-Id': '{clientid}||{defaultagent}'.format(clientid=CONST_DEFAULT_CLIENTID, defaultagent=DEFAULT_USER_AGENT),
     }
 
-    download = api_download(url=CONST_API_URLS['authorization_url'], type='get', headers=HEADERS, data=None, json_data=False, return_json=True)
+    download = api_download(url=CONST_URLS['authorization_url'], type='get', headers=headers, data=None, json_data=False, return_json=True)
     data = download['data']
     code = download['code']
 
@@ -393,7 +371,7 @@ def api_login():
     validityToken = data['session']['validityToken']
     state = data['session']['state']
 
-    download = api_download(url=data['authorizationUri'], type='get', headers=HEADERS, data=None, json_data=False, return_json=False)
+    download = api_download(url=data['authorizationUri'], type='get', headers=headers, data=None, json_data=False, return_json=False)
     data = download['data']
     code = download['code']
 
@@ -406,7 +384,7 @@ def api_login():
         "rememberme": "true"
     }
 
-    download = api_download(url=CONST_API_URLS['login_url'], type='post', headers=HEADERS, data=formdata, json_data=False, return_json=False)
+    download = api_download(url=CONST_URLS['login_url'], type='post', headers=headers, data=formdata, json_data=False, return_json=False)
     data = download['data']
     code = download['code']
 
@@ -424,7 +402,7 @@ def api_login():
         }
     }
 
-    download = api_download(url=CONST_API_URLS['authorization_url'], type='post', headers=HEADERS, data=jsondata, json_data=True, return_json=True)
+    download = api_download(url=CONST_URLS['authorization_url'], type='post', headers=headers, data=jsondata, json_data=True, return_json=True)
     data = download['data']
     code = download['code']
 
@@ -455,7 +433,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     info = {}
     properties = {}
-    base_listing_url = CONST_API_URLS['listings_url']
+    base_listing_url = CONST_URLS['listings_url']
     urldata = None
     urldata2 = None
     path = None
@@ -497,7 +475,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
         info = data['program']
     elif type == 'vod':
-        mediaitems_url = '{mediaitems_url}/{id}'.format(mediaitems_url=CONST_API_URLS['mediaitems_url'], id=id)
+        mediaitems_url = '{mediaitems_url}/{id}'.format(mediaitems_url=CONST_URLS['mediaitems_url'], id=id)
         download = api_download(url=mediaitems_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']
@@ -520,7 +498,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         else:
             return playdata
 
-        playout_url = '{base_url}/playout/{playout_str}/{id}?abrType=BR-AVC-DASH'.format(base_url=CONST_API_URLS['base_url'], playout_str=playout_str, id=id)
+        playout_url = '{base_url}/playout/{playout_str}/{id}?abrType=BR-AVC-DASH'.format(base_url=CONST_URLS['base_url'], playout_str=playout_str, id=id)
         download = api_download(url=playout_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']
@@ -549,16 +527,13 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     if not locator or not len(str(locator)) > 0:
         return playdata
 
-    license = CONST_API_URLS['widevine_url']
+    license = CONST_URLS['widevine_url']
 
     profile_settings = load_profile(profile_id=1)
     profile_settings['drm_locator'] = locator
     save_profile(profile_id=1, profile=profile_settings)
 
     token = api_get_play_token(locator=locator, path=path, force=1)
-
-    #cert = get_server_certificate(locator=locator, token=token)
-    #write_file('widevine_cert', data=cert, isJSON=False)
 
     token_orig = token
 
@@ -598,13 +573,13 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
     return playdata
 
-def api_remove_from_watchlist(id, continuewatch=0):
+def api_remove_from_watchlist(id, type='watchlist'):
     if not api_get_session():
         return None
 
     profile_settings = load_profile(profile_id=1)
 
-    remove_url = '{watchlist_url}/{watchlist_id}/entries/{id}?sharedProfile=true'.format(watchlist_url=CONST_API_URLS['watchlist_url'], watchlist_id=profile_settings['watchlist_id'], id=id)
+    remove_url = '{watchlist_url}/{watchlist_id}/entries/{id}?sharedProfile=true'.format(watchlist_url=CONST_URLS['watchlist_url'], watchlist_id=profile_settings['watchlist_id'], id=id)
 
     download = api_download(url=remove_url, type='delete', headers=api_get_headers(), data=None, json_data=False, return_json=False)
     code = download['code']
@@ -615,9 +590,6 @@ def api_remove_from_watchlist(id, continuewatch=0):
     return True
 
 def api_search(query):
-    if not api_get_session():
-        return None
-
     return False
 
     end = int(time.time() * 1000)
@@ -625,14 +597,13 @@ def api_search(query):
 
     vodstr = ''
 
-    encodedBytes = base64.b32encode(query.encode("utf-8"))
-    queryb32 = str(encodedBytes, "utf-8")
+    queryb32 = encode32(query)
 
-    file = "cache" + os.sep + "{query}.json".format(query=queryb32)
+    file = os.path.join("cache", "{query}.json".format(query=queryb32))
 
-    search_url = '{search_url}?byBroadcastStartTimeRange={start}~{end}&numItems=25&byEntitled=true&personalised=true&q={query}'.format(search_url=CONST_API_URLS['search_url'], start=start, end=end, query=quote_plus(query))
+    search_url = '{search_url}?byBroadcastStartTimeRange={start}~{end}&numItems=25&byEntitled=true&personalised=true&q={query}'.format(search_url=CONST_URLS['search_url'], start=start, end=end, query=quote_plus(query))
 
-    if not is_file_older_than_x_days(file=ADDON_PROFILE + file, days=0.5):
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5):
         data = load_file(file=file, isJSON=True)
     else:
         download = api_download(url=search_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
@@ -751,85 +722,47 @@ def api_search(query):
 
     return items
 
+def api_set_profile(id=''):
+    return None
+
 def api_vod_download():
     return None
 
-def api_vod_season(series, id):
-    if not api_get_session():
-        return None
+def api_vod_season(series, id, use_cache=True):
+    type = "vod_season_{id}".format(id=id)
+    type = encode32(type)
 
-    season = []
+    file = os.path.join("cache", "{type}.json".format(type=type))
+    cache = 0
 
     profile_settings = load_profile(profile_id=1)
 
-    season_url = '{mediaitems_url}?byMediaType=Episode%7CFeatureFilm&byParentId={id}&includeAdult=true&range=1-1000&sort=seriesEpisodeNumber|ASC'.format(mediaitems_url=CONST_API_URLS['mediaitems_url'], id=id)
-    download = api_download(url=season_url, type='get', headers=None, data=None, json_data=False, return_json=True)
-    data = download['data']
-    code = download['code']
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5) and use_cache == True:
+        data = load_file(file=file, isJSON=True)
+        cache = 1
+    else:
+        season_url = '{mediaitems_url}?byMediaType=Episode%7CFeatureFilm&byParentId={id}&includeAdult=true&range=1-1000&sort=seriesEpisodeNumber|ASC'.format(mediaitems_url=CONST_URLS['mediaitems_url'], id=id)
+        download = api_download(url=season_url, type='get', headers=None, data=None, json_data=False, return_json=True)
+        data = download['data']
+        code = download['code']
 
-    if not data or not check_key(data, 'mediaItems'):
-        return None
+    return {'data': data, 'cache': cache}
 
-    data['mediaItems'] = list(data['mediaItems'])
+def api_vod_seasons(type, id, use_cache=True):
+    type2 = "vod_seasons_{id}".format(id=id)
+    type2 = encode32(type2)
 
-    for row in data['mediaItems']:
-        desc = ''
-        image = ''
-        label = ''
+    file = os.path.join("cache", "{type}.json".format(type=type2))
 
-        if not check_key(row, 'title') or not check_key(row, 'id'):
-            continue
+    cache = 0
 
-        if check_key(row, 'description'):
-            desc = row['description']
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=0.5) and use_cache == True:
+        data = load_file(file=file, isJSON=True)
+        cache = 1
+    else:
+        data = api_get_vod_by_type(type=type, character=None, genre=None, subscription_filter=None)
 
-        if check_key(row, 'duration'):
-            duration = int(row['duration'])
-
-        if check_key(row, 'images'):
-            program_image = get_image("boxart", row['images'])
-            image = get_image("HighResLandscape", row['images'])
-
-            if image == '':
-                image = program_image
-            else:
-                image += '?w=1920&mode=box'
-
-        if check_key(row, 'earliestBroadcastStartTime'):
-            startsplit = int(row['earliestBroadcastStartTime']) // 1000
-
-            startT = datetime.datetime.fromtimestamp(startsplit)
-            startT = convert_datetime_timezone(startT, "UTC", "UTC")
-
-            if xbmc.getLanguage(xbmc.ISO_639_1) == 'nl':
-                label = date_to_nl_dag(startT) + startT.strftime(" %d ") + date_to_nl_maand(startT) + startT.strftime(" %Y %H:%M ") + row['title']
-            else:
-                label = (startT.strftime("%A %d %B %Y %H:%M ") + row['title']).capitalize()
-        else:
-            label = row['title']
-
-        season.append({'label': label, 'id': row['id'], 'start': '', 'duration': duration, 'title': row['title'], 'seasonNumber': '', 'episodeNumber': '', 'description': desc, 'image': image})
-
-    return season
-
-def api_vod_seasons(type, id):
-    seasons = []
-
-    data = api_get_vod_by_type(type=type, character=None, genre=None, subscription_filter=None)
-
-    if data:
-        try:
-            row = data[str(id)]
-
-            data_seasons = json.loads(row['seasons'])
-
-            for season in data_seasons:
-                seasons.append({'id': season['id'], 'seriesNumber': season['seriesNumber'], 'description': row['description'], 'image': row['icon']})
-
-        except:
-            return None
-
-    return {'type': 'seasons', 'seasons': seasons, 'watchlist': id}
+    return {'data': data, 'cache': cache}
 
 def api_vod_subscription():
     return None
@@ -843,7 +776,7 @@ def api_watchlist_listing(id):
     end = int(time.time() * 1000)
     start = end - (7 * 24 * 60 * 60 * 1000)
 
-    mediaitems_url = '{media_items_url}?&byMediaGroupId={id}&byStartTime={start}~{end}&range=1-250&sort=startTime%7Cdesc'.format(media_items_url=CONST_API_URLS['listings_url'], id=id, start=start, end=end)
+    mediaitems_url = '{media_items_url}?&byMediaGroupId={id}&byStartTime={start}~{end}&range=1-250&sort=startTime%7Cdesc'.format(media_items_url=CONST_URLS['listings_url'], id=id, start=start, end=end)
     download = api_download(url=mediaitems_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
     code = download['code']
@@ -852,14 +785,3 @@ def api_watchlist_listing(id):
         return False
 
     return data
-
-def api_clean_after_playback(stoptime):
-    profile_settings = load_profile(profile_id=1)
-
-    headers = api_get_headers()
-    headers['Content-type'] = 'application/json'
-    
-    device_id = load_file('device_id', isJSON=False)
-    
-    if device_id:
-        download = api_download(url=CONST_API_URLS['clearstreams_url'], type='post', headers=headers, data='{}', json_data=False, return_json=False)

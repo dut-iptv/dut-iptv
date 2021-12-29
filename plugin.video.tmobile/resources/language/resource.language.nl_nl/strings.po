@@ -306,11 +306,11 @@ msgstr "Zoeken"
 
 msgctxt "#32075"
 msgid "New Search"
-msgstr "Nieuwe zoekterm"
+msgstr "Nieuwe zoekopdracht"
 
 msgctxt "#32076"
 msgid "Start a new search"
-msgstr "Begin een nieuwe zoekactie"
+msgstr "Start een nieuwe zoekopdracht"
 
 msgctxt "#32079"
 msgid "Today"
@@ -327,6 +327,34 @@ msgstr "Live TV verwijst naar Simple IPTV PVR"
 msgctxt "#32082"
 msgid "Reset Session"
 msgstr "Sessie resetten"
+
+msgctxt "#32083"
+msgid "Add to Watchlist"
+msgstr "Toevoegen aan kijklijst"
+
+msgctxt "#32084"
+msgid "Remove from Watchlist"
+msgstr "Verwijderen van kijklijst"
+
+msgctxt "#32085"
+msgid "Watchlist"
+msgstr "Kijklijst"
+
+msgctxt "#32086"
+msgid "Added to Watchlist"
+msgstr "Toegevoegd aan kijklijst"
+
+msgctxt "#32087"
+msgid "Add to Watchlist failed"
+msgstr "Toevoegen aan kijklijst mislukt"
+
+msgctxt "#32088"
+msgid "Removed from Watchlist"
+msgstr "Verwijderd uit kijklijst"
+
+msgctxt "#32089"
+msgid "Remove from Watchlist failed"
+msgstr "Verwijderen uit kijklijst mislukt"
 
 msgctxt "#32090"
 msgid "Enable Radio in Simple IPTV"
@@ -734,7 +762,7 @@ msgstr "Bibliotheek integratie voor series inschakelen"
 
 msgctxt "#330076"
 msgid "Maximum amount of shows to update per hour"
-msgstr "Maximum aantal shows om te updaten per uur"
+msgstr "Maximum aantal series om te updaten per uur"
 
 msgctxt "#330077"
 msgid "Disable integration"
@@ -742,7 +770,7 @@ msgstr "Integratie uitschakelen"
 
 msgctxt "#330078"
 msgid "Enable integration for movies on watchlist"
-msgstr "Integratie voor films op de watchlist inschakelen"
+msgstr "Integratie voor films op de kijklijst inschakelen"
 
 msgctxt "#330079"
 msgid "Enable integration for all movies"
@@ -750,7 +778,7 @@ msgstr "Integratie voor alle films inschakelen"
 
 msgctxt "#330080"
 msgid "Enable integration for shows on watchlist"
-msgstr "Integratie voor series op de watchlist inschakelen"
+msgstr "Integratie voor series op de kijklijst inschakelen"
 
 msgctxt "#330081"
 msgid "Enable integration for all shows"
@@ -775,3 +803,23 @@ msgstr "Bibliotheek gereset"
 msgctxt "#330086"
 msgid "Reset Cache"
 msgstr "Cache verwijderen"
+
+msgctxt "#330087"
+msgid "Added to Continue Watching"
+msgstr "Toegevoegd aan Verder Kijken"
+
+msgctxt "#330088"
+msgid "Add to Continue Watching failed"
+msgstr "Toevoegen aan Verder Kijken mislukt"
+
+msgctxt "#330089"
+msgid "Add to Continue Watching"
+msgstr "Toevoegen aan Verder Kijken"
+
+msgctxt "#330090"
+msgid "Setup UpNext"
+msgstr "UpNext instellen"
+
+msgctxt "#330091"
+msgid "Enable UpNext integration"
+msgstr "UpNext integratie inschakelen"

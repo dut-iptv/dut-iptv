@@ -66,7 +66,7 @@ def reset_settings(**kwargs):
 
     for file in files:
         try:
-            os.remove(ADDON_PROFILE + file)
+            os.remove(os.path.join(ADDON_PROFILE, file))
         except:
             pass
 

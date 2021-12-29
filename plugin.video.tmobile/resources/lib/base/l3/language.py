@@ -216,6 +216,11 @@ class BaseLanguage(object):
     ASK_RESET_LIBRARY = 330084
     LIBRARY_RESET = 330085
     REMOVE_TEMP = 330086
+    ADDED_TO_CONTINUE = 330087
+    ADD_TO_CONTINUE_FAILED = 330088
+    ADD_TO_CONTINUE = 330089
+    SETUP_UPNEXT = 330090
+    ENABLE_UPNEXT = 330091
         
     def __getattribute__(self, name):
         attr = object.__getattribute__(self, name)

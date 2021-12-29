@@ -1,8 +1,6 @@
 import xbmc, xbmcaddon
 
 from resources.lib.api import api_get_channels, api_get_all_epg
-from resources.lib.base.l2.log import log
-from resources.lib.base.l3.util import get_kodi_version
 from resources.lib.util import create_epg, create_playlist
 
 def loop():

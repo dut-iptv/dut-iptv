@@ -4,8 +4,11 @@ from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PATH, ADDON_PROFILE
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
-from resources.lib.base.l3.util import clear_cache, check_key, is_file_older_than_x_days, load_channels, load_file, load_order, load_prefs, load_profile, load_radio_order, load_radio_prefs, write_file
+from resources.lib.base.l3.util import clear_cache, check_key, encode32, is_file_older_than_x_days, load_channels, load_file, load_order, load_prefs, load_profile, load_radio_order, load_radio_prefs, write_file
 from resources.lib.constants import CONST_IMAGES
+
+#Included from base.l7.plugin
+#plugin_get_device_id
 
 def clear_cache_connector():
     clear_cache()
@@ -57,15 +60,13 @@ def create_epg():
 
             if replay == 1 and len(replay_id) > 0 and len(replay_addonid) > 0:
                 directory = os.path.join("cache", replay_addonid.replace('plugin.video.', ''), "")
-                encodedBytes = base64.b32encode(replay_id.encode("utf-8"))
-                replay_id = str(encodedBytes, "utf-8")
+                replay_id = encode32(replay_id)
 
                 addon_id = replay_addonid
                 data = load_file(os.path.join(directory, replay_id + '.xml'), ext=False, isJSON=False)
             else:
                 directory = os.path.join("cache", str(row['live_addonid'].replace('plugin.video.', '')), "")
-                encodedBytes = base64.b32encode(live_id.encode("utf-8"))
-                live_id = str(encodedBytes, "utf-8")
+                live_id = encode32(live_id)
 
                 addon_id = row['live_addonid']
                 data = load_file(os.path.join(directory, live_id + '.xml'), ext=False, isJSON=False)
@@ -187,3 +188,6 @@ def create_playlist():
                 pass
 
     write_file(file="playlist.m3u8", data=playlist, isJSON=False)
+    
+def plugin_get_device_id():
+    return 'NOTNEEDED'

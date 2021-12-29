@@ -1,4 +1,4 @@
-import base64, hashlib, time, xbmc
+import base64, hashlib, xbmc
 from Cryptodome import Random
 from Cryptodome.Cipher import AES
 from Cryptodome.Util import Padding
@@ -6,7 +6,8 @@ from Cryptodome.Util import Padding
 class Credentials(object):
     def __init__(self):
         self.bs = 32
-        self.crypt_key = self.uniq_id()
+        self.crypt_key = self.uniq_id(fallback=False)
+        self.crypt_key2 = self.uniq_id(fallback=True)
 
     def encode_credentials(self, username, password):
         encoded_username = ''
@@ -48,26 +49,36 @@ class Credentials(object):
         enc = base64.b64decode(enc)
         iv = enc[:AES.block_size]
         cipher = AES.new(self.crypt_key, AES.MODE_CBC, iv)
-        decoded = Padding.unpad(
-            padded_data=cipher.decrypt(enc[AES.block_size:]),
-            block_size=self.bs).decode('utf-8')
+        cipher2 = AES.new(self.crypt_key2, AES.MODE_CBC, iv)
+        
+        try:
+            decoded = Padding.unpad(
+                padded_data=cipher.decrypt(enc[AES.block_size:]),
+                block_size=self.bs).decode('utf-8')
+        except:
+            decoded = Padding.unpad(
+                padded_data=cipher2.decrypt(enc[AES.block_size:]),
+                block_size=self.bs).decode('utf-8')
+                
         return decoded
 
-    def uniq_id(self, delay=1):
+    def uniq_id(self, fallback=False, delay=1000):
         mac_addr = self.get_mac_address(delay=delay)
 
-        if ':' in mac_addr and delay == 2:
+        if fallback == True:
+            return hashlib.sha256('UnsafeStaticSecret'.encode()).digest()
+        elif ':' in mac_addr:
             return hashlib.sha256(str(mac_addr).encode()).digest()
         else:
             return hashlib.sha256('UnsafeStaticSecret'.encode()).digest()
 
-    def get_mac_address(self, delay=1):
+    def get_mac_address(self, delay=1000):
         mac_addr = xbmc.getInfoLabel('Network.MacAddress')
         i = 0
 
         while ':' not in mac_addr and i < 3:
             i += 1
-            time.sleep(delay)
+            xbmc.sleep(delay)
             mac_addr = xbmc.getInfoLabel('Network.MacAddress')
 
         return mac_addr

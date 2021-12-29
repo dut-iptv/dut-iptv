@@ -4,7 +4,11 @@ CONST_BASE_DOMAIN = ''
 CONST_BASE_DOMAIN_MOD = False
 CONST_BASE_IP = ''
 
-CONST_BASE_URL = 'https://f1tv.formula1.com'
+CONST_URLS = {
+    'api': 'https://api.formula1.com/v2/account',
+    'base': 'https://f1tv.formula1.com',
+    'image': 'https://f1tv.formula1.com/image-resizer/image',
+}
 
 CONST_BASE_HEADERS = {
     'Accept': '*/*',
@@ -12,31 +16,33 @@ CONST_BASE_HEADERS = {
     'Accept-Language': 'en-US,en;q=0.9,nl;q=0.8',
     'Cache-Control': 'no-cache',
     'DNT': '1',
-    'Origin': CONST_BASE_URL,
+    'Origin': CONST_URLS['base'],
     'Pragma': 'no-cache',
-    'Referer': CONST_BASE_URL + '/',
+    'Referer': '{}/'.format(CONST_URLS['base']),
     'Sec-Fetch-Dest': 'empty',
     'Sec-Fetch-Mode': 'cors',
     'Sec-Fetch-Site': 'same-origin',
 }
 
-CONST_CONTINUE_WATCH = False
+CONST_FIRST_BOOT = {
+    'erotica': False,
+    'minimal': False,
+    'regional': False,
+    'home': False
+}
 
-CONST_DEFAULT_API = 'https://api.formula1.com/v2/account'
-
-CONST_FIRST_BOOT = False
-
-CONST_HAS_DUTIPTV = False
-
-CONST_HAS_LIBRARY = False
-
-CONST_HAS_LIVE = False
-
-CONST_HAS_REPLAY = False
-
-CONST_HAS_SEARCH = False
-
-CONST_IMAGE_URL = 'https://f1tv.formula1.com/image-resizer/image'
+CONST_HAS = {
+    'dutiptv': False,
+    'library': False,
+    'live': False,
+    'onlinesearch': False,
+    'profiles': False,
+    'proxy': False,
+    'replay': False,
+    'search': False,
+    'startfrombeginning': False,
+    'upnext': False,
+}
 
 CONST_IMAGES = {
     'vod': {
@@ -51,14 +57,6 @@ CONST_LIBRARY = {}
 CONST_MAIN_VOD_AR = ['395', '1510', '392', '2128', '2130', '493', '410', '413', '3675', '3673', '3946', '804']
 
 CONST_MOD_CACHE = {}
-
-CONST_ONLINE_SEARCH = False
-
-CONST_START_FROM_BEGINNING = False
-
-CONST_USE_PROXY = False
-
-CONST_USE_PROFILES = False
 
 CONST_VOD_CAPABILITY = [
     { 'file': 395, 'label': 'Live', 'start': 0, 'menu': 0, 'online': 1, 'search': 0, 'az': 0 },
@@ -75,4 +73,15 @@ CONST_VOD_CAPABILITY = [
     { 'file': 804, 'label': 'W Series', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
 ]
 
-CONST_WATCHLIST = False
+#"show"
+#"series"
+#"Serie"
+#"season"
+#"episode"
+#"event"
+#"Epg"
+#"Vod"
+
+CONST_WATCHLIST = {}
+
+CONST_WATCHLIST_CAPABILITY = {}

@@ -1,6 +1,7 @@
 import _strptime
 import datetime, io, json, os, re, sys, xbmc, xbmcvfs
 
+from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
@@ -9,19 +10,37 @@ from resources.lib.base.l3.util import check_key, convert_datetime_timezone, dat
 from resources.lib.base.l4 import gui
 from resources.lib.base.l5.api import api_download, api_get_channels
 from resources.lib.base.l6 import inputstream
-from resources.lib.constants import CONST_API_URLS, CONST_DEFAULT_CLIENTID
+from resources.lib.constants import CONST_URLS, CONST_DEFAULT_CLIENTID, CONST_IMAGES
 from urllib.parse import urlencode
+
+#Included from base.l7.plugin
+#plugin_get_device_id
+
+#Included from base.l8.menu
+#plugin_ask_for_creds
+#plugin_check_devices
+#plugin_login_error
+#plugin_post_login
+#plugin_process_info
+#plugin_process_playdata
+#plugin_process_vod
+#plugin_process_vod_season
+#plugin_process_vod_seasons
+#plugin_process_watchlist
+#plugin_process_watchlist_listing
+#plugin_renew_token
+#plugin_vod_subscription_filter
 
 def check_devices():
     device_id = load_file('device_id', isJSON=False)
-    
+
     if not device_id:
         LOGPATH = xbmcvfs.translatePath('special://logpath')
         LOGFILE = os.path.join(LOGPATH, 'kodi.old.log')
-        
+
         with io.open(LOGFILE, 'r', encoding='utf-8', errors='ignore') as f:
             text = f.read()
-            
+
         regex = r"HEADER_IN:\sX-DRM-Device-ID:\s([a-zA-Z0-9]*)"
 
         matches = re.finditer(regex, text, re.MULTILINE)
@@ -29,13 +48,13 @@ def check_devices():
         for matchNum, match in enumerate(matches, start=1):
             device_id = match.group(1)
             break
-            
+
         if not device_id:
             LOGFILE = os.path.join(LOGPATH, 'kodi.log')
-        
+
             with io.open(LOGFILE, 'r', encoding='utf-8', errors='ignore') as f:
                 text = f.read()
-                
+
             regex = r"HEADER_IN:\sX-DRM-Device-ID:\s([a-zA-Z0-9]*)"
 
             matches = re.finditer(regex, text, re.MULTILINE)
@@ -48,7 +67,7 @@ def check_devices():
             from resources.lib.api import api_list_devices, api_replace_device, api_new_device
 
             devices = api_list_devices()
-            
+
             select_list = []
             device_ar = {}
             count = 0
@@ -78,7 +97,7 @@ def check_devices():
 def check_entitlements():
     from resources.lib.api import api_get_play_token
 
-    media_groups_url = '{mediagroups_url}/crid:~~2F~~2Fschange.com~~2F63494ff3-70b4-4ce6-866a-9645f2b76d3e?byHasCurrentVod=true&range=1-1&sort=playCount7%7Cdesc'.format(mediagroups_url=CONST_API_URLS['mediagroupsfeeds_url'])
+    media_groups_url = '{mediagroups_url}/crid:~~2F~~2Fschange.com~~2F63494ff3-70b4-4ce6-866a-9645f2b76d3e?byHasCurrentVod=true&range=1-1&sort=playCount7%7Cdesc'.format(mediagroups_url=CONST_URLS['mediagroupsfeeds_url'])
 
     download = api_download(url=media_groups_url, type='get', headers=None, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -91,7 +110,7 @@ def check_entitlements():
 
     id = data['mediaGroups'][0]['id']
 
-    media_item_url = '{mediaitem_url}/{mediaitem_id}'.format(mediaitem_url=CONST_API_URLS['mediaitems_url'], mediaitem_id=id)
+    media_item_url = '{mediaitem_url}/{mediaitem_id}'.format(mediaitem_url=CONST_URLS['mediaitems_url'], mediaitem_id=id)
 
     download = api_download(url=media_item_url, type='get', headers=None, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -108,7 +127,7 @@ def check_entitlements():
     if (not urldata or not check_key(urldata, 'play_url') or not check_key(urldata, 'locator') or urldata['play_url'] == 'http://Playout/using/Session/Service'):
             urldata = {}
 
-            playout_url = '{base_url}/playout/vod/{id}?abrType=BR-AVC-DASH'.format(base_url=CONST_API_URLS['base_url'], id=id)
+            playout_url = '{base_url}/playout/vod/{id}?abrType=BR-AVC-DASH'.format(base_url=CONST_URLS['base_url'], id=id)
             download = api_download(url=playout_url, type='get', headers=None, data=None, json_data=False, return_json=True)
             data = download['data']
             code = download['code']
@@ -198,6 +217,12 @@ def plugin_ask_for_creds(creds):
         return {'result': False, 'username': '', 'password': ''}
 
     return {'result': True, 'username': username, 'password': password}
+
+def plugin_check_devices():
+    pass
+
+def plugin_get_device_id():
+    return load_file('device_id', isJSON=False)
 
 def plugin_login_error(login_result):
     gui.ok(message=_.LOGIN_ERROR, heading=_.LOGIN_ERROR_TITLE)
@@ -317,7 +342,7 @@ def plugin_process_playdata(playdata):
         'X-OESP-Username': creds['username'],
         'X-OESP-License-Token': profile_settings['drm_token'],
         'X-OESP-DRM-SchemeIdUri': 'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed',
-        'X-OESP-Content-Locator': playdata['locator']
+        'X-OESP-Content-Locator': playdata['locator'],
     }
 
     params = []
@@ -335,28 +360,82 @@ def plugin_process_playdata(playdata):
 
     item_inputstream = inputstream.Widevine(
         license_key = playdata['license'],
-        #server_certificate = load_file('widevine_cert', isJSON=False),
-        #license_flags = 'persistent_storage'
     )
 
     return item_inputstream, CDMHEADERS
 
-def plugin_renew_token(data):
-    from resources.lib.api import api_get_play_token
-
-    api_get_play_token(locator=data['locator'], path=data['path'])
-
-    data['path'] = data['path'].replace("/manifest.mpd", "/")
-
-    splitpath = data['path'].split('/Manifest?device', 1)
-
-    if len(splitpath) == 2:
-        data['path'] = splitpath[0] + "/"
-
-    return data['path']
-
-def plugin_process_watchlist(data, continuewatch=0):
+def plugin_process_vod(data, start=0):
     items = []
+
+    return data
+
+def plugin_process_vod_season(series, id, data):
+    season = []
+
+    if not data or not check_key(data, 'mediaItems'):
+        return None
+
+    data['mediaItems'] = list(data['mediaItems'])
+
+    for row in data['mediaItems']:
+        desc = ''
+        image = ''
+        label = ''
+
+        if not check_key(row, 'title') or not check_key(row, 'id'):
+            continue
+
+        if check_key(row, 'description'):
+            desc = row['description']
+
+        if check_key(row, 'duration'):
+            duration = int(row['duration'])
+
+        if check_key(row, 'images'):
+            program_image = get_image("boxart", row['images'])
+            image = get_image("HighResLandscape", row['images'])
+
+            if image == '':
+                image = program_image
+            else:
+                image += '?w=1920&mode=box'
+
+        if check_key(row, 'earliestBroadcastStartTime'):
+            startsplit = int(row['earliestBroadcastStartTime']) // 1000
+
+            startT = datetime.datetime.fromtimestamp(startsplit)
+            startT = convert_datetime_timezone(startT, "UTC", "UTC")
+
+            if xbmc.getLanguage(xbmc.ISO_639_1) == 'nl':
+                label = date_to_nl_dag(startT) + startT.strftime(" %d ") + date_to_nl_maand(startT) + startT.strftime(" %Y %H:%M ") + row['title']
+            else:
+                label = (startT.strftime("%A %d %B %Y %H:%M ") + row['title']).capitalize()
+        else:
+            label = row['title']
+
+        season.append({'label': label, 'id': row['id'], 'start': '', 'duration': duration, 'title': row['title'], 'seasonNumber': '', 'episodeNumber': '', 'description': desc, 'image': image})
+
+    return season
+
+def plugin_process_vod_seasons(id, data):
+    seasons = []
+
+    if data:
+        try:
+            row = data[str(id)]
+
+            data_seasons = json.loads(row['seasons'])
+
+            for season in data_seasons:
+                seasons.append({'id': season['id'], 'seriesNumber': season['seriesNumber'], 'description': row['description'], 'image': row['icon']})
+
+        except:
+            return None
+
+    return {'type': 'seasons', 'seasons': seasons, 'watchlist': id}
+
+def plugin_process_watchlist(data, type='watchlist'):
+    items = {}
 
     if check_key(data, 'entries'):
         for row in data['entries']:
@@ -422,7 +501,7 @@ def plugin_process_watchlist(data, continuewatch=0):
                 playable = True
                 mediatype = 'video'
 
-            items.append(plugin.Item(
+            items[str(currow['id'])] = plugin.Item(
                 label = currow['title'],
                 info = {
                     'plot': description,
@@ -438,12 +517,12 @@ def plugin_process_watchlist(data, continuewatch=0):
                 playable = playable,
                 progress = 0,
                 context = context
-            ))
+            )
 
     return items
 
-def plugin_process_watchlist_listing(data, id=None, continuewatch=0):
-    items = []
+def plugin_process_watchlist_listing(data, id=None, type='watchlist'):
+    items = {}
 
     if check_key(data, 'listings'):
         for row in data['listings']:
@@ -511,7 +590,7 @@ def plugin_process_watchlist_listing(data, id=None, continuewatch=0):
                 else:
                     program_image_large += '?w=1920&mode=box'
 
-            items.append(plugin.Item(
+            items[str(row['id'])] = plugin.Item(
                 label = label,
                 info = {
                     'plot': description,
@@ -526,9 +605,23 @@ def plugin_process_watchlist_listing(data, id=None, continuewatch=0):
                 path = plugin.url_for(func_or_url=play_video, type="program", channel=channel, id=row['id']),
                 playable = True,
                 context = context
-            ))
+            )
 
     return items
+
+def plugin_renew_token(data):
+    from resources.lib.api import api_get_play_token
+
+    api_get_play_token(locator=data['locator'], path=data['path'])
+
+    data['path'] = data['path'].replace("/manifest.mpd", "/")
+
+    splitpath = data['path'].split('/Manifest?device', 1)
+
+    if len(splitpath) == 2:
+        data['path'] = splitpath[0] + "/"
+
+    return data['path']
 
 def plugin_vod_subscription_filter():
     return None

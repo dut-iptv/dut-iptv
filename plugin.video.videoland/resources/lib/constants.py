@@ -4,7 +4,10 @@ CONST_BASE_DOMAIN = ''
 CONST_BASE_DOMAIN_MOD = False
 CONST_BASE_IP = ''
 
-CONST_BASE_URL = 'https://www.videoland.com'
+CONST_URLS = {
+    'base': 'https://www.videoland.com',
+    'gigya': 'https://accounts.eu1.gigya.com'
+}
 
 CONST_BASE_HEADERS = {
     'Accept': '*/*',
@@ -12,29 +15,33 @@ CONST_BASE_HEADERS = {
     'Accept-Language': 'en-US,en;q=0.9,nl;q=0.8',
     'Cache-Control': 'no-cache',
     'DNT': '1',
-    'Origin': CONST_BASE_URL,
+    'Origin': CONST_URLS['base'],
     'Pragma': 'no-cache',
-    'Referer': CONST_BASE_URL + '/',
+    'Referer': '{}/'.format(CONST_URLS['base']),
     'Sec-Fetch-Dest': 'empty',
     'Sec-Fetch-Mode': 'cors',
     'Sec-Fetch-Site': 'same-origin',
 }
 
-CONST_CONTINUE_WATCH = True
+CONST_FIRST_BOOT = {
+    'erotica': False,
+    'minimal': False,
+    'regional': False,
+    'home': False
+}
 
-CONST_FIRST_BOOT = False
-
-CONST_GIGYA_URL = 'https://accounts.eu1.gigya.com'
-
-CONST_HAS_DUTIPTV = False
-
-CONST_HAS_LIBRARY = True
-
-CONST_HAS_LIVE = True
-
-CONST_HAS_REPLAY = False
-
-CONST_HAS_SEARCH = True
+CONST_HAS = {
+    'dutiptv': False,
+    'library': True,
+    'live': True,
+    'onlinesearch': False,
+    'profiles': True,
+    'proxy': True,
+    'replay': False,
+    'search': True,
+    'startfrombeginning': False,
+    'upnext': True,
+}
 
 CONST_IMAGES = {
     'still': {
@@ -63,7 +70,7 @@ CONST_LIBRARY = {
     'shows': {
         'series': {
             'online': 1,
-            'label': 'SERIES' 
+            'label': 'SERIES'
         },
         'kidsseries': {
             'online': 1,
@@ -84,14 +91,6 @@ CONST_LIBRARY = {
 
 CONST_MOD_CACHE = {}
 
-CONST_ONLINE_SEARCH = False
-
-CONST_START_FROM_BEGINNING = False
-
-CONST_USE_PROXY = True
-
-CONST_USE_PROFILES = True
-
 CONST_VOD_CAPABILITY = [
     { 'file': 'series', 'label': _.SERIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 2 },
     { 'file': 'seriesvideoland', 'label': _.SERIES + ' (Categorie)', 'start': 0, 'menu': 0, 'online': 0, 'search': 0, 'az': 4 },
@@ -103,4 +102,59 @@ CONST_VOD_CAPABILITY = [
     { 'file': 'kidsmoviesvideoland', 'label': _.KIDS_MOVIES + ' (Categorie)', 'start': 0, 'menu': 0, 'online': 0, 'search': 0, 'az': 4 },
 ]
 
-CONST_WATCHLIST = True
+#"show"
+#"series"
+#"Serie"
+#"season"
+#"episode"
+#"event"
+#"Epg"
+#"Vod"
+
+CONST_WATCHLIST = {
+    'vod': {
+        'show': {
+            'type': 'watchlist'
+        },
+        'series': {
+            'type': 'watchlist'
+        },
+        'season': {
+            'type': 'watchlist'
+        },
+        'episode': {
+            'type': 'watchlist'
+        },
+        'movie': {
+            'type': 'watchlist'
+        },
+    },
+    'replay': {
+
+    }
+}
+
+CONST_WATCHLIST_CAPABILITY = {
+    'watchlist': {
+        'label': _.WATCHLIST,
+        'add': 1,
+        'addlist': _.ADD_TO_WATCHLIST,
+        'addsuccess': _.ADDED_TO_WATCHLIST,
+        'addfailed': _.ADD_TO_WATCHLIST_FAILED,
+        'remove': 1,
+        'removelist': _.REMOVE_FROM_WATCHLIST,
+        'removesuccess': _.REMOVED_FROM_WATCHLIST,
+        'removefailed': _.REMOVE_FROM_WATCHLIST_FAILED
+    },
+    'continuewatch': {
+        'label': _.CONTINUE_WATCH,
+        'add': 0,
+        'addlist': '',
+        'addsuccess': '',
+        'addfailed': '',
+        'remove': 1,
+        'removelist': _.REMOVE_FROM_CONTINUE,
+        'removesuccess': _.REMOVED_FROM_CONTINUE,
+        'removefailed': _.REMOVE_FROM_CONTINUE_FAILED
+    },
+}

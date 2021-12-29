@@ -6,11 +6,13 @@ from resources.lib.base.l1.constants import ADDON_ICON, ADDON_FANART, ADDON_ID, 
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import load_file, write_file
+from resources.lib.base.l3.util import encode_obj, json_rpc, load_file, remove_dir, remove_file, upnext_signal, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import PluginError
 from resources.lib.base.l5 import signals
 from resources.lib.base.l6 import inputstream, router
+from resources.lib.util import plugin_get_device_id
+from urllib.parse import urlencode
 
 ## SHORTCUTS
 url_for = router.url_for
@@ -174,17 +176,17 @@ def _reset(**kwargs):
         method = 'Addons.SetAddonEnabled'
         json_rpc(method, {"addonid": ADDON_ID, "enabled": "false"})
 
-        shutil.rmtree(os.path.join(ADDON_PROFILE, "cache"))
-        shutil.rmtree(os.path.join(ADDON_PROFILE, "tmp"))
+        remove_dir(directory="cache", ext=False)
+        remove_dir(directory="tmp", ext=False)
 
         for file in glob.glob(os.path.join(ADDON_PROFILE, "stream*")):
-            os.remove(file)
+            remove_file(file=file, ext=True)
 
         for file in glob.glob(os.path.join(ADDON_PROFILE, "*.json")):
-            os.remove(file)
+            remove_file(file=file, ext=True)
 
         for file in glob.glob(os.path.join(ADDON_PROFILE, "*.xml")):
-            os.remove(file)
+            remove_file(file=file, ext=True)
 
         if not os.path.isdir(os.path.join(ADDON_PROFILE, "cache")):
             os.makedirs(os.path.join(ADDON_PROFILE, "cache"))
@@ -231,20 +233,19 @@ class Item(gui.Item):
         except:
             pass
 
-        if ADDON_ID == 'plugin.video.betelenet':
-            device_id = load_file('device_id', isJSON=False)
+        device_id = plugin_get_device_id
 
-            if not device_id:
-                method = 'settings.GetSettingValue'
-                cursetting = {}
-                cursetting['debug.extralogging'] = json_rpc(method, {"setting":"debug.extralogging"})['value']
-                cursetting['debug.showloginfo'] = json_rpc(method, {"setting":"debug.showloginfo"})['value']
-                cursetting['debug.setextraloglevel'] = json_rpc(method, {"setting":"debug.setextraloglevel"})['value']
+        if not device_id:
+            method = 'settings.GetSettingValue'
+            cursetting = {}
+            cursetting['debug.extralogging'] = json_rpc(method, {"setting":"debug.extralogging"})['value']
+            cursetting['debug.showloginfo'] = json_rpc(method, {"setting":"debug.showloginfo"})['value']
+            cursetting['debug.setextraloglevel'] = json_rpc(method, {"setting":"debug.setextraloglevel"})['value']
 
-                method = 'settings.SetSettingValue'
-                json_rpc(method, {"setting":"debug.extralogging", "value": "true"})
-                json_rpc(method, {"setting":"debug.showloginfo", "value": "true"})
-                json_rpc(method, {"setting":"debug.setextraloglevel", "value":[64]})
+            method = 'settings.SetSettingValue'
+            json_rpc(method, {"setting":"debug.extralogging", "value": "true"})
+            json_rpc(method, {"setting":"debug.showloginfo", "value": "true"})
+            json_rpc(method, {"setting":"debug.setextraloglevel", "value":[64]})
 
         if settings.getBool(key='disable_subtitle'):
             self.properties['disable_subtitle'] = 1
@@ -279,14 +280,76 @@ class Item(gui.Item):
             player.play(self.path, li)
 
         currentTime = 0
+        upnext = settings.getBool('upnext_enabled')
 
         while player.is_active:
             if xbmc.getCondVisibility("Player.HasMedia") and player.is_started:
-                playbackStarted = True
+                if playbackStarted == False:
+                    playbackStarted = True
 
-                if ADDON_ID == 'plugin.video.betelenet':
-                    if not device_id:
-                        player.stop()
+                if upnext:
+                    upnext = False
+                    result = json_rpc("XBMC.GetInfoLabels", {"labels":["VideoPlayer.DBID", "VideoPlayer.TvShowDBID"]})
+
+                    if result and len(str(result['VideoPlayer.DBID'])) > 0 and len(str(result['VideoPlayer.TvShowDBID'])) > 0:
+                        result2 = json_rpc("VideoLibrary.GetEpisodes", {"tvshowid": int(result['VideoPlayer.TvShowDBID']), "properties":[ "title", "plot", "rating", "firstaired", "playcount", "runtime", "season", "episode", "showtitle", "fanart", "thumbnail", "art"]})
+                        nextep = 0
+                        current_episode = dict()
+                        next_episode = dict()
+
+                        if result2:                       
+                            for result3 in result2['episodes']:
+                                if nextep == 0 and int(result3['episodeid']) == int(result['VideoPlayer.DBID']):                                    
+                                    current_episode=dict(
+                                        episodeid=result3['episodeid'],
+                                        tvshowid=int(result['VideoPlayer.TvShowDBID']),
+                                        title=result3["title"],
+                                        art=result3["art"],
+                                        season=result3["season"],
+                                        episode=result3["episode"],
+                                        showtitle=result3["showtitle"],
+                                        plot=result3["plot"],
+                                        playcount=result3["playcount"],
+                                        rating=result3["rating"],
+                                        firstaired=result3["firstaired"],
+                                        runtime=result3["runtime"]
+                                    )
+                                    
+                                    nextep = 1
+                                elif nextep == 1:                                   
+                                    params = []
+                                    params.append(('_', 'play_dbitem'))
+                                    params.append(('id', result3['episodeid']))
+
+                                    path = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))
+                                    
+                                    next_info = dict(
+                                        current_episode=current_episode,
+                                        next_episode=dict(
+                                            episodeid=result3['episodeid'],
+                                            tvshowid=int(result['VideoPlayer.TvShowDBID']),
+                                            title=result3["title"],
+                                            art=result3["art"],
+                                            season=result3["season"],
+                                            episode=result3["episode"],
+                                            showtitle=result3["showtitle"],
+                                            plot=result3["plot"],
+                                            playcount=result3["playcount"],
+                                            rating=result3["rating"],
+                                            firstaired=result3["firstaired"],
+                                            runtime=result3["runtime"]
+                                        ),
+                                        play_url=path,
+                                        #notification_time=60, 
+                                        #notification_offset=notification_offset,
+                                    )
+                                    
+                                    upnext_signal(sender=ADDON_ID, next_info=next_info)
+                                    #upnext_signal(sender=ADDON_ID)
+                                    break
+
+                if not device_id:
+                    player.stop()
 
                 if 'disable_subtitle' in self.properties:
                     player.showSubtitles(False)
@@ -317,6 +380,8 @@ class Item(gui.Item):
                             wait = calc_wait
 
                     while not xbmc.Monitor().waitForAbort(wait) and xbmc.getCondVisibility("Player.HasMedia") and player.is_started:
+                        info = None
+
                         try:
                             info = api_get_info(id=id, channel=channel)
                         except:
@@ -370,11 +435,10 @@ class Item(gui.Item):
             except:
                 pass
 
-        if ADDON_ID == 'plugin.video.betelenet':
-            if not device_id:
-                json_rpc(method, {"setting":"debug.showloginfo", "value": cursetting['debug.showloginfo']})
-                json_rpc(method, {"setting":"debug.setextraloglevel", "value": str(', '.join([str(elem) for elem in cursetting['debug.setextraloglevel']]))})
-                json_rpc(method, {"setting":"debug.extralogging", "value": cursetting['debug.setextraloglevel']})
+        if not device_id:
+            json_rpc(method, {"setting":"debug.showloginfo", "value": cursetting['debug.showloginfo']})
+            json_rpc(method, {"setting":"debug.setextraloglevel", "value": str(', '.join([str(elem) for elem in cursetting['debug.setextraloglevel']]))})
+            json_rpc(method, {"setting":"debug.extralogging", "value": cursetting['debug.setextraloglevel']})
 
 class MyPlayer(xbmc.Player):
     def __init__(self):

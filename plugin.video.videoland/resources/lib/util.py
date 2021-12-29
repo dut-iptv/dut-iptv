@@ -1,6 +1,7 @@
 import _strptime
 import datetime, re, xbmc
 
+from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
@@ -8,20 +9,26 @@ from resources.lib.base.l3.language import _
 from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, encode_obj, load_file, load_profile, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l6 import inputstream
-from resources.lib.constants import CONST_IMAGES
+from resources.lib.constants import CONST_IMAGES, CONST_WATCHLIST_CAPABILITY
 from urllib.parse import urlencode
 
-def check_devices():
-    pass
+#Included from base.l7.plugin
+#plugin_get_device_id
 
-def check_entitlements():
-    return
-
-def get_image(prefix, content):
-    return ''
-
-def get_play_url(content):
-    return {'play_url': '', 'locator': ''}
+#Included from base.l8.menu
+#plugin_ask_for_creds
+#plugin_check_devices
+#plugin_login_error
+#plugin_post_login
+#plugin_process_info
+#plugin_process_playdata
+#plugin_process_vod
+#plugin_process_vod_season
+#plugin_process_vod_seasons
+#plugin_process_watchlist
+#plugin_process_watchlist_listing
+#plugin_renew_token
+#plugin_vod_subscription_filter
 
 def plugin_ask_for_creds(creds):
     username = str(gui.input(message=_.ASK_USERNAME, default=creds['username'])).strip()
@@ -37,6 +44,12 @@ def plugin_ask_for_creds(creds):
         return {'result': False, 'username': '', 'password': ''}
 
     return {'result': True, 'username': username, 'password': password}
+
+def plugin_check_devices():
+    pass
+
+def plugin_get_device_id():
+    return 'NOTNEEDED'
 
 def plugin_login_error(login_result):
     gui.ok(message=_.LOGIN_ERROR, heading=_.LOGIN_ERROR_TITLE)
@@ -121,12 +134,75 @@ def plugin_process_playdata(playdata):
 
     return item_inputstream, CDMHEADERS
 
-def plugin_renew_token(data):
-    return None
+def plugin_process_vod(data, start=0):
+    items = {}
 
-def plugin_process_watchlist(data, continuewatch=0):
-    continuewatch = int(continuewatch)
+    return data
 
+def plugin_process_vod_season(series, id, data):
+    if not data or not check_key(data, 'details'):
+        return None
+
+    id_ar = id.split('###')
+    series = id_ar[0]
+    seasonstr = id_ar[1]
+
+    season = []
+    seasonno = ''
+
+    if check_key(data['details'], 'SN' + str(seasonstr)):
+        seasonno = re.sub("[^0-9]", "", data['details']['SN' + str(seasonstr)]['title'])
+
+    for currow in data['details']:
+        row = data['details'][currow]
+
+        if check_key(row, 'type') and row['type'] == 'episode':
+            image = ''
+            duration = 0
+
+            if check_key(row, 'runtime'):
+                duration = row['runtime']
+
+            if check_key(row, 'still'):
+                if settings.getBool('use_small_images', default=False) == True:
+                    image = row['still'].replace(CONST_IMAGES['still']['replace'], CONST_IMAGES['still']['small'])
+                else:
+                    image = row['still'].replace(CONST_IMAGES['still']['replace'], CONST_IMAGES['still']['large'])
+
+            if check_key(row, 'title') and len(str(row['title'])) > 0:
+                name = row['title']
+            else:
+                name = 'Aflevering {position}'.format(position=row['position'])
+
+            label = '{seasonno}.{episode} - {title}'.format(seasonno=seasonno, episode=row['position'], title=name)
+
+            season.append({'label': label, 'id': 'E' + str(series) + '###' + str(seasonstr) + '###' + str(row['id']), 'media_id': '', 'duration': duration, 'title': name, 'episodeNumber': row['position'], 'description': row['description'], 'image': image})
+
+    return season
+
+def plugin_process_vod_seasons(id, data):
+    seasons = []
+
+    ref = id
+    id = id[1:]
+
+    if not data or not check_key(data, 'details'):
+        return None
+
+    for currow in data['details']:
+        row = data['details'][currow]
+
+        if check_key(row, 'type') and row['type'] == 'season':
+            if settings.getBool('use_small_images', default=False) == True:
+                image = data['poster'].replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['small'])
+            else:
+                image = data['poster'].replace(CONST_IMAGES['poster']['replace'], CONST_IMAGES['poster']['large'])
+
+            seasons.append({'id': str(id) + '###' + str(row['id']), 'seriesNumber': row['title'], 'description': data['description'], 'image': image, 'watchlist': ref})
+
+    return {'type': 'seasons', 'seasons': seasons}
+
+def plugin_process_watchlist(data, type='watchlist'):
     items = {}
 
     if check_key(data, 'details'):
@@ -139,13 +215,12 @@ def plugin_process_watchlist(data, continuewatch=0):
 
             params = []
             params.append(('_', 'remove_from_watchlist'))
-            params.append(('continuewatch', continuewatch))
+            params.append(('type', type))
 
             progress = 0
+            remove_txt = CONST_WATCHLIST_CAPABILITY[type]['removelist']
 
-            if continuewatch == 1:
-                remove_txt = _.REMOVE_FROM_CONTINUE
-
+            if type == 'continuewatch':
                 if currow['type'] == 'episode':
                     params.append(('id', str(currow['id']) + '?series=' + str(currow['series_ref'])))
                 else:
@@ -154,17 +229,17 @@ def plugin_process_watchlist(data, continuewatch=0):
                 if not currow['type'] == 'series':
                     progress = data['progress'][row]
             else:
-                remove_txt = _.REMOVE_FROM_WATCHLIST
                 params.append(('id', currow['ref']))
 
-            context.append((remove_txt, 'RunPlugin({context_url})'.format(context_url='plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))), ))
+            if CONST_WATCHLIST_CAPABILITY[type]['remove'] == 1:
+                context.append((remove_txt, 'RunPlugin({context_url})'.format(context_url='plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))), ))
 
-            type = 'vod'
+            type2 = 'vod'
 
             if currow['type'] == 'episode':
                 params = []
                 params.append(('_', 'play_video'))
-                params.append(('type', type))
+                params.append(('type', type2))
                 params.append(('channel', None))
 
                 params.append(('id', 'E' + str(currow['series_ref'][1:]) + '###' + str(currow['season_id']) + '###' + str(currow['id'])))
@@ -173,7 +248,7 @@ def plugin_process_watchlist(data, continuewatch=0):
                 path = 'plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params)))
                 playable = True
                 mediatype = 'video'
-            elif currow['type'] == 'series' and continuewatch == 0:
+            elif currow['type'] == 'series' and not type == 'continuewatch':
                 params = []
                 params.append(('_', 'vod_series'))
                 params.append(('type', 'series'))
@@ -186,7 +261,7 @@ def plugin_process_watchlist(data, continuewatch=0):
             elif currow['type'] == 'movie':
                 params = []
                 params.append(('_', 'play_video'))
-                params.append(('type', type))
+                params.append(('type', type2))
                 params.append(('channel', None))
                 params.append(('id', currow['ref']))
                 params.append(('title', None))
@@ -213,12 +288,13 @@ def plugin_process_watchlist(data, continuewatch=0):
 
     return items
 
-def plugin_process_watchlist_listing(data, id=None, continuewatch=0):
-    continuewatch = int(continuewatch)
-
-    items = []
+def plugin_process_watchlist_listing(data, id=None, type='watchlist'):
+    items = {}
 
     return items
-    
+
+def plugin_renew_token(data):
+    return None
+
 def plugin_vod_subscription_filter():
     return None

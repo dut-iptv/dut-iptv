@@ -4,8 +4,13 @@ CONST_BASE_DOMAIN = ''
 CONST_BASE_DOMAIN_MOD = False
 CONST_BASE_IP = ''
 
-CONST_API_URL = 'https://api.nlziet.nl'
-CONST_APP_URL = 'https://app.nlziet.nl'
+CONST_URLS = {
+    'api': 'https://api.nlziet.nl',
+    'app': 'https://app.nlziet.nl',
+    'base': 'https://www.nlziet.nl',
+    'id': 'https://id.nlziet.nl',
+    'image': 'https://nlzietprodstorage.blob.core.windows.net',
+}
 
 CONST_BASE_HEADERS = {
     'Accept': '*/*',
@@ -13,33 +18,45 @@ CONST_BASE_HEADERS = {
     'Accept-Language': 'en-US,en;q=0.9,nl;q=0.8',
     'Cache-Control': 'no-cache',
     'DNT': '1',
-    'Origin': CONST_APP_URL,
+    'Origin': CONST_URLS['app'],
     'Pragma': 'no-cache',
-    'Referer': CONST_APP_URL,
+    'Referer': CONST_URLS['app'],
     'Sec-Fetch-Dest': 'empty',
     'Sec-Fetch-Mode': 'cors',
     'Sec-Fetch-Site': 'same-origin',
 }
 
-CONST_BASE_URL = 'https://www.nlziet.nl'
+CONST_FIRST_BOOT = {
+    'erotica': False,
+    'minimal': False,
+    'regional': True,
+    'home': False
+}
 
-CONST_CONTINUE_WATCH = False
-
-CONST_FIRST_BOOT = True
-
-CONST_HAS_DUTIPTV = True
-
-CONST_HAS_LIBRARY = False
-
-CONST_HAS_LIVE = True
-
-CONST_HAS_REPLAY = True
-
-CONST_HAS_SEARCH = True
-
-CONST_ID_URL = 'https://id.nlziet.nl'
+CONST_HAS = {
+    'dutiptv': True,
+    'library': True,
+    'live': True,
+    'onlinesearch': False,
+    'profiles': True,
+    'proxy': True,
+    'replay': True,
+    'search': True,
+    'startfrombeginning': False,
+    'upnext': True,
+}
 
 CONST_IMAGES = {
+    'still': {
+        'large': '',
+        'small': '',
+        'replace': '[format]'
+    },
+    'poster': {
+        'large': '',
+        'small': '',
+        'replace': '[format]'
+    },
     'replay': {
         'large': '',
         'small': '',
@@ -52,30 +69,99 @@ CONST_IMAGES = {
     },
 }
 
-CONST_IMAGE_URL = 'https://nlzietprodstorage.blob.core.windows.net'
-
-CONST_LIBRARY = {}
+CONST_LIBRARY = {
+    'shows': {
+        'series': {
+            'online': 1,
+            'label': 'SERIESBINGE'
+        },
+    },
+    'movies': {
+        'movies': {
+            'online': 0,
+            'label': 'MOVIES'
+        },
+    }
+}
 
 CONST_MOD_CACHE = {}
 
-CONST_ONLINE_SEARCH = False
-
-CONST_START_FROM_BEGINNING = True
-
-CONST_USE_PROXY = True
-
-CONST_USE_PROFILES = False
-
 CONST_VOD_CAPABILITY = [
+    { 'file': 'movies', 'label': _.MOVIES, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 1 },
+    { 'file': 'series', 'label': _.SERIESBINGE, 'start': 0, 'menu': 0, 'online': 0, 'search': 1, 'az': 1 },
     { 'file': 'tipfeednpo', 'label': _.RECOMMENDED + ' NPO', 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
     { 'file': 'tipfeed', 'label': _.RECOMMENDED, 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
     { 'file': 'watchaheadnpo', 'label': _.WATCHAHEAD + ' NPO', 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
     { 'file': 'watchahead', 'label': _.WATCHAHEAD, 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
-    { 'file': 'moviesnpo', 'label': _.MOVIES + ' NPO', 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
-    { 'file': 'movies', 'label': _.MOVIES, 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
-    { 'file': 'seriesbingenpo', 'label': _.SERIESBINGE + ' NPO', 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
-    { 'file': 'seriesbinge', 'label': _.SERIESBINGE, 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
+    #{ 'file': 'moviesnpo', 'label': _.MOVIES + ' NPO', 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
+    #{ 'file': 'movies', 'label': _.MOVIES, 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
+    #{ 'file': 'seriesbingenpo', 'label': _.SERIESBINGE + ' NPO', 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
+    #{ 'file': 'seriesbinge', 'label': _.SERIESBINGE, 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
     { 'file': 'mostviewed', 'label': _.MOSTVIEWED, 'start': 0, 'menu': 0, 'online': 1, 'search': 1, 'az': 0 },
 ]
 
-CONST_WATCHLIST = False
+#"show"
+#"series"
+#"Serie"
+#"season"
+#"episode"
+#"event"
+#"Epg"
+#"Vod"
+
+CONST_WATCHLIST = {
+    'vod': {
+        'show': {
+            'type': 'watchlist'
+        },
+        'series': {
+            'type': 'watchlist'
+        },
+        'Serie': {
+            'type': 'watchlist'
+        },
+        'season': {
+            'type': 'watchlist'
+        },
+        'episode': {
+            'type': 'continuewatch'
+        },
+        'movie': {
+            'type': 'continuewatch'
+        },
+        'Epg': {
+            'type': 'continuewatch'
+        },
+        'Vod': {
+            'type': 'continuewatch'
+        },
+    },
+    'replay': {
+
+    }
+}
+
+CONST_WATCHLIST_CAPABILITY = {
+    'watchlist': {
+        'label': _.WATCHLIST,
+        'add': 1,
+        'addlist': _.ADD_TO_WATCHLIST,
+        'addsuccess': _.ADDED_TO_WATCHLIST,
+        'addfailed': _.ADD_TO_WATCHLIST_FAILED,
+        'remove': 1,
+        'removelist': _.REMOVE_FROM_WATCHLIST,
+        'removesuccess': _.REMOVED_FROM_WATCHLIST,
+        'removefailed': _.REMOVE_FROM_WATCHLIST_FAILED
+    },
+    'continuewatch': {
+        'label': _.CONTINUE_WATCH,
+        'add': 1,
+        'addlist': _.ADD_TO_CONTINUE,
+        'addsuccess': _.ADDED_TO_CONTINUE,
+        'addfailed': _.ADD_TO_CONTINUE_FAILED,
+        'remove': 1,
+        'removelist': _.REMOVE_FROM_CONTINUE,
+        'removesuccess': _.REMOVED_FROM_CONTINUE,
+        'removefailed': _.REMOVE_FROM_CONTINUE_FAILED
+    },
+}

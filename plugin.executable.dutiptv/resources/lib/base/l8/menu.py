@@ -7,13 +7,13 @@ from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, ADDON_VERSI
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import add_library_sources, change_icon, check_key, clear_cache, clear_old, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, disable_prefs, get_credentials, json_rpc, load_file, load_profile, load_prefs, remove_library, save_profile, save_prefs, set_credentials, write_file
+from resources.lib.base.l3.util import add_library_sources, change_icon, check_key, clear_cache, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, disable_prefs, get_credentials, json_rpc, load_file, load_profile, load_prefs, remove_dir, remove_file, remove_library, save_profile, save_prefs, set_credentials, write_file
 from resources.lib.base.l4 import gui
 from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
 from resources.lib.base.l7 import plugin
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_CONTINUE_WATCH, CONST_FIRST_BOOT, CONST_HAS_DUTIPTV, CONST_HAS_LIBRARY, CONST_HAS_LIVE, CONST_HAS_REPLAY, CONST_HAS_SEARCH, CONST_IMAGES, CONST_LIBRARY, CONST_ONLINE_SEARCH, CONST_START_FROM_BEGINNING, CONST_USE_PROXY, CONST_USE_PROFILES, CONST_VOD_CAPABILITY, CONST_WATCHLIST
-from resources.lib.util import check_devices, plugin_ask_for_creds, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_vod, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
+from resources.lib.constants import CONST_BASE_HEADERS, CONST_FIRST_BOOT, CONST_HAS, CONST_IMAGES, CONST_LIBRARY, CONST_VOD_CAPABILITY, CONST_WATCHLIST, CONST_WATCHLIST_CAPABILITY
+from resources.lib.util import plugin_ask_for_creds, plugin_check_devices, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_vod, plugin_process_vod_season, plugin_process_vod_seasons, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
 from urllib.parse import urlparse
 from xml.dom.minidom import parseString
 
@@ -22,11 +22,6 @@ backend = ''
 
 @plugin.route('')
 def home(**kwargs):
-    clear_old()
-
-    if CONST_FIRST_BOOT:
-        check_first()
-
     profile_settings = load_profile(profile_id=1)
 
     if not ADDON_ID == 'plugin.executable.dutiptv' and (not check_key(profile_settings, 'version') or not ADDON_VERSION == profile_settings['version']):
@@ -34,30 +29,29 @@ def home(**kwargs):
         clear_cache(clear_all=1)
         profile_settings['version'] = ADDON_VERSION
         save_profile(profile_id=1, profile=profile_settings)
+        check_first()
 
     folder = plugin.Folder()
 
     if profile_settings and check_key(profile_settings, 'pswd') and len(profile_settings['pswd']) > 0:
-        if CONST_HAS_LIVE:
+        if CONST_HAS['live']:
             folder.add_item(label=_(_.LIVE_TV, _bold=True),  path=plugin.url_for(func_or_url=live_tv))
 
-        if CONST_HAS_REPLAY:
+        if CONST_HAS['replay']:
             folder.add_item(label=_(_.CHANNELS, _bold=True), path=plugin.url_for(func_or_url=replaytv, movies=0))
 
         if settings.getBool('showMoviesSeries'):
             for vod_entry in CONST_VOD_CAPABILITY:
                 folder.add_item(label=_(vod_entry['label'], _bold=True), path=plugin.url_for(func_or_url=vod, file=vod_entry['file'], label=vod_entry['label'], start=vod_entry['start'], online=vod_entry['online'], az=vod_entry['az'], menu=vod_entry['menu']))
 
-        if CONST_WATCHLIST:
-            folder.add_item(label=_(_.WATCHLIST, _bold=True), path=plugin.url_for(func_or_url=watchlist))
+        for entry in CONST_WATCHLIST_CAPABILITY:
+            row = CONST_WATCHLIST_CAPABILITY[entry]
+            folder.add_item(label=_(row['label'], _bold=True), path=plugin.url_for(func_or_url=watchlist, type=entry))
 
-        if CONST_CONTINUE_WATCH:
-            folder.add_item(label=_(_.CONTINUE_WATCH, _bold=True), path=plugin.url_for(func_or_url=watchlist, continuewatch=1))
-
-        if CONST_HAS_SEARCH:
+        if CONST_HAS['search']:
             folder.add_item(label=_(_.SEARCH, _bold=True), path=plugin.url_for(func_or_url=search_menu))
 
-        if CONST_USE_PROFILES:
+        if CONST_HAS['profiles']:
             if check_key(profile_settings, 'profile_name') and len(str(profile_settings['profile_name'])) > 0:
                 profile_txt = '{}: {}'.format(_.PROFILE, profile_settings['profile_name'])
             else:
@@ -327,6 +321,9 @@ def vod(file, label, start=0, character=None, genre=None, online=0, az=0, menu=0
                 else:
                     label = genre
 
+                if not label or len(str(label.strip())) == 0:
+                    continue
+
                 folder.add_item(
                     label = label,
                     info = {'plot': genre},
@@ -363,16 +360,20 @@ def vod_series(label, type, id, **kwargs):
 
     items = []
     context = []
+    seasons = []
 
-    seasons = api_vod_seasons(type, id)
+    data = api_vod_seasons(type, id)
+
+    if data:
+        seasons = plugin_process_vod_seasons(id=id, data=data['data'])
 
     title = label
 
     if seasons and check_key(seasons, 'seasons'):
-        if CONST_WATCHLIST and check_key(seasons, 'watchlist'):
-            context.append(
-                (_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=seasons['watchlist'], type='group')), )
-            )
+        program_type = 'season'
+
+        if check_key(CONST_WATCHLIST, 'vod') and check_key(CONST_WATCHLIST['vod'], program_type) and CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['vod'][program_type]['type']]['add'] == 1:
+            context.append((CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['vod'][program_type]['type']]['addlist'], 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=id, program_type=program_type, type=CONST_WATCHLIST['vod'][program_type]['type'])), ))
 
         if seasons['type'] == "seasons":
             for season in seasons['seasons']:
@@ -421,13 +422,24 @@ def vod_season(label, series, id, **kwargs):
     folder = plugin.Folder(title=label)
 
     items = []
+    season = []
 
-    season = api_vod_season(series=series, id=id)
+    data = api_vod_season(series=series, id=id)
+
+    if data:
+        season = plugin_process_vod_season(series=series, id=id, data=data['data'])
 
     for episode in season:
-        context = [
+        context = []
+
+        program_type = 'episode'
+
+        if check_key(CONST_WATCHLIST, 'vod') and check_key(CONST_WATCHLIST['vod'], program_type) and CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['vod'][program_type]['type']]['add'] == 1:
+            context.append((CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['vod'][program_type]['type']]['addlist'], 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=episode['id'], season=id, series=series, program_type=program_type, type=CONST_WATCHLIST['vod'][program_type]['type'])), ))
+
+        context.append(
             (_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='vod', channel=None, id=str(episode['id']), data=json.dumps(episode), change_audio=1)), ),
-        ]
+        )
 
         items.append(plugin.Item(
             label = str(episode['label']),
@@ -461,7 +473,7 @@ def search_menu(**kwargs):
         path = plugin.url_for(func_or_url=search),
     )
 
-    if CONST_ONLINE_SEARCH:
+    if CONST_HAS['onlinesearch']:
         folder.add_item(
             label = str(label) + " (Online)",
             path=plugin.url_for(func_or_url=online_search)
@@ -480,7 +492,7 @@ def search_menu(**kwargs):
                 label = str(searchstr)
                 path = plugin.url_for(func_or_url=search, query=searchstr)
 
-                if CONST_ONLINE_SEARCH:
+                if CONST_HAS['onlinesearch']:
                     if check_key(profile_settings, 'search_type' + str(x)):
                         type = profile_settings['search_type' + str(x)]
                     else:
@@ -547,7 +559,7 @@ def search(query=None, **kwargs):
 
         profile_settings['search1'] = query
 
-        if CONST_ONLINE_SEARCH:
+        if CONST_HAS['onlinesearch']:
             for x in reversed(range(2, 10)):
                 if check_key(profile_settings, 'search_type' + str(x - 1)):
                     profile_settings['search_type' + str(x)] = profile_settings['search_type' + str(x - 1)]
@@ -562,7 +574,7 @@ def search(query=None, **kwargs):
 
     folder = plugin.Folder(title=_(_.SEARCH_FOR, query=query))
 
-    if CONST_HAS_REPLAY:
+    if CONST_HAS['replay']:
         processed = process_replaytv_search(search=query)
         items += processed['items']
 
@@ -627,20 +639,23 @@ def online_search(query=None, **kwargs):
 def settings_menu(**kwargs):
     folder = plugin.Folder(title=_.SETTINGS)
 
-    if CONST_HAS_LIVE or CONST_HAS_REPLAY:
+    if CONST_HAS['live'] or CONST_HAS['replay']:
         folder.add_item(label=_.CHANNEL_PICKER, path=plugin.url_for(func_or_url=channel_picker_menu))
 
-    if CONST_HAS_LIBRARY:
+    if CONST_HAS['library']:
         folder.add_item(label=_.SETUP_LIBRARY, path=plugin.url_for(func_or_url=setup_library))
 
-    if CONST_HAS_DUTIPTV:
+    if CONST_HAS['dutiptv']:
         folder.add_item(label=_.INSTALL_DUT_IPTV, path=plugin.url_for(func_or_url=install_connector))
         folder.add_item(label=_.SET_KODI, path=plugin.url_for(func_or_url=plugin._set_settings_kodi))
 
     folder.add_item(label=_.RESET_SESSION, path=plugin.url_for(func_or_url=login, ask=0))
 
-    if CONST_HAS_LIBRARY:
+    if CONST_HAS['library']:
         folder.add_item(label=_.ASK_RESET_LIBRARY, path=plugin.url_for(func_or_url=delete_library))
+        
+    if CONST_HAS['upnext']:
+        folder.add_item(label=_.SETUP_UPNEXT, path=plugin.url_for(func_or_url=setup_upnext))
 
     folder.add_item(label=_.REMOVE_TEMP, path=plugin.url_for(func_or_url=clear_all_cache))
 
@@ -650,6 +665,28 @@ def settings_menu(**kwargs):
     folder.add_item(label="Addon {}".format(_.SETTINGS), path=plugin.url_for(func_or_url=plugin._settings))
 
     return folder
+
+@plugin.route()
+def setup_upnext(**kwargs):
+    addon = 'service.upnext'
+
+    if xbmc.getCondVisibility('System.HasAddon({addon})'.format(addon=addon)) == 1:
+        try:
+            VIDEO_ADDON = xbmcaddon.Addon(id=addon)
+            gui.ok(message=_.DONE_NOREBOOT)
+        except:
+            method = 'Addons.SetAddonEnabled'
+            json_rpc(method, {"addonid": addon, "enabled": "true"})
+
+            try:
+                VIDEO_ADDON = xbmcaddon.Addon(id=addon)
+                gui.ok(message=_.DONE_NOREBOOT)
+            except:
+                pass
+    else:
+        xbmc.executebuiltin('InstallAddon({})'.format(addon), True)
+
+    settings.setBool('upnext_enabled', True)
 
 @plugin.route()
 def clear_all_cache(**kwargs):
@@ -679,21 +716,26 @@ def install_connector(**kwargs):
 def channel_picker_menu(**kwargs):
     folder = plugin.Folder(title=_.CHANNEL_PICKER)
 
-    if CONST_HAS_LIVE:
+    if CONST_HAS['live']:
         folder.add_item(label=_.LIVE_TV, path=plugin.url_for(func_or_url=channel_picker, type='live'))
 
-    if CONST_HAS_REPLAY:
+    if CONST_HAS['replay']:
         folder.add_item(label=_.CHANNELS, path=plugin.url_for(func_or_url=channel_picker, type='replay'))
 
-    if CONST_HAS_LIVE and CONST_HAS_REPLAY:
+    if CONST_HAS['live'] and CONST_HAS['replay']:
         folder.add_item(label=_.LIVE_TV + ' = ' + _.CHANNELS, path=plugin.url_for(func_or_url=copy_channels, dest='live', source='replay'))
         folder.add_item(label=_.CHANNELS + ' = ' + _.LIVE_TV, path=plugin.url_for(func_or_url=copy_channels, dest='replay', source='live'))
 
-    folder.add_item(label=_.DISABLE_EROTICA, path=plugin.url_for(func_or_url=disable_prefs_menu, type='erotica'))
-    folder.add_item(label=_.DISABLE_MINIMAL, path=plugin.url_for(func_or_url=disable_prefs_menu, type='minimal'))
-    folder.add_item(label=_.DISABLE_REGIONAL2, path=plugin.url_for(func_or_url=disable_prefs_menu, type='regional'))
+    if CONST_FIRST_BOOT['erotica']:
+        folder.add_item(label=_.DISABLE_EROTICA, path=plugin.url_for(func_or_url=disable_prefs_menu, type='erotica'))
 
-    if PROVIDER_NAME == 'kpn':
+    if CONST_FIRST_BOOT['minimal']:
+        folder.add_item(label=_.DISABLE_MINIMAL, path=plugin.url_for(func_or_url=disable_prefs_menu, type='minimal'))
+
+    if CONST_FIRST_BOOT['regional']:
+        folder.add_item(label=_.DISABLE_REGIONAL2, path=plugin.url_for(func_or_url=disable_prefs_menu, type='regional'))
+
+    if CONST_FIRST_BOOT['home']:
         folder.add_item(label=_.DISABLE_HOME_CONNECTION, path=plugin.url_for(func_or_url=disable_prefs_menu, type='home_only'))
 
     return folder
@@ -819,7 +861,7 @@ def change_channel(type, id, change, set_value=0, **kwargs):
 
 @plugin.route()
 def reset_addon(**kwargs):
-    if CONST_HAS_LIBRARY:
+    if CONST_HAS['library']:
         remove_library('movies')
         remove_library('shows')
 
@@ -895,6 +937,10 @@ def logout(**kwargs):
     gui.refresh()
 
 @plugin.route()
+def play_dbitem(id, **kwargs):
+    json_rpc("Player.Open", {"item":{"episodeid": int(id)}})
+    
+@plugin.route()
 def play_video(type=None, channel=None, id=None, data=None, title=None, from_beginning=0, pvr=0, change_audio=0, **kwargs):
     profile_settings = load_profile(profile_id=1)
     from_beginning = int(from_beginning)
@@ -906,7 +952,7 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
 
     proxy_url = "http://127.0.0.1:11189/{provider}".format(provider=PROVIDER_NAME)
 
-    if CONST_USE_PROXY:
+    if CONST_HAS['proxy']:
         code = 0
 
         try:
@@ -919,7 +965,7 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
             gui.ok(message=_.PROXY_NOT_SET)
             return False
 
-    if CONST_START_FROM_BEGINNING and not from_beginning == 1 and settings.getBool(key='ask_start_from_beginning') and gui.yes_no(message=_.START_FROM_BEGINNING):
+    if CONST_HAS['startfrombeginning'] and not from_beginning == 1 and settings.getBool(key='ask_start_from_beginning') and gui.yes_no(message=_.START_FROM_BEGINNING):
         from_beginning = 1
 
     playdata = api_play_url(type=type, channel=channel, id=id, video_data=data, from_beginning=from_beginning, pvr=pvr, change_audio=change_audio)
@@ -944,10 +990,10 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
     path = playdata['path']
     license = playdata['license']
 
-    if CONST_START_FROM_BEGINNING and from_beginning == 1:
+    if CONST_HAS['startfrombeginning'] and from_beginning == 1:
         playdata['properties']['seekTime'] = 0
 
-        if PROVIDER_NAME == 'tmobile':
+        if ADDON_ID == 'plugin.video.tmobile':
             start = load_file(file='stream_start', isJSON=False)
 
             if start:
@@ -966,8 +1012,7 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
     except:
         pass
 
-    if PROVIDER_NAME == 'betelenet':
-        check_devices()
+    plugin_check_devices()
 
     if check_key(playdata, 'mpd') and len(str(playdata['mpd'])) > 0:
         language_list = {}
@@ -1002,7 +1047,7 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
             except:
                 pass
 
-    if CONST_USE_PROXY:
+    if CONST_HAS['proxy']:
         real_url = "{hostscheme}://{netloc}".format(hostscheme=urlparse(path).scheme, netloc=urlparse(path).netloc)
         path = path.replace(real_url, proxy_url)
         write_file(file='stream_hostname', data=real_url, isJSON=False)
@@ -1066,39 +1111,28 @@ def renew_token(**kwargs):
     mod_path = plugin_renew_token(data)
 
 @plugin.route()
-def add_to_watchlist(id, type, **kwargs):
-    if api_add_to_watchlist(id=id, type=type):
-        gui.notification(_.ADDED_TO_WATCHLIST)
+def add_to_watchlist(id, program_type='', type='watchlist', series='', season='', **kwargs):
+    if api_add_to_watchlist(id=id, series=series, season=season, program_type=program_type, type=type):
+        gui.notification(CONST_WATCHLIST_CAPABILITY[type]['addsuccess'])
     else:
-        gui.notification(_.ADD_TO_WATCHLIST_FAILED)
+        gui.notification(CONST_WATCHLIST_CAPABILITY[type]['addfailed'])
 
 @plugin.route()
-def remove_from_watchlist(id, continuewatch=0, **kwargs):
-    continuewatch = int(continuewatch)
-
-    if api_remove_from_watchlist(id=id, continuewatch=continuewatch):
+def remove_from_watchlist(id, type='watchlist', **kwargs):
+    if api_remove_from_watchlist(id=id, type=type):
         gui.refresh()
-
-        if continuewatch == 0:
-            gui.notification(_.REMOVED_FROM_WATCHLIST)
-        else:
-            gui.notification(_.REMOVED_FROM_CONTINUE)
+        gui.notification(CONST_WATCHLIST_CAPABILITY[type]['removesuccess'])
     else:
-        if continuewatch == 0:
-            gui.notification(_.REMOVE_FROM_WATCHLIST_FAILED)
-        else:
-            gui.notification(_.REMOVE_FROM_CONTINUE_FAILED)
+        gui.notification(CONST_WATCHLIST_CAPABILITY[type]['removefailed'])
 
 @plugin.route()
-def watchlist(continuewatch=0, **kwargs):
-    continuewatch = int(continuewatch)
+def watchlist(type='watchlist', **kwargs):
+    folder = plugin.Folder(title=CONST_WATCHLIST_CAPABILITY[type]['label'])
 
-    folder = plugin.Folder(title=_.WATCHLIST)
-
-    data = api_list_watchlist(continuewatch=continuewatch)
+    data = api_list_watchlist(type=type)
 
     if data:
-        processed = plugin_process_watchlist(data=data, continuewatch=continuewatch)
+        processed = plugin_process_watchlist(data=data, type=type)
 
         if processed:
             items = []
@@ -1135,18 +1169,18 @@ def watchlist(continuewatch=0, **kwargs):
     return folder
 
 @plugin.route()
-def watchlist_listing(label, id, search=0, continuewatch=0, **kwargs):
+def watchlist_listing(label, id, search=0, type='watchlist', **kwargs):
     search = int(search)
 
     folder = plugin.Folder(title=label)
 
-    data = api_watchlist_listing(id, continuewatch=continuewatch)
+    data = api_watchlist_listing(id, type=type)
 
     if search == 0:
         id = None
 
     if data:
-        processed = plugin_process_watchlist_listing(data=data, id=id, continuewatch=continuewatch)
+        processed = plugin_process_watchlist_listing(data=data, id=id, type=type)
 
         if processed:
             items = []
@@ -1196,7 +1230,7 @@ def get_live_channels(all=False):
             if all or not prefs or not check_key(prefs, id) or prefs[id]['live'] == 1:
                 context = []
 
-                if CONST_START_FROM_BEGINNING:
+                if CONST_HAS['startfrombeginning']:
                     context = [
                         (_.START_BEGINNING, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='channel', channel=id, id=str(row['assetid']), from_beginning=1, _is_live=True)), ),
                     ]
@@ -1426,9 +1460,10 @@ def process_replaytv_content(station, day=0, start=0):
 
         image = str(str(row['icon']).replace(CONST_IMAGES['replay']['replace'], CONST_IMAGES['replay']['small'])).strip()
         program_id = str(row['program_id'])
+        program_type = 'program'
 
-        if CONST_WATCHLIST:
-            context.append((_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=program_id, type='item')), ))
+        if check_key(CONST_WATCHLIST, 'replay') and check_key(CONST_WATCHLIST['replay'], program_type) and CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['replay'][program_type]['type']]['add'] == 1:
+            context.append((CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['replay'][program_type]['type']]['addlist'], 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=program_id, program_type=program_type, type=CONST_WATCHLIST['replay'][program_type]['type'])), ))
 
         context.append((_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='program', channel=channel, id=program_id, change_audio=1)), ))
 
@@ -1517,7 +1552,7 @@ def process_replaytv_list_content(label, idtitle, start=0):
         itemlabel += str(row['title'])
 
         try:
-            itemlabel += " (" + str(channels_ar2[channel]) + ")"
+            itemlabel += " ({channelstr})".format(channelstr=channels_ar2[channel])
         except:
             pass
 
@@ -1525,9 +1560,10 @@ def process_replaytv_list_content(label, idtitle, start=0):
         duration = int((endT - startT).total_seconds())
         image = str(str(row['icon']).replace(CONST_IMAGES['replay']['replace'], CONST_IMAGES['replay']['small'])).strip()
         program_id = str(row['program_id'])
+        program_type = 'program'
 
-        if CONST_WATCHLIST:
-            context.append((_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=program_id, type='item')), ))
+        if check_key(CONST_WATCHLIST, 'replay') and check_key(CONST_WATCHLIST['replay'], program_type) and CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['replay'][program_type]['type']]['add'] == 1:
+            context.append((CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['replay'][program_type]['type']]['addlist'], 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=program_id, program_type=program_type, type=CONST_WATCHLIST['replay'][program_type]['type'])), ))
 
         context.append((_.SELECT_AUDIO_LANGUAGE, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=play_video, type='program', channel=channel, id=program_id, change_audio=1)), ))
 
@@ -1574,7 +1610,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
             data = api_search(query=search)
         else:
             data = api_vod_download(type=data, start=start)
-            
+
             if data:
                 data = plugin_process_vod(data=data, start=start)
     else:
@@ -1584,10 +1620,7 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
         return {'items': items, 'count': item_count, 'count2': count, 'total': 0}
 
     for currow in data:
-        #if not online == 1:
         row = data[currow]
-        #else:
-        #    row = currow
 
         if item_count == settings.getInt('item_count'):
             break
@@ -1624,8 +1657,8 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
         image = str(str(row['icon']).replace(CONST_IMAGES['vod']['replace'], CONST_IMAGES['vod']['small'])).strip()
         program_type = str(row['type'])
 
-        if CONST_WATCHLIST:
-            context.append((_.ADD_TO_WATCHLIST, 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=id, type='group')), ))
+        if check_key(CONST_WATCHLIST, 'vod') and check_key(CONST_WATCHLIST['vod'], program_type) and CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['vod'][program_type]['type']]['add'] == 1:
+            context.append((CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['vod'][program_type]['type']]['addlist'], 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=id, program_type=program_type, type=CONST_WATCHLIST['vod'][program_type]['type'])), ))
 
         if program_type == "show" or program_type == "Serie" or program_type == "series":
             path = plugin.url_for(func_or_url=vod_series, type=type2, label=label, id=id)
@@ -1691,7 +1724,7 @@ def process_vod_menu_content(data, start=0, search=None, type=None, character=No
             data = api_search(query=search)
         else:
             data = api_vod_download(type=data, start=start)
-            
+
             if data:
                 data = plugin_process_vod(data=data, start=start)
     else:
@@ -1701,10 +1734,7 @@ def process_vod_menu_content(data, start=0, search=None, type=None, character=No
         return {'items': items, 'count': item_count, 'count2': count, 'total': 0}
 
     for currow in data['menu']:
-        #if not online == 1:
         row = data['menu'][currow]
-        #else:
-        #    row = currow
 
         id = str(currow)
         label = str(row['label'])
@@ -1750,22 +1780,25 @@ def check_first():
     profile_settings = load_profile(profile_id=1)
 
     if not check_key(profile_settings, 'setup_complete'):
-        if gui.yes_no(message=_.DISABLE_EROTICA) == False:
-            settings.setBool(key='disableErotica', value=False)
-        else:
-            settings.setBool(key='disableErotica', value=True)
+        if CONST_FIRST_BOOT['erotica'] == True:
+            if gui.yes_no(message=_.DISABLE_EROTICA) == False:
+                settings.setBool(key='disableErotica', value=False)
+            else:
+                settings.setBool(key='disableErotica', value=True)
 
-        if gui.yes_no(message=_.MINIMAL_CHANNELS) == False:
-            settings.setBool(key='minimalChannels', value=False)
-        else:
-            settings.setBool(key='minimalChannels', value=True)
+        if CONST_FIRST_BOOT['minimal'] == True:
+            if gui.yes_no(message=_.MINIMAL_CHANNELS) == False:
+                settings.setBool(key='minimalChannels', value=False)
+            else:
+                settings.setBool(key='minimalChannels', value=True)
 
-        if gui.yes_no(message=_.DISABLE_REGIONAL) == False:
-            settings.setBool(key='disableRegionalChannels', value=False)
-        else:
-            settings.setBool(key='disableRegionalChannels', value=True)
+        if CONST_FIRST_BOOT['regional'] == True:
+            if gui.yes_no(message=_.DISABLE_REGIONAL) == False:
+                settings.setBool(key='disableRegionalChannels', value=False)
+            else:
+                settings.setBool(key='disableRegionalChannels', value=True)
 
-        if PROVIDER_NAME == 'kpn':
+        if CONST_FIRST_BOOT['home'] == True:
             if gui.yes_no(message=_.HOME_CONNECTION) == True:
                 settings.setBool(key='homeConnection', value=True)
             else:
@@ -1775,7 +1808,4 @@ def check_first():
         save_profile(profile_id=1, profile=profile_settings)
 
 def remove_stream_start():
-    try:
-        os.remove(os.path.join(ADDON_PROFILE, 'stream_start'))
-    except:
-        pass
+    remove_file(file='stream_start', ext=False)

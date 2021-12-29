@@ -37,8 +37,8 @@ msgid "Live TV"
 msgstr "Live TV"
 
 msgctxt "#30010"
-msgid "All programs"
-msgstr "Alle programma's"
+msgid "Series"
+msgstr "Series"
 
 msgctxt "#30011"
 msgid "Movies"
@@ -302,11 +302,11 @@ msgstr "Zoeken"
 
 msgctxt "#32075"
 msgid "New Search"
-msgstr "Nieuwe zoekterm"
+msgstr "Nieuwe zoekopdracht"
 
 msgctxt "#32076"
 msgid "Start a new search"
-msgstr "Begin een nieuwe zoekactie"
+msgstr "Start een nieuwe zoekopdracht"
 
 msgctxt "#32079"
 msgid "Today"
@@ -326,31 +326,31 @@ msgstr "Sessie resetten"
 
 msgctxt "#32083"
 msgid "Add to Watchlist"
-msgstr "Toevoegen aan Watchlist"
+msgstr "Toevoegen aan Mijn series"
 
 msgctxt "#32084"
 msgid "Remove from Watchlist"
-msgstr "Verwijderen van Watchlist"
+msgstr "Verwijderen van Mijn series"
 
 msgctxt "#32085"
 msgid "Watchlist"
-msgstr "Watchlist"
+msgstr "Mijn series"
 
 msgctxt "#32086"
 msgid "Added to Watchlist"
-msgstr "Toegevoegd aan Watchlist"
+msgstr "Toegevoegd aan Mijn series"
 
 msgctxt "#32087"
 msgid "Add to Watchlist failed"
-msgstr "Toevoegen aan Watchlist mislukt"
+msgstr "Toevoegen aan Mijn series mislukt"
 
 msgctxt "#32088"
 msgid "Removed from Watchlist"
-msgstr "Verwijderd uit Watchlist"
+msgstr "Verwijderd uit Mijn series"
 
 msgctxt "#32089"
 msgid "Remove from Watchlist failed"
-msgstr "Verwijderen uit Watchlist mislukt"
+msgstr "Verwijderen uit Mijn series mislukt"
 
 msgctxt "#32090"
 msgid "Enable Radio in Simple IPTV"
@@ -710,19 +710,19 @@ msgstr "Profiel veranderen mislukt"
 
 msgctxt "#330061"
 msgid "Continue Watching"
-msgstr "Verder Kijken"
+msgstr "Kijk later"
 
 msgctxt "#330062"
 msgid "Removed from Continue Watching"
-msgstr "Verwijderd uit Verder Kijken"
+msgstr "Verwijderd uit Kijk later"
 
 msgctxt "#330063"
 msgid "Remove from Continue Watching failed"
-msgstr "Verwijderen uit Verder Kijken mislukt"
+msgstr "Verwijderen uit Kijk later mislukt"
 
 msgctxt "#330064"
 msgid "Remove from Continue Watching"
-msgstr "Verwijderen uit Verder Kijken"
+msgstr "Verwijderen uit Kijk later"
 
 msgctxt "#330065"
 msgid "Select automatically"
@@ -770,7 +770,7 @@ msgstr "Bibliotheek integratie voor series inschakelen"
 
 msgctxt "#330076"
 msgid "Maximum amount of shows to update per hour"
-msgstr "Maximum aantal shows om te updaten per uur"
+msgstr "Maximum aantal series om te updaten per uur"
 
 msgctxt "#330077"
 msgid "Disable integration"
@@ -778,7 +778,7 @@ msgstr "Integratie uitschakelen"
 
 msgctxt "#330078"
 msgid "Enable integration for movies on watchlist"
-msgstr "Integratie voor films op de watchlist inschakelen"
+msgstr "Integratie voor films op de kijk later lijst inschakelen"
 
 msgctxt "#330079"
 msgid "Enable integration for all movies"
@@ -786,7 +786,7 @@ msgstr "Integratie voor alle films inschakelen"
 
 msgctxt "#330080"
 msgid "Enable integration for shows on watchlist"
-msgstr "Integratie voor series op de watchlist inschakelen"
+msgstr "Integratie voor series in Mijn series inschakelen"
 
 msgctxt "#330081"
 msgid "Enable integration for all shows"
@@ -811,3 +811,15 @@ msgstr "Bibliotheek gereset"
 msgctxt "#330086"
 msgid "Reset Cache"
 msgstr "Cache verwijderen"
+
+msgctxt "#330087"
+msgid "Added to Continue Watching"
+msgstr "Toegevoegd aan Kijk later"
+
+msgctxt "#330088"
+msgid "Add to Continue Watching failed"
+msgstr "Toevoegen aan Kijk later mislukt"
+
+msgctxt "#330089"
+msgid "Add to Continue Watching"
+msgstr "Toevoegen aan Kijk later"
