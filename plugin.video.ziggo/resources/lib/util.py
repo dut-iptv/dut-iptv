@@ -2,7 +2,7 @@ import _strptime
 import datetime, json, re, sys, xbmc
 
 from collections import OrderedDict
-from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
+from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT, PROVIDER_NAME
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
@@ -19,6 +19,7 @@ from urllib.parse import urlencode
 #Included from base.l8.menu
 #plugin_ask_for_creds
 #plugin_check_devices
+#plugin_check_first
 #plugin_login_error
 #plugin_post_login
 #plugin_process_info
@@ -158,6 +159,9 @@ def plugin_ask_for_creds(creds):
 def plugin_check_devices():
     pass
 
+def plugin_check_first():
+    pass
+
 def plugin_get_device_id():
     return 'NOTNEEDED'
 
@@ -295,9 +299,19 @@ def plugin_process_playdata(playdata):
 
     write_file(file='token_renew', data='plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params))), isJSON=False)
 
-    item_inputstream = inputstream.Widevine(
-        license_key = playdata['license'],
-    )
+    if check_key(playdata, 'certificate'):
+        item_inputstream = inputstream.Widevine(
+            #license_key = "http://127.0.0.1:11189/{provider}/license".format(provider=PROVIDER_NAME),
+            license_key = playdata['license'],
+            #server_certificate = playdata['certificate'],
+        )
+    else:
+        item_inputstream = inputstream.Widevine(
+            #license_key = "http://127.0.0.1:11189/{provider}/license".format(provider=PROVIDER_NAME),
+            license_key = playdata['license'],
+        )
+                
+    #write_file(file='stream_license', data=playdata['license'], isJSON=False)
 
     return item_inputstream, CDMHEADERS
 

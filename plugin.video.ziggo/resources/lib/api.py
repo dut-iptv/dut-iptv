@@ -1,4 +1,4 @@
-import base64, json, os, re, sys, time, xbmc
+import base64, json, os, re, requests, sys, time, xbmc
 
 from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, DEFAULT_USER_AGENT
@@ -298,7 +298,7 @@ def api_login():
     return { 'code': code, 'data': data, 'result': True }
 
 def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0, change_audio=0):
-    playdata = {'path': '', 'mpd': '', 'license': '', 'token': '', 'locator': '', 'type': '', 'properties': {}}
+    playdata = {'path': '', 'mpd': '', 'license': '', 'certificate': '', 'token': '', 'locator': '', 'type': '', 'properties': {}}
 
     if not api_get_session():
         return playdata
@@ -321,6 +321,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     urldata2 = None
     path = None
     locator = None
+    certificate_data = None
 
     if not type or not len(str(type)) > 0 or not id or not len(str(id)) > 0:
         return playdata
@@ -450,8 +451,11 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
 
         if code and code == 200:
             mpd = data
-
-    playdata = {'path': path, 'mpd': mpd, 'license': license, 'token': token, 'locator': locator, 'info': info, 'type': type, 'properties': properties}
+            
+    #certificate_data = base64.b64encode(requests.get('{web_url}/content/dam/certs/cert_license_widevine_com.bin'.format(web_url=CONST_URLS['web_url'])).content).decode('utf-8')
+    #write_file(file='server_certificate', data=certificate_data, isJSON=False)
+    
+    playdata = {'path': path, 'mpd': mpd, 'license': license, 'certificate': certificate_data, 'token': token, 'locator': locator, 'info': info, 'type': type, 'properties': properties}
 
     return playdata
 

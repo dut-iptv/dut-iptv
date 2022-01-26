@@ -1,5 +1,5 @@
 import _strptime
-import datetime, re, xbmc
+import certifi, datetime, re, requests, sys, xbmc
 
 from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
@@ -19,6 +19,7 @@ from urllib.parse import urlencode
 #Included from base.l8.menu
 #plugin_ask_for_creds
 #plugin_check_devices
+#plugin_check_first
 #plugin_login_error
 #plugin_post_login
 #plugin_process_info
@@ -48,6 +49,16 @@ def plugin_ask_for_creds(creds):
 
 def plugin_check_devices():
     pass
+
+def plugin_check_first():
+    try:
+        requests.get('https://t-mobiletv.nl')
+    except requests.exceptions.SSLError as err:
+        customca = requests.get('https://cacerts.digicert.com/DigiCertTLSRSASHA2562020CA1-1.crt.pem').content
+        cafile = certifi.where()
+        with open(cafile, 'ab') as outfile:
+            outfile.write(b'\n')
+            outfile.write(customca)
 
 def plugin_get_device_id():
     return 'NOTNEEDED'

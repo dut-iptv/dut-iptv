@@ -1,0 +1,1178 @@
+# Emby for Kodi language file
+# Addon Name: Emby for Kodi
+# Addon id: plugin.video.emby-next-gen
+# Addon Provider: angelblue05
+# Translators:
+# Jaroslav Lichtblau <jlichtblau@seznam.cz>, 2019
+# angelblue05 <tamara.angel05@gmail.com>, 2019
+# DJ Sweder <djsweder@gmail.com>, 2019
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Emby for Kodi\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2018-09-07 20:10+0000\n"
+"Last-Translator: DJ Sweder <djsweder@gmail.com>, 2019\n"
+"Language-Team: Czech (https://www.transifex.com/emby-for-kodi/teams/91090/cs/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cs\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+msgctxt "#29999"
+msgid "Emby for Kodi"
+msgstr "Emby pro Kodi"
+
+msgctxt "#30000"
+msgid "Server address"
+msgstr "Adresa serveru"
+
+msgctxt "#30001"
+msgid "Server name"
+msgstr "Název serveru"
+
+msgctxt "#30002"
+msgid "Force HTTP playback"
+msgstr "Vynutit přehrávání přes HTTP"
+
+msgctxt "#30003"
+msgid "Login method"
+msgstr "Způsob přihlášení"
+
+msgctxt "#30004"
+msgid "Log level"
+msgstr "Úroveň protokolu"
+
+msgctxt "#30016"
+msgid "Device name"
+msgstr "Název zařízení"
+
+msgctxt "#30022"
+msgid "Advanced"
+msgstr "Pokročilé"
+
+msgctxt "#30024"
+msgid "Username"
+msgstr "Uživatelské jméno"
+
+msgctxt "#30030"
+msgid "Port number"
+msgstr "Číslo portu"
+
+msgctxt "#30091"
+msgid "Confirm file deletion"
+msgstr "Potvrzení smazání souboru"
+
+msgctxt "#30114"
+msgid "Offer delete after playback"
+msgstr "Nabídka smazat po přehrání"
+
+msgctxt "#30115"
+msgid "For Episodes"
+msgstr "Pro epizody"
+
+msgctxt "#30116"
+msgid "For Movies"
+msgstr "Pro filmy"
+
+msgctxt "#30157"
+msgid "Enable enhanced artwork (i.e. cover art)"
+msgstr "Umožnit vylepšený artwork (např. cover art)"
+
+msgctxt "#30160"
+msgid "Video quality"
+msgstr "Kvalita videa"
+
+msgctxt "#30170"
+msgid "Recently Added TV Shows"
+msgstr "Nedávno přidané TV pořady"
+
+msgctxt "#30171"
+msgid "In Progress TV Shows"
+msgstr "Právě přehrávané TV pořady"
+
+msgctxt "#30174"
+msgid "Recently Added Movies"
+msgstr "Nedávno přidané filmy"
+
+msgctxt "#30175"
+msgid "Recently Added Episodes"
+msgstr "Nedávno přidané epizody"
+
+msgctxt "#30177"
+msgid "In Progress Movies"
+msgstr "Právě přehrávané filmy"
+
+msgctxt "#30178"
+msgid "In Progress Episodes"
+msgstr "Právě přehrávané epizody"
+
+msgctxt "#30179"
+msgid "Next Episodes"
+msgstr "Další epizody"
+
+msgctxt "#30180"
+msgid "Favorite Movies"
+msgstr "Oblíbené filmy"
+
+msgctxt "#30181"
+msgid "Favorite Shows"
+msgstr "Oblíbené pořady"
+
+msgctxt "#30182"
+msgid "Favorite Episodes"
+msgstr "Oblíbené epizody"
+
+msgctxt "#30185"
+msgid "Boxsets"
+msgstr "Kolekce"
+
+msgctxt "#30189"
+msgid "Unwatched Movies"
+msgstr "Nepřehrané filmy"
+
+msgctxt "#30229"
+msgid "Random Items"
+msgstr "Náhodné"
+
+msgctxt "#30230"
+msgid "Recommended Items"
+msgstr "Doporučené"
+
+msgctxt "#30235"
+msgid "Interface"
+msgstr "Rozhraní"
+
+msgctxt "#30239"
+msgid "Reset local Kodi database"
+msgstr "Vyprázdnění lokální databáze Kodi"
+
+msgctxt "#30249"
+msgid "Enable welcome message"
+msgstr "Povolit uvítací zprávu"
+
+msgctxt "#30251"
+msgid "Recently added Home Videos"
+msgstr "Nedávno přidaná domácí videa"
+
+msgctxt "#30252"
+msgid "Recently added Photos"
+msgstr "Nedávno přidané fotky"
+
+msgctxt "#30253"
+msgid "Favourite Home Videos"
+msgstr "Oblíbená domácí videa"
+
+msgctxt "#30254"
+msgid "Favourite Photos"
+msgstr "Oblíbené fotky"
+
+msgctxt "#30255"
+msgid "Favourite Albums"
+msgstr "Oblíbená alba"
+
+msgctxt "#30256"
+msgid "Recently added Music videos"
+msgstr "Nedávno přidaná hudební videa"
+
+msgctxt "#30257"
+msgid "In progress Music videos"
+msgstr "Právě přehrávaná hudební videa"
+
+msgctxt "#30258"
+msgid "Unwatched Music videos"
+msgstr "Nepřehraná hudební videa"
+
+msgctxt "#30302"
+msgid "Movies"
+msgstr "Filmy"
+
+msgctxt "#30305"
+msgid "TV Shows"
+msgstr "TV pořady"
+
+msgctxt "#30401"
+msgid "Emby options"
+msgstr "Možnosti Emby"
+
+msgctxt "#30402"
+msgid "Emby transcode"
+msgstr "Emby překódování"
+
+msgctxt "#30405"
+msgid "Add to favorites"
+msgstr "Přidat do oblíbených"
+
+msgctxt "#30406"
+msgid "Remove from favorites"
+msgstr "Odebrat z oblíbených"
+
+msgctxt "#30408"
+msgid "Settings"
+msgstr "Nastavení"
+
+msgctxt "#30409"
+msgid "Delete from Emby"
+msgstr "Smazat z Emby"
+
+msgctxt "#30410"
+msgid "Refresh this item"
+msgstr "Obnovit"
+
+msgctxt "#30412"
+msgid "Transcode"
+msgstr "Překódovat"
+
+msgctxt "#30500"
+msgid "Verify connection"
+msgstr "Ověřit připojení"
+
+msgctxt "#30504"
+msgid "Use alternate device name"
+msgstr "Použít alternativní název zařízení"
+
+msgctxt "#30506"
+msgid "Sync"
+msgstr "Synchronizovat"
+
+msgctxt "#30507"
+msgid "Enable notification if update count is greater than"
+msgstr "Povolit oznámení v případě, že počet aktualizací je větší než"
+
+msgctxt "#30508"
+msgid "Sync empty shows"
+msgstr "Synchronizovat prázdné pořady"
+
+msgctxt "#30509"
+msgid "Enable music library"
+msgstr "Povolit hudební knihovnu"
+
+msgctxt "#30511"
+msgid "Playback mode"
+msgstr "Režim přehrávání"
+
+msgctxt "#30512"
+msgid "Enable artwork caching"
+msgstr "Povolit ukládání obrázků do mezipaměti"
+
+msgctxt "#30515"
+msgid "Paging - max items requested (default: 15)"
+msgstr "Stránkování - maximální požadovaný počet položek (výchozí: 15)"
+
+msgctxt "#30516"
+msgid "Playback"
+msgstr "Přehrávání"
+
+msgctxt "#30517"
+msgid "Network credentials"
+msgstr "Údaje pro přihlášení k síti"
+
+msgctxt "#30518"
+msgid "Enable cinema mode"
+msgstr "Povolit režim Cinema"
+
+msgctxt "#30519"
+msgid "Ask to play trailers"
+msgstr "Zeptat se pro přehrání trailerů"
+
+msgctxt "#30520"
+msgid "Skip the delete confirmation (use at your own risk)"
+msgstr ""
+"Přeskočit potvrzení smazání (aktivace této volby je na vlastní riziko)"
+
+msgctxt "#30521"
+msgid "Jump back on resume (in seconds)"
+msgstr "Přeskoč zpět na začátek (v sekundách)"
+
+msgctxt "#30522"
+msgid "Transcode H265/HEVC"
+msgstr "Překódování H265/HEVC"
+
+msgctxt "#30527"
+msgid "Ignore specials in next episodes"
+msgstr "Ignorovat mimořádné díly v dalších epizodách"
+
+msgctxt "#30528"
+msgid "Permanent users"
+msgstr "Stálí uživatelé"
+
+msgctxt "#30529"
+msgid "Startup delay (in seconds)"
+msgstr "Opožděný start (v sekundách)"
+
+msgctxt "#30530"
+msgid "Enable server restart message"
+msgstr "Povolit zprávu o restartu serveru"
+
+msgctxt "#30531"
+msgid "Enable new content"
+msgstr "Povolit nový obsah"
+
+msgctxt "#30532"
+msgid "Duration of the video library pop up"
+msgstr "Doba zobrazení vyskakovacího okna knihovny videí"
+
+msgctxt "#30533"
+msgid "Duration of the music library pop up"
+msgstr "Doba zobrazení vyskakovacího okna hudební knihovny"
+
+msgctxt "#30534"
+msgid "Notifications (in seconds)"
+msgstr "Oznámení (v sekundách)"
+
+msgctxt "#30535"
+msgid "Generate a new device Id"
+msgstr "Vytvořit nové ID zařízení"
+
+msgctxt "#30536"
+msgid "Allow the screensaver during syncs"
+msgstr "Povolit spořič obrazovky během synchronizace"
+
+msgctxt "#30539"
+msgid "Login"
+msgstr "Přihlášení"
+
+msgctxt "#30540"
+msgid "Manual login"
+msgstr "Manuální přihlášení"
+
+msgctxt "#30543"
+msgid "Username or email"
+msgstr "Uživatelské jméno nebo e-mail"
+
+msgctxt "#30545"
+msgid "Enable server offline"
+msgstr "Povolit offline server"
+
+msgctxt "#30547"
+msgid "Display message"
+msgstr "Zobrazit zprávu"
+
+msgctxt "#30600"
+msgid "Sign in with Emby Connect"
+msgstr "Přihlásit přes Emby Connect"
+
+msgctxt "#30602"
+msgid "Password"
+msgstr "Heslo"
+
+msgctxt "#30605"
+msgid "Sign in"
+msgstr "Přihlášení"
+
+msgctxt "#30606"
+msgid "Cancel"
+msgstr "Zrušit"
+
+msgctxt "#30607"
+msgid "Select main server"
+msgstr "Vyberte hlavní server"
+
+msgctxt "#30608"
+msgid "Username or password cannot be empty"
+msgstr "Uživatelské jméno nebo heslo nesmí být prázdné"
+
+msgctxt "#30609"
+msgid "Unable to connect to the selected server"
+msgstr "Nelze se připojit k vybranému serveru"
+
+msgctxt "#30610"
+msgid "Connect to"
+msgstr "Připojit k"
+
+msgctxt "#30611"
+msgid "Manually add server"
+msgstr "Přidat server ručně"
+
+msgctxt "#30612"
+msgid "Please sign in"
+msgstr "Přihlašte se, prosím"
+
+msgctxt "#30613"
+msgid "Change Emby Connect user"
+msgstr "Změnit uživatele Emby Connect"
+
+msgctxt "#30614"
+msgid "Connect to server"
+msgstr "Připojit k serveru"
+
+msgctxt "#30615"
+msgid "Host"
+msgstr "Host"
+
+msgctxt "#30616"
+msgid "Connect"
+msgstr "Připojit"
+
+msgctxt "#30617"
+msgid "Server or port cannot be empty"
+msgstr "Server nebo port nesmí být prázdný"
+
+msgctxt "#30618"
+msgid "Change Emby Connect user"
+msgstr "Změnit uživatele Emby Connect"
+
+msgctxt "#33000"
+msgid "Welcome"
+msgstr "Vítejte"
+
+msgctxt "#33006"
+msgid "Server is restarting"
+msgstr "Server se právě restartuje"
+
+msgctxt "#33009"
+msgid "Invalid username or password"
+msgstr "Nesprávné uživatelské jméno nebo heslo"
+
+msgctxt "#33013"
+msgid "Choose the audio stream"
+msgstr "Vyberte audio stream"
+
+msgctxt "#33014"
+msgid "Choose the subtitles stream"
+msgstr "Vyberte verzi titulků"
+
+msgctxt "#33015"
+msgid "Delete file from Emby?"
+msgstr "Vymazat z Emby"
+
+msgctxt "#33016"
+msgid "Play trailers?"
+msgstr "Přehraj trailery"
+
+msgctxt "#33018"
+msgid "Gathering boxsets"
+msgstr "Seskupení kolekcí"
+
+msgctxt "#33021"
+msgid "Gathering:"
+msgstr "Seskupení"
+
+msgctxt "#33022"
+msgid ""
+"Detected the database needs to be recreated for this version of Emby for "
+"Kodi. Proceed?"
+msgstr ""
+"Nalezené databáze je potřeba znovu vytvořit pro tuto verzi Emby pro Kodi. "
+"Pokračovat?"
+
+msgctxt "#33023"
+msgid "Emby for Kodi will not work correctly until the database is reset."
+msgstr ""
+"Emby pro Kodi nebude pracovat správně dokud nebude resetovaná databáze."
+
+msgctxt "#33025"
+msgid "Completed in:"
+msgstr "Dokončeno v:"
+
+msgctxt "#33033"
+msgid "A new device Id has been generated. Kodi will now restart."
+msgstr "Nové ID zařízení bylo vytvořeno. Kodi se nyní restartuje."
+
+msgctxt "#33035"
+msgid ""
+"Caution! If you choose Native mode, certain Emby features will be missing, "
+"such as: Emby cinema mode, direct stream/transcode options and parental "
+"access schedule."
+msgstr ""
+"Pozor! Jestliže vyberete nativní režim, budou chybět některé funkce Emby, "
+"jako třeba: Emby režim cinema, volby přímého streamování/překódování a "
+"plánování rodičovské kontroly."
+
+msgctxt "#33036"
+msgid "Add-on (default)"
+msgstr "Doplněk (výchozí)"
+
+msgctxt "#33037"
+msgid "Native (direct paths)"
+msgstr "Nativní (přímé cesty)"
+
+msgctxt "#33039"
+msgid "Enable music library?"
+msgstr "Povolit hudební knihovnu?"
+
+msgctxt "#33042"
+msgid "Running the caching process may take some time. Continue anyway?"
+msgstr ""
+"Spuštění procesu ukládání do mezipaměti může nějakou dobu trvat. Opravdu "
+"pokračovat?"
+
+msgctxt "#33044"
+msgid "Reset existing artwork cache?"
+msgstr "Vyprázdnit současnou mezipaměť obrázků?"
+
+msgctxt "#33045"
+msgid "Updating artwork cache"
+msgstr "Aktualizovat mezipaměť obrázků"
+
+msgctxt "#33046"
+msgid "Waiting for threads to exit"
+msgstr "Čekání na ukončení vláken"
+
+msgctxt "#33047"
+msgid "Kodi can't locate file:"
+msgstr "Kodi nemůže najít soubor:"
+
+msgctxt "#33048"
+msgid ""
+"Use the Emby path substitution to format your path correctly or ensure your "
+"path is added to Kodi's file manager. For more information, check the FAQ in"
+" Emby for Kodi's github wiki. Stop syncing?"
+msgstr ""
+"Použijte Emby náhradu cesty ke správnému formátu vaší cesty anebo zajistěte "
+"přidání Vaší cesty do správce souborů Kodi. Pro více informací navštivte FAQ"
+" na Github Wikipedii k Emby pro Kodi. Zastavit synchronizaci?"
+
+msgctxt "#33049"
+msgid "New"
+msgstr "Nový"
+
+msgctxt "#33054"
+msgid "Add user to session"
+msgstr "Přidat uživatele do relace"
+
+msgctxt "#33058"
+msgid "Perform local database reset"
+msgstr "Provést resetování lokální databáze"
+
+msgctxt "#33059"
+msgid "Cache all artwork"
+msgstr "Všechny obrázky ukládat do mezipaměti"
+
+msgctxt "#33060"
+msgid "Sync theme media"
+msgstr "Synchrozovat tématická média"
+
+msgctxt "#33061"
+msgid "Add/Remove user from the session"
+msgstr "Přidat/Odebrat uživatele z relace"
+
+msgctxt "#33062"
+msgid "Add user"
+msgstr "Přidat uživatele"
+
+msgctxt "#33063"
+msgid "Remove user"
+msgstr "Odstranit uživatele"
+
+msgctxt "#33064"
+msgid "Remove user from the session"
+msgstr "Odebrat uživatele z relace"
+
+msgctxt "#33066"
+msgid "Removed"
+msgstr "Odstraněno"
+
+msgctxt "#33067"
+msgid "Added"
+msgstr "Přidáno"
+
+msgctxt "#33074"
+msgid "Are you sure you want to reset your local Kodi database?"
+msgstr "Skutečně chcete resetovat Vaší lokální databázi Kodi?"
+
+msgctxt "#33086"
+msgid "Remove all cached artwork?"
+msgstr "Smazat z mezipaměti všechny obrázky?"
+
+msgctxt "#33087"
+msgid "Reset all Emby add-on settings?"
+msgstr "Obnovit všechna nastavení doplňku Emby?"
+
+msgctxt "#33088"
+msgid ""
+"Database reset has completed, Kodi will now restart to apply the changes."
+msgstr ""
+"Reset databáze byl ukončen. Aby se změny projevily, Kodi se nyní restartuje."
+
+msgctxt "#33089"
+msgid "Enter folder name for backup"
+msgstr "Zadejte název složky pro zálohu"
+
+msgctxt "#33090"
+msgid "Replace existing backup?"
+msgstr "Nahradit existující zálohu?"
+
+msgctxt "#33091"
+msgid "Created backup at:"
+msgstr "Záloha vytvořená v:"
+
+msgctxt "#33092"
+msgid "Create a backup"
+msgstr "Vytvořit zálohu"
+
+msgctxt "#33093"
+msgid "Backup folder"
+msgstr "Adresář záloh"
+
+msgctxt "#33097"
+msgid ""
+"Important, cleanonupdate was removed in your advanced settings to prevent "
+"conflict with Emby for Kodi. Kodi will restart now."
+msgstr ""
+"Důležité, aby se zabránilo konfliktům s Emby pro Kodi, byla funkce Vyčištění"
+" při aktualizaci odebrána z pokočilých nastavení. Kodi se nyní restartuje."
+
+msgctxt "#33098"
+msgid "Refresh boxsets"
+msgstr "Obnovit kolekce"
+
+msgctxt "#33099"
+msgid ""
+"Install the server plugin Kodi Companion to automatically apply emby library"
+" updates at startup. This setting can be found in the add-on settings > sync"
+" options > Enable Kodi Companion."
+msgstr ""
+"Nainstaluje serverový zásuvný modul Kodi Companion pro automatické použití "
+"Emby knihoven při startu. Toto nastavení je možné nalétz v nastavení doplňků"
+" > možnosti synchronizace > Povolit Kodi Companion."
+
+msgctxt "#33100"
+msgid "Would you like to sync empty shows?"
+msgstr "Chcete synchronizovat prázdné pořady?"
+
+msgctxt "#33101"
+msgid ""
+"Since you are using native playback mode with music enabled, do you want to "
+"import music rating from files?"
+msgstr ""
+"Jelikož používáte nativní režim přehrávání s povolenou hudbou, chcete "
+"importovat hodnocení hudby ze souborů?"
+
+msgctxt "#33102"
+msgid "Resume the previous sync?"
+msgstr "Pokračovat v předchozí synchronizaci?"
+
+msgctxt "#33103"
+msgid ""
+"Enable the webserver service in the Kodi settings to allow artwork caching."
+msgstr ""
+"Chcete-li umožnit ukládání obrázků do mezipaměti, povolte službu webového "
+"serveru v nastavení Kodi."
+
+msgctxt "#33104"
+msgid "Find more info in the github wiki/Create-and-restore-from-backup."
+msgstr ""
+"Pro více informací navštivte Wikipedii na Github / Vytvoření a obnovení ze "
+"zálohy."
+
+msgctxt "#33105"
+msgid "Enable the context menu"
+msgstr "Povolit kontextovou nabídku"
+
+msgctxt "#33106"
+msgid "Enable the option to transcode"
+msgstr "Povolit možnost překódování"
+
+msgctxt "#33107"
+msgid "Users added to the session"
+msgstr "Uživatelé přidáni do relace"
+
+msgctxt "#33108"
+msgid "Notifications are delayed during video playback (except live tv)."
+msgstr ""
+"Během přehrávání videa (s vyjímkou živého TV vysílání) jsou oznámení "
+"zpožděna."
+
+msgctxt "#33109"
+msgid "Plugin"
+msgstr "Zásuvný modul."
+
+msgctxt "#33110"
+msgid "Restart Kodi to take effect."
+msgstr "Restartujte Kodi k projevení změn."
+
+msgctxt "#33111"
+msgid "Reset the local database to apply the playback mode change."
+msgstr "Resetujte lokální databázi k projevení změn režimu přehrávání."
+
+msgctxt "#33112"
+msgid "Applies to Native and Add-on playback mode"
+msgstr "Platí pro nativní a dopňkový režim přehrávání."
+
+msgctxt "#33113"
+msgid "Applies to Add-on playback mode only"
+msgstr "Platí pouze pro režim přehrávání s doplňkem"
+
+msgctxt "#33114"
+msgid "Enable external subtitles"
+msgstr "Umožnit externí titulky"
+
+msgctxt "#33115"
+msgid "Adjust for remote connection"
+msgstr "Upravte pro vzdálené připojení"
+
+msgctxt "#33116"
+msgid "Compress artwork (reduces quality)"
+msgstr "Komprimovat obrázek (snižuje kvalitu)"
+
+msgctxt "#33117"
+msgid ""
+"Enable artwork caching? If not, Kodi will still cache your artwork at a "
+"slower pace."
+msgstr ""
+"Povolit ukládání obrázků do mezipaměti? Pokud ne, Kodi bude stále ukládat "
+"vaše obrázky do mezipaměti pomaleji."
+
+msgctxt "#33118"
+msgid ""
+"You've change the playback mode. Kodi needs to be reset to apply the change,"
+" would you like to do this now?"
+msgstr ""
+"Byl změněn režim přehrávání. Kodi musí být zresetován k projevení změn, "
+"chcete to provést teď?"
+
+msgctxt "#33119"
+msgid ""
+"Something went wrong during the sync. You'll be able to restore progress "
+"when restarting Kodi. If the problem persists, please report on the Emby for"
+" Kodi forums, with your Kodi log."
+msgstr ""
+"Během synchronizace došlo k chybě. Průběh budete moci obnovit, když "
+"restartujete Kodi. Pokud problém přetrvává, nahlašte jej s přiložením "
+"protokolu Kodi na fóru Emby pro Kodi."
+
+msgctxt "#33120"
+msgid "Select the libraries to add"
+msgstr "Vyberte knihovny, které chcete přidat"
+
+msgctxt "#33121"
+msgid "All"
+msgstr "Vše"
+
+msgctxt "#33122"
+msgid "Restart Kodi to resume where you left off."
+msgstr "Abyste mohli pokračovat, kde jste přestali, restartujte Kodi"
+
+msgctxt "#33123"
+msgid "Sync library to Kodi"
+msgstr "Synchronizovat knihovnu do Kodi"
+
+msgctxt "#33124"
+msgid "Include people (slow)"
+msgstr "Zahrnout osoby (pomalé)"
+
+msgctxt "#33125"
+msgid ""
+"Choose the Emby views to sync to Kodi. You can optionally sync libraries at "
+"a later time."
+msgstr ""
+"Vyberte Emby pohledy pro synchronizování s Kodi. Případně můžete "
+"synchronizovat knihovny později."
+
+msgctxt "#33126"
+msgid "Sync later"
+msgstr "Synchronizovat později"
+
+msgctxt "#33127"
+msgid "Proceed"
+msgstr "Pokračovat"
+
+msgctxt "#33128"
+msgid ""
+"Failed to retrieve latest content updates. No content updates will be "
+"applied until Kodi is restarted. If this issue persists, please report on "
+"the Emby for Kodi forums, with your Kodi log."
+msgstr ""
+"Nepodařilo se načíst nejnovější aktualizace obsahu. Nebudou použity žádné "
+"aktualizace obsahu dokud nerestartujete Kodi. Pokud problém přetrvává, tento"
+" problém nahlašte s přiložením protokolu Kodi na fóru Emby pro Kodi."
+
+msgctxt "#33129"
+msgid "You can sync libraries by launching the Emby add-on > Add libraries."
+msgstr ""
+"Knihovny můžete synchronizovat spuštěním Emby doplňku > přidat knihovny."
+
+msgctxt "#33130"
+msgid "Select the source"
+msgstr "Vyberte zdroj"
+
+msgctxt "#33131"
+msgid "Refreshing boxsets"
+msgstr "Obnovení kolekcí"
+
+msgctxt "#33132"
+msgid "Repair library"
+msgstr "Oprava knihovny"
+
+msgctxt "#33133"
+msgid "Remove library from Kodi"
+msgstr "Odebrat knihovnu z Kodi"
+
+msgctxt "#33134"
+msgid "Add server"
+msgstr "Přidat server"
+
+msgctxt "#33135"
+msgid "Kodi will now restart to apply a small patch for your Kodi version."
+msgstr "Kodi se nyní restartuje k provedení malé opravy pro Vaší verzi Kodi."
+
+msgctxt "#33136"
+msgid "Update library"
+msgstr "Obnovit knihovnu"
+
+msgctxt "#33137"
+msgid "Enable Kodi Companion (server plugin)"
+msgstr "Povolit Kodi Companion (zásuvný modul serveru)"
+
+msgctxt "#33138"
+msgid ""
+"You can update your library manually rather than rely on the server plugin "
+"Kodi companion. Launch the add-on and update libraries (or per library). To "
+"remove content, you'll need to repair the library."
+msgstr ""
+"Knihovnu můžete aktualizovat ručně, než se spoléhat na zásuvný modul serveru"
+" Kodi companion. Spusťte doplněk a aktualizujte knihovny (nebo každou "
+"knihovnu zvlášť). Chcete-li odstranit obsah, musíte knihovnu obnovit."
+
+msgctxt "#33139"
+msgid "Update libraries"
+msgstr "Obnovit knihovny"
+
+msgctxt "#33140"
+msgid "Repair libraries"
+msgstr "Opravit knihovny"
+
+msgctxt "#33141"
+msgid "Remove server"
+msgstr "Odebrat server"
+
+msgctxt "#33142"
+msgid "Something went wrong. Try again later."
+msgstr "Došlo k neznámé chybě. Zkuste později znovu."
+
+msgctxt "#33143"
+msgid "Enable the option to delete"
+msgstr "Povolit možnost smazání"
+
+msgctxt "#33144"
+msgid "Removing library"
+msgstr "Odstranění knihovny"
+
+msgctxt "#33145"
+msgid ""
+"Please make sure your Emby server libraries are accessible to your Kodi "
+"installation and that you have path substitution configured on your server. "
+"For more information, check the FAQ in Emby for Kodi's github wiki."
+msgstr ""
+"Ujistěte se, že Vaše knihovny na serveru Emby jsou přístupné Vaší instalaci "
+"kodi a že máte na serveru nastavené náhradní cesty. Pro více informací "
+"navštivte FAQ na Github Wikipedii k Emby pro Kodi."
+
+msgctxt "#33146"
+msgid "Unable to connect to Emby."
+msgstr "Nelze se připojit k Emby."
+
+msgctxt "#33147"
+msgid "Your access to Emby is restricted."
+msgstr "Váš přístup k Emby je omezený."
+
+msgctxt "#33148"
+msgid "Your access to this server is restricted."
+msgstr "Váš přístup k tomuto serveru je omezený."
+
+msgctxt "#33149"
+msgid "Unable to connect to this server."
+msgstr "Nelze se připojit k tomuto serveru."
+
+msgctxt "#33150"
+msgid "Update server information"
+msgstr "Aktualizovat informace o serveru."
+
+msgctxt "#33151"
+msgid ""
+"Reconnect to the same server that was previously loaded. If you want to use "
+"a different server, reset your local database, including your user "
+"information."
+msgstr ""
+"Znovu se připojte k stejnému serveru, který byl dříve načten. Pokud chcete "
+"použít jiný server, obnovte lokální databázi včetně informací o uživateli."
+
+msgctxt "#33152"
+msgid "Unable to locate TV Tunes in Kodi."
+msgstr "Nelze najít TV Tunes v Kodi"
+
+msgctxt "#33153"
+msgid "Your Emby theme media has been synced to Kodi"
+msgstr "Vaše tématická média byla synchronizována do Kodi"
+
+msgctxt "#33154"
+msgid "Add libraries"
+msgstr "Přidat knihovny"
+
+msgctxt "#33155"
+msgid ""
+"The currently applied patch for Emby for Kodi is corrupted! Please post to "
+"the Emby for Kodi forums if this issue persists. This will need to be fixed "
+"as soon as possible."
+msgstr ""
+"Aktuální oprava aplikovaná na Emby pro Kodi je poškozena. Pokud tento "
+"problém přetrvává, nahlašte jej na fóru Emby pro Kodi. Bude opraveno jakmile"
+" to bude možné."
+
+msgctxt "#33156"
+msgid "A patch has been applied!"
+msgstr "Patch byl aplikován!"
+
+msgctxt "#33157"
+msgid "Audio only"
+msgstr "Pouze audio"
+
+msgctxt "#33158"
+msgid "Subtitles only"
+msgstr "Pouze titulky"
+
+msgctxt "#33159"
+msgid "Enable audio/subtitles selection"
+msgstr "Povolit výběr zvuku/titulků"
+
+msgctxt "#33160"
+msgid "To avoid errors, please update Emby for Kodi to version: "
+msgstr "Pro prevenci chyb, prosím, aktualizujte Emby pro Kodi na verzi:"
+
+msgctxt "#33161"
+msgid "Check for updates"
+msgstr "Zkontrolovat aktualizace"
+
+msgctxt "#33162"
+msgid "Reset the music library?"
+msgstr "Obnovit hudební knihovnu?"
+
+msgctxt "#33163"
+msgid "Support this project"
+msgstr "Podpořte tento projekt"
+
+msgctxt "#33164"
+msgid "Mask sensitive information in log (does not apply to kodi logging)"
+msgstr ""
+"Schovat citlivé informace v protokolu (nemá vliv na protokolování Kodi)"
+
+msgctxt "#33165"
+msgid "Failed to create backup"
+msgstr "Nelze vytvořit zálohu"
+
+msgctxt "#33166"
+msgid "(dynamic)"
+msgstr "(dynamický)"
+
+msgctxt "#33167"
+msgid "Recently added"
+msgstr "Nedávno přidané"
+
+msgctxt "#33168"
+msgid "Favourites"
+msgstr "Oblíbené"
+
+msgctxt "#33169"
+msgid "In Progress"
+msgstr "Probíhá"
+
+msgctxt "#33170"
+msgid "Unwatched"
+msgstr "Neshlédnuto"
+
+msgctxt "#33171"
+msgid "By first letter"
+msgstr "Podle prvního písmene"
+
+msgctxt "#33172"
+msgid ""
+"You have {number} updates pending. This may take a little while before "
+"seeing new content. It might be faster to update your libraries via "
+"launching the Emby add-on > update libraries. Proceed anyway?"
+msgstr ""
+"Máte (číslo) čekajících aktualizací. Zobrazení nového obsahu může chvíli "
+"trvat. Aktualizovat knihovny prostřednictvím spuštění doplňku knihoven Emby "
+"> aktualizovat knihovny může být rychlejší. Přesto pokračovat?"
+
+msgctxt "#33173"
+msgid "Forget about the previous sync? This is not recommended."
+msgstr "Zapomenout předchozí synchronizaci? Toto není doporučeno."
+
+msgctxt "#33174"
+msgid "Paging - download threads (default: 3)"
+msgstr "Stránkování - vlákna stahování (výchozí: 3) "
+
+msgctxt "#33175"
+msgid ""
+"Paging tip: Each download thread requests your max items value from Emby at "
+"the same time."
+msgstr ""
+"Tip pro stránkování: každé vlákno požaduje zároveň hodnotu maximálního počtu"
+" položek z Emby."
+
+msgctxt "#33176"
+msgid "Update or repair your libraries to apply the changes below."
+msgstr "Pro provedení změn níže aktualizujte nebo opravte knihovny."
+
+msgctxt "#33177"
+msgid "Display the progress bar if update count greater than"
+msgstr "Zobrazit ukazatel průběhu jestliže je počet aktualizací větší než"
+
+msgctxt "#33178"
+msgid "Processing updates"
+msgstr "Zpracování aktualizací"
+
+msgctxt "#33179"
+msgid "Force transcode"
+msgstr "Vynutit překódování"
+
+msgctxt "#33180"
+msgid "Restart Emby for Kodi"
+msgstr "Restart Emby pro Kodi"
+
+msgctxt "#33181"
+msgid "Restarting to apply the patch"
+msgstr "Restartování pro projevení opravy"
+
+msgctxt "#33182"
+msgid "Play with cinema mode"
+msgstr "Přehraj v řežimu Cinema"
+
+msgctxt "#33183"
+msgid "Enable the option to play with cinema mode"
+msgstr "Povoliž možnost přehrání v režimu Cinema"
+
+msgctxt "#33184"
+msgid "Remove libraries"
+msgstr "Odstraň knihovny"
+
+msgctxt "#33185"
+msgid "Enable sync during playback (may cause some lag)"
+msgstr "Povolit synchronizaci během přehrávání (může způsobit zasekávání)"
+
+msgctxt "#33186"
+msgid ""
+"The Kodi companion speeds up the start up sync. Other syncs are triggered by"
+" server events."
+msgstr ""
+"Kodi companion urychluje synchronizaci při spuštění. Ostatní synchronizace "
+"jsou spouštěny událostmi serveru."
+
+msgctxt "#33187"
+msgid "Sync Rotten Tomatoes ratings"
+msgstr "Synchronizovat hodnocení s Rotten Tomatoes"
+
+msgctxt "#33188"
+msgid "Would you like to sync Rotten Tomatoes ratings?"
+msgstr "Chcete synchronizovat hodnocení s Rotten Tomatoes?"
+
+msgctxt "#33191"
+msgid "Restart Emby for Kodi to apply this change?"
+msgstr "Restartovat Emby pro Kodi k projevení této změny?"
+
+msgctxt "#33192"
+msgid "Restart Emby for Kodi"
+msgstr "Restart Emby pro Kodi"
+
+msgctxt "#33193"
+msgid "Restarting..."
+msgstr "Restartování..."
+
+msgctxt "#33194"
+msgid "Manage libraries"
+msgstr "Spravovat knihovny"
+
+msgctxt "#33195"
+msgid "Enable Emby for Kodi"
+msgstr "Povolit Emby pro Kodi"
+
+msgctxt "#33196"
+msgid "Advanced options"
+msgstr "Pokročilé možnosti"
+
+msgctxt "#33197"
+msgid ""
+"A sync is already running, please wait until it completes and try again."
+msgstr ""
+"Právě probíhá synchronizace, prosím, počkejte dokud se nedokončí a zkuste "
+"znovu."
+
+msgctxt "#33199"
+msgid "Emby"
+msgstr "Emby"
+
+msgctxt "#33201"
+msgid "Emby play"
+msgstr "Emby přehrát"
+
+msgctxt "#33202"
+msgid "Music database rescan patch"
+msgstr "Oprava znovu prohledání hudební databáze."
+
+msgctxt "#33203"
+msgid "Task succeeded!"
+msgstr "Úloha úspěšně dokončena!"
+
+msgctxt "#33204"
+msgid "Task failed!"
+msgstr "Úloha se nezdařila!"
+
+msgctxt "#33205"
+msgid "Enable simple play (external player friendly)"
+msgstr "Povolit jednoduché přehrávání (jednodušší pro externí přehrávač)"
+
+msgctxt "#33206"
+msgid "Transcode 10-bit (H264)"
+msgstr "Překódování 10-bit (H264)"
+
+msgctxt "#33207"
+msgid "Ask to proceed with sync if count greater than"
+msgstr "Zeptat se pro pokračování synchronizace jestliže je počet větší než"
+
+msgctxt "#33208"
+msgid "Transcode 10-bit (H265/HEVC)"
+msgstr "Překódování 10-bit (H265/HEVC)"
+
+msgctxt "#33209"
+msgid "Play remote urls using Emby"
+msgstr "Přehraj vzálená URLs pomocí Emby."
+
+msgctxt "#33210"
+msgid "Display hidden users in selection"
+msgstr "Zobrazit skryté uživatele ve výběru."
+
+msgctxt "#33211"
+msgid "Reset patch update"
+msgstr "Obnovit aktualizaci opravy"
+
+msgctxt "#33212"
+msgid "Latest release"
+msgstr "Nejnovější vydání"
+
+msgctxt "#33213"
+msgid "Enable label for multi-episodes. i.e. | # | title"
+msgstr "Povolit značku pro multi-epizody, např. | # | název"
+
+msgctxt "#33214"
+msgid "Transcode Divx (MSMPEG4V3)"
+msgstr "Překódování Divx (MSMPEG4V3)"
+
+msgctxt "#33215"
+msgid "Transcode Xvid (MPEG4)"
+msgstr "Překódování Xvid (MPEG4)"
+
+msgctxt "#33216"
+msgid "Transcode Dvd (MPEG2)"
+msgstr "Překódování Dvd (MPEG2)"
+
+msgctxt "#33217"
+msgid ""
+"Verify the connection? Recommended: Disable for self-signed certificate "
+"only."
+msgstr ""
+"Ověřit připojení? Doporučení: Vypnout pouze pro certifikáty podepsané sebou "
+"samým."
+
+msgctxt "#33218"
+msgid "By Year"
+msgstr "Podle roku"
+
+msgctxt "#33219"
+msgid "By Actor"
+msgstr "Podle herce"
+
+msgctxt "#33220"
+msgid "By Tag"
+msgstr "Podle tagu"

@@ -1,0 +1,6 @@
+*.pyo
+__local__/
+machine_guid
+/resources/media/Thumbs.db
+
+.idea/

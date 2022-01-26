@@ -13,7 +13,7 @@ from resources.lib.base.l4.exceptions import Error
 from resources.lib.base.l5.api import api_download, api_get_channels, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
 from resources.lib.base.l7 import plugin
 from resources.lib.constants import CONST_BASE_HEADERS, CONST_FIRST_BOOT, CONST_HAS, CONST_IMAGES, CONST_LIBRARY, CONST_VOD_CAPABILITY, CONST_WATCHLIST, CONST_WATCHLIST_CAPABILITY
-from resources.lib.util import plugin_ask_for_creds, plugin_check_devices, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_vod, plugin_process_vod_season, plugin_process_vod_seasons, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
+from resources.lib.util import plugin_ask_for_creds, plugin_check_devices, plugin_check_first, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_vod, plugin_process_vod_season, plugin_process_vod_seasons, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
 from urllib.parse import urlparse
 from xml.dom.minidom import parseString
 
@@ -1806,6 +1806,8 @@ def check_first():
 
         profile_settings['setup_complete'] = 1
         save_profile(profile_id=1, profile=profile_settings)
+
+    plugin_check_first()
 
 def remove_stream_start():
     remove_file(file='stream_start', ext=False)

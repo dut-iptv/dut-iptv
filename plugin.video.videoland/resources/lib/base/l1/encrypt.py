@@ -56,9 +56,12 @@ class Credentials(object):
                 padded_data=cipher.decrypt(enc[AES.block_size:]),
                 block_size=self.bs).decode('utf-8')
         except:
-            decoded = Padding.unpad(
-                padded_data=cipher2.decrypt(enc[AES.block_size:]),
-                block_size=self.bs).decode('utf-8')
+            try:
+                decoded = Padding.unpad(
+                    padded_data=cipher2.decrypt(enc[AES.block_size:]),
+                    block_size=self.bs).decode('utf-8')
+            except:
+                decoded = ''
                 
         return decoded
 

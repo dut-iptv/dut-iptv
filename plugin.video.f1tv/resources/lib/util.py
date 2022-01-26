@@ -18,6 +18,7 @@ from urllib.parse import urlencode
 #Included from base.l8.menu
 #plugin_ask_for_creds
 #plugin_check_devices
+#plugin_check_first
 #plugin_login_error
 #plugin_post_login
 #plugin_process_info
@@ -49,6 +50,9 @@ def plugin_ask_for_creds(creds):
     return {'result': True, 'username': username, 'password': password}
 
 def plugin_check_devices():
+    pass
+
+def plugin_check_first():
     pass
 
 def plugin_get_device_id():

@@ -54,12 +54,13 @@ CONST_IMAGES = {
 
 CONST_LIBRARY = {}
 
-CONST_MAIN_VOD_AR = ['395', '1510', '392', '2128', '2130', '493', '410', '413', '3675', '3673', '3946', '804']
+CONST_MAIN_VOD_AR = ['395', '4319', '1510', '392', '2128', '2130', '493', '410', '413', '3675', '3673', '3946', '804']
 
 CONST_MOD_CACHE = {}
 
 CONST_VOD_CAPABILITY = [
     { 'file': 395, 'label': 'Live', 'start': 0, 'menu': 0, 'online': 1, 'search': 0, 'az': 0 },
+    { 'file': 4319, 'label': '2022 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
     { 'file': 1510, 'label': '2021 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
     { 'file': 392, 'label': '2020 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },
     { 'file': 2128, 'label': '2019 Season', 'start': 0, 'menu': 1, 'online': 2, 'search': 0, 'az': 0 },

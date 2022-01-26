@@ -19,6 +19,7 @@ from urllib.parse import urlencode
 #Included from base.l8.menu
 #plugin_ask_for_creds
 #plugin_check_devices
+#plugin_check_first
 #plugin_login_error
 #plugin_post_login
 #plugin_process_info
@@ -221,6 +222,9 @@ def plugin_ask_for_creds(creds):
 def plugin_check_devices():
     pass
 
+def plugin_check_first():
+    pass
+
 def plugin_get_device_id():
     return load_file('device_id', isJSON=False)
 
@@ -359,7 +363,8 @@ def plugin_process_playdata(playdata):
     write_file(file='token_renew', data='plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params))), isJSON=False)
 
     item_inputstream = inputstream.Widevine(
-        license_key = playdata['license'],
+        #license_key = playdata['license'],
+        license_key = "http://127.0.0.1:11189/{provider}/license".format(provider=PROVIDER_NAME)
     )
 
     return item_inputstream, CDMHEADERS

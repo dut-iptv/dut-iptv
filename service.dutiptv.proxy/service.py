@@ -1,4 +1,4 @@
-import datetime, io, json, pytz, os, re, requests, sys, threading, time, xbmc, xbmcaddon, xbmcvfs, xbmcgui
+import base64, datetime, io, json, pytz, os, re, requests, sys, threading, time, xbmc, xbmcaddon, xbmcvfs, xbmcgui
 import http.server as ProxyServer
 
 from collections import OrderedDict
@@ -7,11 +7,45 @@ from resources.lib.dnsutils import override_dns
 from xml.dom.minidom import parseString
 
 stream_url = {}
+stream_license = {}
 now_playing = 0
 last_token = 0
 audio_segments = {}
 last_segment = 0
 last_timecode = 0
+
+ALLOWED_LICENSE_HEADERS = {}
+
+ALLOWED_LICENSE_HEADERS['betelenet'] = [
+    "User-Agent",
+    "X-OESP-Content-Locator",
+    "X-OESP-Username",
+    "X-OESP-DRM-SchemeIdUri",
+    "X-OESP-License-Token",
+    "X-OESP-License-Token-Type", 
+    "X-OESP-Token",
+    "Content-Type",
+    "Content-Length"
+]
+
+ALLOWED_LICENSE_HEADERS['videoland'] = [
+    "User-Agent",
+    "Authorization",
+    "Content-Type",
+    "Content-Length"
+]
+
+ALLOWED_LICENSE_HEADERS['ziggo'] = [
+    "User-Agent",
+    "X-OESP-Content-Locator",
+    "X-OESP-Username",
+    "X-OESP-DRM-SchemeIdUri",
+    "X-OESP-License-Token",
+    "X-OESP-License-Token-Type", 
+    "X-OESP-Token",
+    "Content-Type",
+    "Content-Length"
+]
 
 class HTTPMonitor(xbmc.Monitor):
     def __init__(self, addon):
@@ -24,6 +58,79 @@ class HTTPServer(ProxyServer.HTTPServer):
         self.addon = addon
 
 class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
+    def do_POST(self):
+        if "/betelenet/" in self.path:
+            addon_name = 'betelenet'
+        elif "/canaldigitaal/" in self.path:
+            addon_name = 'canaldigitaal'
+        elif "/kpn/" in self.path:
+            addon_name = 'kpn'
+        elif "/nlziet/" in self.path:
+            addon_name = 'nlziet'
+        elif "/tmobile/" in self.path:
+            addon_name = 'tmobile'
+        elif "/videoland/" in self.path:
+            addon_name = 'videoland'
+        elif "/ziggo/" in self.path:
+            addon_name = 'ziggo'
+
+        self.path = self.path.replace('{addon_name}/'.format(addon_name=addon_name), '', 1)
+
+        ADDON = xbmcaddon.Addon(id="plugin.video.{addon_name}".format(addon_name=addon_name))
+        ADDON_PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
+        
+        if "/license" in self.path:
+            if os.path.isfile(ADDON_PROFILE + 'stream_license'):
+                stream_license[addon_name] = load_file(file=ADDON_PROFILE + 'stream_license', isJSON=False)
+
+                try:
+                    os.remove(ADDON_PROFILE + 'stream_license')
+                except:
+                    pass
+                    
+            data = self.rfile.read(int(self.headers['Content-Length']))
+            headers = {}
+                        
+            for header in self.headers:
+                if check_key(ALLOWED_LICENSE_HEADERS, addon_name):                
+                    if header in ALLOWED_LICENSE_HEADERS[addon_name]:
+                        headers[header] = self.headers[header]
+                else:
+                    headers[header] = self.headers[header]
+            
+            write_file(file=ADDON_PROFILE + 'license_headers', data=headers, isJSON=True)
+            write_file(file=ADDON_PROFILE + 'license_data', data=base64.b64encode(data).decode('utf-8'), isJSON=False)
+            
+            #session = proxy_get_session(proxy=self, addon_name=addon_name)
+            write_file(file=ADDON_PROFILE + 'license_url', data=str(stream_license[addon_name]), isJSON=False)
+            r = requests.post(stream_license[addon_name], headers=headers, data=data)
+            write_file(file=ADDON_PROFILE + 'license_response_data', data=base64.b64encode(r.content).decode('utf-8'), isJSON=False)
+            self.send_response(r.status_code)
+
+            for header in r.headers:
+                self.send_header(header, r.headers[header])
+
+            self.end_headers()
+            r.close()
+
+            try:
+                self.wfile.write(r.content)
+            except:
+                pass
+
+            try:
+                self.connection.close()
+            except:
+                pass
+        else:
+            self.send_response(501)
+            self.end_headers()
+            
+            try:
+                self.connection.close()
+            except:
+                pass
+        
     def do_GET(self):
         global stream_url, now_playing, last_token, audio_segments, last_segment, last_timecode
 
@@ -51,7 +158,7 @@ class HTTPRequestHandler(ProxyServer.BaseHTTPRequestHandler):
 
             ADDON = xbmcaddon.Addon(id="plugin.video.{addon_name}".format(addon_name=addon_name))
             ADDON_PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
-
+                
             if proxy_get_match(path=self.path, addon_name=addon_name) and os.path.isfile(ADDON_PROFILE + 'stream_hostname'):
                 stream_url[addon_name] = load_file(file=ADDON_PROFILE + 'stream_hostname', isJSON=False)
 
