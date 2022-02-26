@@ -552,8 +552,6 @@ def api_vod_download(type, start=0):
         return vodJSON2
 
 def api_vod_season(series, id, use_cache=True):
-    season = []
-
     info_url = '{base_url}/2.0/R/ENG/WEB_DASH/ALL/CONTENT/VIDEO/{id}/F1_TV_Pro_Annual/2?contentId={id}'.format(base_url=CONST_URLS['base'], id=id)
     download = api_download(url=info_url, type='get', headers=None, data=None, json_data=False, return_json=True)
     data = download['data']
@@ -562,59 +560,7 @@ def api_vod_season(series, id, use_cache=True):
     if not code or not code == 200 or not data or not check_key(data, 'resultCode') or not data['resultCode'] == 'OK' or not check_key(data, 'resultObj') or not check_key(data['resultObj'], 'containers'):
         return None
 
-    for row in data['resultObj']['containers']:
-        duration = 0
-        ep_id = ''
-        desc = ''
-        image = ''
-        label = ''
-        seasonno = ''
-        episodeno = ''
-        start = ''
-
-        if check_key(row['metadata'], 'title'):
-            label = 'Main Feed'
-
-        if check_key(row['metadata'], 'duration'):
-            duration = row['metadata']['duration']
-
-        if check_key(row, 'id'):
-            ep_id = row['id']
-
-        if check_key(row['metadata'], 'longDescription'):
-            desc = row['metadata']['longDescription']
-
-        if check_key(row['metadata'], 'pictureUrl'):
-            image = '{image_url}/{image}?w=1920&h=1080&q=HI&o=L'.format(image_url=CONST_URLS['image'], image=row['metadata']['pictureUrl'])
-
-        if check_key(row['metadata'], 'season'):
-            seasonno = row['metadata']['season']
-
-        season.append({'label': label, 'id': ep_id, 'start': start, 'duration': duration, 'title': label, 'seasonNumber': seasonno, 'episodeNumber': episodeno, 'description': desc, 'image': image})
-
-        for n in range(0, 100):
-            if check_key(row['metadata'], 'additionalStreams'):
-                for row2 in row['metadata']['additionalStreams']:
-                    if not n == int(row2['racingNumber']):
-                        continue
-
-                    ep_id = ''
-                    label = ''
-
-                    if check_key(row['metadata'], 'title'):
-                        if n == 0:
-                            label = str(row2['title'])
-                        elif (check_key(row2, 'teamName') and check_key(row2, 'driverFirstName') and check_key(row2, 'driverLastName')):
-                            label = '{racingnumber} {firstname} {lastname} ({teamname})'.format(racingnumber=row2['racingNumber'], firstname=row2['driverFirstName'], lastname=row2['driverLastName'], teamname=row2['teamName'])
-                        else:
-                            label = str(row2['title'])
-
-                    if check_key(row2, 'playbackUrl'):
-                        ep_id = row2['playbackUrl']
-
-                    season.append({'label': label, 'id': ep_id, 'start': start, 'duration': duration, 'title': label, 'seasonNumber': seasonno, 'episodeNumber': episodeno, 'description': desc, 'image': image})
-
-    return season
+    return { "data": data }
 
 def api_vod_seasons(type, id, use_cache=True):
     return None

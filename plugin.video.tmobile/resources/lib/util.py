@@ -2,7 +2,7 @@ import _strptime
 import certifi, datetime, re, requests, sys, xbmc
 
 from collections import OrderedDict
-from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT
+from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT, PROVIDER_NAME
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
@@ -137,9 +137,12 @@ def plugin_process_playdata(playdata):
 
     if check_key(playdata, 'license') and check_key(playdata['license'], 'triggers') and check_key(playdata['license']['triggers'][0], 'licenseURL'):
         item_inputstream = inputstream.Widevine(
-            license_key = playdata['license']['triggers'][0]['licenseURL'],
+            #license_key = playdata['license']['triggers'][0]['licenseURL'],
             #manifest_update_parameter = 'update',
+            license_key = "http://127.0.0.1:11189/{provider}/license".format(provider=PROVIDER_NAME)
         )
+        
+        write_file(file='stream_license', data=playdata['license']['triggers'][0]['licenseURL'], isJSON=False)
 
         if check_key(playdata['license']['triggers'][0], 'customData'):
             CDMHEADERS['AcquireLicense.CustomData'] = playdata['license']['triggers'][0]['customData']

@@ -199,6 +199,58 @@ def plugin_process_vod(data, start=0):
 
 def plugin_process_vod_season(series, id, data):
     season = []
+    
+    for row in data['resultObj']['containers']:
+        duration = 0
+        ep_id = ''
+        desc = ''
+        image = ''
+        label = ''
+        seasonno = ''
+        episodeno = ''
+        start = ''
+
+        if check_key(row['metadata'], 'title'):
+            label = 'Main Feed'
+
+        if check_key(row['metadata'], 'duration'):
+            duration = row['metadata']['duration']
+
+        if check_key(row, 'id'):
+            ep_id = row['id']
+
+        if check_key(row['metadata'], 'longDescription'):
+            desc = row['metadata']['longDescription']
+
+        if check_key(row['metadata'], 'pictureUrl'):
+            image = '{image_url}/{image}?w=1920&h=1080&q=HI&o=L'.format(image_url=CONST_URLS['image'], image=row['metadata']['pictureUrl'])
+
+        if check_key(row['metadata'], 'season'):
+            seasonno = row['metadata']['season']
+
+        season.append({'label': label, 'id': ep_id, 'start': start, 'duration': duration, 'title': label, 'seasonNumber': seasonno, 'episodeNumber': episodeno, 'description': desc, 'image': image})
+
+        for n in range(0, 100):
+            if check_key(row['metadata'], 'additionalStreams'):
+                for row2 in row['metadata']['additionalStreams']:
+                    if not n == int(row2['racingNumber']):
+                        continue
+
+                    ep_id = ''
+                    label = ''
+
+                    if check_key(row['metadata'], 'title'):
+                        if n == 0:
+                            label = str(row2['title'])
+                        elif (check_key(row2, 'teamName') and check_key(row2, 'driverFirstName') and check_key(row2, 'driverLastName')):
+                            label = '{racingnumber} {firstname} {lastname} ({teamname})'.format(racingnumber=row2['racingNumber'], firstname=row2['driverFirstName'], lastname=row2['driverLastName'], teamname=row2['teamName'])
+                        else:
+                            label = str(row2['title'])
+
+                    if check_key(row2, 'playbackUrl'):
+                        ep_id = row2['playbackUrl']
+
+                    season.append({'label': label, 'id': ep_id, 'start': start, 'duration': duration, 'title': label, 'seasonNumber': seasonno, 'episodeNumber': episodeno, 'description': desc, 'image': image})
 
     return season
 
