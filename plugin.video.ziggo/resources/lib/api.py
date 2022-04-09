@@ -32,6 +32,8 @@ from urllib.parse import parse_qs, urlparse, quote_plus
 #api_watchlist_listing
 
 def api_add_to_watchlist(id, series='', season='', program_type='', type='watchlist'):
+    #log('api_add_to_watchlist')
+    
     if not api_get_session():
         return None
 
@@ -57,9 +59,12 @@ def api_add_to_watchlist(id, series='', season='', program_type='', type='watchl
     if not code or not code == 204 or not data:
         return False
 
+    #log('api_add_to_watchlist sucess')
     return True
 
 def api_clean_after_playback(stoptime):
+    #log('api_clean_after_playback, stoptime {}'.format(stoptime))
+    
     if not api_get_session():
         return None
 
@@ -69,6 +74,8 @@ def api_clean_after_playback(stoptime):
     headers['Content-type'] = 'application/json'
 
     download = api_download(url=CONST_URLS['clearstreams_url'], type='post', headers=headers, data='{}', json_data=False, return_json=False)
+    
+    #log('api_clean_after_playback sucess')
 
 def api_get_headers():
     creds = get_credentials()
@@ -93,6 +100,7 @@ def api_get_headers():
     return headers
 
 def api_get_info(id, channel=''):
+    #log('api_get_info, id {},channel {}'.format(id, channel))
     profile_settings = load_profile(profile_id=1)
 
     info = {}
@@ -103,6 +111,10 @@ def api_get_info(id, channel=''):
         download = api_download(url=listing_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']
+        
+        #log('URL {}'.format(listing_url))
+        #log('Data {}'.format(data))
+        #log('Code {}'.format(code))
 
         if code and code == 200 and data and check_key(data, 'listings'):
             for row in data['listings']:
@@ -113,9 +125,12 @@ def api_get_info(id, channel=''):
     except:
         pass
 
+    #log('api_get_info success')
     return info
 
 def api_get_play_token(locator=None, path=None, force=0):
+    #log('api_get_play_token, locator {}, path {}, force {}'.format(locator, path, force))
+    
     if not api_get_session():
         return None
 
@@ -142,6 +157,10 @@ def api_get_play_token(locator=None, path=None, force=0):
         download = api_download(url=CONST_URLS['token_url'], type='post', headers=api_get_headers(), data=jsondata, json_data=True, return_json=True)
         data = download['data']
         code = download['code']
+        
+        #log('URL {}'.format(CONST_URLS['token_url']))
+        #log('Data {}'.format(data))
+        #log('Code {}'.format(code))
 
         if not code or not code == 200 or not data or not check_key(data, 'token'):
             profile_settings['tokenrun'] = 0
@@ -162,21 +181,35 @@ def api_get_play_token(locator=None, path=None, force=0):
         profile_settings['drm_locator'] = locator
         save_profile(profile_id=1, profile=profile_settings)
 
+        #log('api_get_play_token success')
         return data['token']
     else:
+        #log('api_get_play_token success')
         return profile_settings['drm_token']
 
 def api_get_session(force=0, return_data=False):
+    #log('api_get_session, force {}, return_data {}'.format(force, return_data))
     force = int(force)
     profile_settings = load_profile(profile_id=1)
+    
+    if force==0 and return_data == False and profile_settings['last_login_success'] == 1 and int(profile_settings['last_login_time']) + 3600 > int(time.time()):
+        #log('api_get_session skipping')       
+        return True
 
     devices_url = CONST_URLS['devices_url']
+    #log('URL {}'.format(devices_url))
 
     download = api_download(url=devices_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
     code = download['code']
+    
+    #log('Data {}'.format(data))
+    #log('Code {}'.format(code))
 
-    if not code or not code == 200 or not data or not check_key(data, 'isAccountEnabled'):
+    if code and code == 503:
+        #log('api_get_session code 503, skipping')        
+    elif not code or not code == 200 or not data or not check_key(data, 'isAccountEnabled'):
+        #log('api_login call from api_get_session')
         login_result = api_login()
 
         if not login_result['result']:
@@ -193,22 +226,32 @@ def api_get_session(force=0, return_data=False):
     if return_data == True:
         return {'result': True, 'data': data, 'code': code}
 
+    #log('api_get_session success')
+
     return True
 
 def api_get_profiles():
+    #log('api_get_profiles')
+    #log('api_get_profiles success')
     return None
 
 def api_get_watchlist_id():
+    #log('api_get_watchlist_id')
+    
     if not api_get_session():
         return None
 
     profile_settings = load_profile(profile_id=1)
 
     watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&maxResults=1&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_URLS['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
-
+    #log('URL {}'.format(watchlist_url))
+    
     download = api_download(url=watchlist_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
     code = download['code']
+    
+    #log('Data {}'.format(data))
+    #log('Code {}'.format(code))
 
     if not code or not code == 200 or not data or not check_key(data, 'watchlistId'):
         return False
@@ -216,26 +259,36 @@ def api_get_watchlist_id():
     profile_settings['watchlist_id'] = data['watchlistId']
     save_profile(profile_id=1, profile=profile_settings)
 
+    #log('api_get_watchlist_id success')
     return True
 
 def api_list_watchlist(type='watchlist'):
+    #log('api_list_watchlist, type {}'.format(type))
+
     if not api_get_session():
         return None
 
     profile_settings = load_profile(profile_id=1)
 
     watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_URLS['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
-
+    #log('URL {}'.format(watchlist_url))
+    
     download = api_download(url=watchlist_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
     code = download['code']
 
+    #log('Data {}'.format(data))
+    #log('Code {}'.format(code))
+
     if not code or not code == 200 or not data or not check_key(data, 'entries'):
         return False
 
+    #log('api_list_watchlist success')
     return data
 
-def api_login():
+def api_login(retry=False):
+    #log('api_login, retry {}'.format(retry))
+    
     creds = get_credentials()
     username = creds['username']
     password = creds['password']
@@ -262,8 +315,18 @@ def api_login():
     data = download['data']
     code = download['code']
 
-    if code and data and check_key(data, 'reason') and data['reason'] == 'wrong backoffice':
-        return { 'code': code, 'data': data, 'result': False }
+    #log('Data {}'.format(data))
+    #log('Code {}'.format(code))
+
+    if code and data and check_key(data, 'accessToken') and retry==False:
+        #log('api_login call from api_login')
+        retry_result = api_login(retry=True)
+        
+        if retry_result['result'] == False:
+            return { 'code': code, 'data': data, 'result': False }
+        else:
+            data = retry_result['data']
+            code = retry_result['code']
 
     if not code or not data or not check_key(data, 'oespToken'):
         if not code:
@@ -294,7 +357,8 @@ def api_login():
 
     if len(str(profile_settings['watchlist_id'])) == 0:
         api_get_watchlist_id()
-
+    
+    #log('api_login success')
     return { 'code': code, 'data': data, 'result': True }
 
 def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0, change_audio=0):
