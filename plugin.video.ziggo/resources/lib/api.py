@@ -207,6 +207,7 @@ def api_get_session(force=0, return_data=False):
     #log('Code {}'.format(code))
 
     if code and code == 503:
+        pass
         #log('api_get_session code 503, skipping')        
     elif not code or not code == 200 or not data or not check_key(data, 'isAccountEnabled'):
         #log('api_login call from api_get_session')
