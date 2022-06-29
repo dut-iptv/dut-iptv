@@ -1,5 +1,7 @@
 import _strptime
+import certifi
 import datetime, re, time, xbmc
+import requests
 
 from collections import OrderedDict
 from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT, PROVIDER_NAME
