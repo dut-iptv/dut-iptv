@@ -1462,6 +1462,10 @@ def process_replaytv_content(station, day=0, start=0):
         program_id = str(row['program_id'])
         program_type = 'program'
 
+        profile_settings = load_profile(profile_id=1)
+        profile_settings['replay_id'] = program_id
+        save_profile(profile_id=1, profile=profile_settings)
+
         if check_key(CONST_WATCHLIST, 'replay') and check_key(CONST_WATCHLIST['replay'], program_type) and CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['replay'][program_type]['type']]['add'] == 1:
             context.append((CONST_WATCHLIST_CAPABILITY[CONST_WATCHLIST['replay'][program_type]['type']]['addlist'], 'RunPlugin({context_url})'.format(context_url=plugin.url_for(func_or_url=add_to_watchlist, id=program_id, program_type=program_type, type=CONST_WATCHLIST['replay'][program_type]['type'])), ))
 

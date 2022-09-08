@@ -1,7 +1,7 @@
 import base64, json, os, re, requests, sys, time, xbmc
 
 from collections import OrderedDict
-from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, DEFAULT_USER_AGENT
+from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, ADDONS_PATH, CONST_DUT_EPG_BASE, CONST_DUT_EPG, DEFAULT_USER_AGENT, SESSION_CHUNKSIZE
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
@@ -84,15 +84,15 @@ def api_get_headers():
     profile_settings = load_profile(profile_id=1)
 
     headers = {
-        'User-Agent': DEFAULT_USER_AGENT,
-        'X-Client-Id': '{clientid}||{defaultagent}'.format(clientid=CONST_DEFAULT_CLIENTID, defaultagent=DEFAULT_USER_AGENT),        
+        'User-Agent': DEFAULT_USER_AGENT,     
     }
 
     if check_key(profile_settings, 'ziggo_profile_id') and len(str(profile_settings['ziggo_profile_id'])) > 0:
-        headers['X-OESP-Profile-Id'] = profile_settings['ziggo_profile_id']
+        headers['X-Profile'] = profile_settings['ziggo_profile_id']
 
     if check_key(profile_settings, 'access_token') and len(str(profile_settings['access_token'])) > 0:
-        headers['X-OESP-Token'] = profile_settings['access_token']
+        headers['Cookie'] = profile_settings['access_token']
+        headers['Content-Type'] = 'application/json'
 
     if len(str(username)) > 0:
         headers['X-OESP-Username'] = username
@@ -154,35 +154,69 @@ def api_get_play_token(locator=None, path=None, force=0):
         else:
             jsondata = {"contentLocator": locator}
 
-        download = api_download(url=CONST_URLS['token_url'], type='post', headers=api_get_headers(), data=jsondata, json_data=True, return_json=True)
-        data = download['data']
-        code = download['code']
-        
-        #log('URL {}'.format(CONST_URLS['token_url']))
-        #log('Data {}'.format(data))
-        #log('Code {}'.format(code))
+        creds = get_credentials()
+        username = creds['username']
 
-        if not code or not code == 200 or not data or not check_key(data, 'token'):
-            profile_settings['tokenrun'] = 0
-            save_profile(profile_id=1, profile=profile_settings)
+        headers = {
+            'User-Agent': DEFAULT_USER_AGENT,
+            'X-Profile': profile_settings['ziggo_profile_id'],
+            'Cookie': profile_settings['access_token'],
+            'X-Entitlements-Token': profile_settings['entitlements_token'],
+            'Content-Type': 'application/json',
+            'X-OESP-Username': username,
+        }
 
-            return None
+        #payload = json.dumps({
+        #    "contentLocator": locator,
+        #    "drmScheme": "sdash:BR-AVC-DASH"
+        #})
 
         profile_settings = load_profile(profile_id=1)
+
+        if profile_settings['detect_replay'] == 0:
+            str = profile_settings['drm_locator']
+            channelid = str[39:-17]
+            log(channelid)
+
+            base_session = CONST_URLS['session_url']
+            session = '{base}/{hid}/live?assetType=Orion-DASH&channelId={id}'.format(base=base_session, hid=profile_settings['household_id'], id=channelid)
+            log(session)
+            download = requests.request("POST", session, headers=headers)
+
+            log('getplaytoken; live sessionurl response: {}'.format(download))
+
+            wvtoken = download.headers['x-streaming-token']
+        
+        if profile_settings['detect_replay'] == 1:
+            program_id = profile_settings['replay_id']
+            base_session = CONST_URLS['session_url']
+            session = '{base}/{hid}/replay?eventId={eventid}&profileId={id}&abrType=BR-AVC-DASH'.format(base=base_session, hid=profile_settings['household_id'], eventid=program_id,id=profile_settings['ziggo_profile_id'])
+            log(session)
+            download = requests.request("POST", session, headers=headers)
+            code = download.status_code
+
+            log('getplayurl; replay sessionurl response: {}'.format(download))
+
+            wvtoken = download.headers['x-streaming-token']
+
+
+        #log('URL {}'.format(CONST_URLS['token_url']))
+        #log('Data {}'.format(data))
 
         if not locator == profile_settings['drm_locator']:
             return False
 
+        profile_settings['contentid'] = download.json()['drmContentId']
         profile_settings['tokenrun'] = 0
         profile_settings['drm_path'] = path
-        profile_settings['drm_token'] = data['token']
-        write_file(file='widevine_token', data=data['token'], isJSON=False)
+        profile_settings['drm_token'] = wvtoken
+        write_file(file='widevine_token', data=wvtoken, isJSON=False)
         profile_settings['drm_token_age'] = int(time.time())
         profile_settings['drm_locator'] = locator
         save_profile(profile_id=1, profile=profile_settings)
 
         #log('api_get_play_token success')
-        return data['token']
+        return wvtoken
     else:
         #log('api_get_play_token success')
         return profile_settings['drm_token']
@@ -193,30 +227,31 @@ def api_get_session(force=0, return_data=False):
     profile_settings = load_profile(profile_id=1)
     
     if force==0 and return_data == False and profile_settings['last_login_success'] == 1 and int(profile_settings['last_login_time']) + 3600 > int(time.time()):
-        #log('api_get_session skipping')       
+        log('api_get_session skipping')       
         return True
 
-    devices_url = CONST_URLS['devices_url']
-    #log('URL {}'.format(devices_url))
-
-    download = api_download(url=devices_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
+    base_cust = CONST_URLS['customer_url']
+    cust_url = '{base}/{hid}?with=profiles,devices'.format(base=base_cust, hid=profile_settings['household_id'])
+    download = api_download(url=cust_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
     data = download['data']
     code = download['code']
-    
+
     #log('Data {}'.format(data))
-    #log('Code {}'.format(code))
+    log('Session Code {}'.format(code))
 
     if code and code == 503:
         pass
-        #log('api_get_session code 503, skipping')        
-    elif not code or not code == 200 or not data or not check_key(data, 'isAccountEnabled'):
-        #log('api_login call from api_get_session')
+        log('api_get_session code 503, skipping')        
+    elif not code or not code == 200 or not data:
+        log('api_login call from api_get_session')
         login_result = api_login()
 
         if not login_result['result']:
+            log('login_result: api_login did not return result!')
             if return_data == True:
+                log('login_result: but api_login did return data!')
                 return {'result': False, 'data': login_result['data'], 'code': login_result['code']}
-
+            log('login_result: neither did api_login return any data!!! (this is bad)')
             return False
 
     profile_settings = load_profile(profile_id=1)
@@ -244,7 +279,7 @@ def api_get_watchlist_id():
 
     profile_settings = load_profile(profile_id=1)
 
-    watchlist_url = '{watchlist_url}/profile/{profile_id}?language=nl&maxResults=1&order=DESC&sharedProfile=true&sort=added'.format(watchlist_url=CONST_URLS['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
+    watchlist_url = '{watchlist_url}/profile/{profile_id}/extended?sort=ADDED&order=DESC&language=nl&maxResults=1&sharedProfile=true'.format(watchlist_url=CONST_URLS['watchlist_url'], profile_id=profile_settings['ziggo_profile_id'])
     #log('URL {}'.format(watchlist_url))
     
     download = api_download(url=watchlist_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
@@ -288,7 +323,7 @@ def api_list_watchlist(type='watchlist'):
     return data
 
 def api_login(retry=False):
-    #log('api_login, retry {}'.format(retry))
+    log('api_login, retry {}'.format(retry))
     
     creds = get_credentials()
     username = creds['username']
@@ -308,59 +343,69 @@ def api_login(retry=False):
     save_profile(profile_id=1, profile=profile_settings)
 
     headers = {
-        'User-Agent':  DEFAULT_USER_AGENT,
-        'X-Client-Id': '{clientid}||{defaultagent}'.format(clientid=CONST_DEFAULT_CLIENTID, defaultagent=DEFAULT_USER_AGENT),
+        'Content-Type': 'application/json',
+        'X-Device-Code': 'web',
     }
 
-    download = api_download(url=CONST_URLS['session_url'], type='post', headers=headers, data={"username": username, "password": password}, json_data=True, return_json=True)
-    data = download['data']
-    code = download['code']
+    downloads = requests.request("POST", CONST_URLS['auth_url'], headers=headers, data=json.dumps({"username": username, "password": password}))
+    download = downloads.json()
 
-    #log('Data {}'.format(data))
-    #log('Code {}'.format(code))
-
-    if code and data and check_key(data, 'accessToken') and retry==False:
-        #log('api_login call from api_login')
-        retry_result = api_login(retry=True)
-        
-        if retry_result['result'] == False:
-            return { 'code': code, 'data': data, 'result': False }
-        else:
-            data = retry_result['data']
-            code = retry_result['code']
-
-    if not code or not data or not check_key(data, 'oespToken'):
-        if not code:
-            code = {}
-
-        if not data:
-            data = {}
-
-        return { 'code': code, 'data': data, 'result': False }
-
-    ziggo_profile_id = ''
     household_id = ''
 
     try:
-        ziggo_profile_id = data['customer']['sharedProfileId']
+        household_id = download['householdId']
     except:
         pass
+
+    log('householdId: {}'.format(household_id))
+
+    headers2 = {
+        'Content-Type': 'application/json',
+        'Cookie': f"ACCESSTOKEN={download['accessToken']}",
+    }
+
+    base_cust = CONST_URLS['customer_url']
+    cust_url = '{base}/{hid}?with=profiles,devices'.format(base=base_cust, hid=household_id)
+    download2 = requests.request("GET", cust_url, headers=headers2)
+    profile = download2.json()
+    profile_orig = profile
+
+    ziggo_profile_id = ''
 
     try:
-        household_id = data['customer']['householdId']
+        ziggo_profile_id = profile['profiles'][0]['profileId']
     except:
         pass
 
-    profile_settings['access_token'] = data['oespToken']
+    log('profileId {}'.format(ziggo_profile_id))
+
+    base_entitl = CONST_URLS['entitlements_url']
+    ent_url = '{base}/{hid}/entitlements'.format(base=base_entitl, hid=household_id)
+    entitl = requests.request("GET", ent_url, headers=headers2)
+    entitlements = entitl.json()
+
+    entitlements_token = ''
+
+    try:
+        entitlements_token = entitlements['token']
+    except:
+        pass
+
+    log('entitlements: {}'.format(entitlements_token))
+
+    xstoken = download['accessToken']
+    log('accesstoken: {}'.format(xstoken))
+    profile_settings['access_token'] = f"ACCESSTOKEN={xstoken}"
     profile_settings['ziggo_profile_id'] = ziggo_profile_id
     profile_settings['household_id'] = household_id
+    profile_settings['entitlements_token'] = entitlements_token
     save_profile(profile_id=1, profile=profile_settings)
 
     if len(str(profile_settings['watchlist_id'])) == 0:
         api_get_watchlist_id()
     
-    #log('api_login success')
-    return { 'code': code, 'data': data, 'result': True }
+    log('api_login success')
+    return { 'code': 200, 'data': profile_orig, 'result': True }
 
 def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0, pvr=0, change_audio=0):
     playdata = {'path': '', 'mpd': '', 'license': '', 'certificate': '', 'token': '', 'locator': '', 'type': '', 'properties': {}}
@@ -392,6 +437,10 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         return playdata
 
     if type == 'channel':
+        profile_settings = load_profile(profile_id=1)
+        profile_settings['detect_replay'] = 0
+        save_profile(profile_id=1, profile=profile_settings)
+
         data = api_get_channels()
 
         try:
@@ -414,6 +463,10 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
                 if check_key(row, 'program'):
                     info = row['program']
     elif type == 'program':
+        profile_settings = load_profile(profile_id=1)
+        profile_settings['detect_replay'] = 1
+        save_profile(profile_id=1, profile=profile_settings)
+        
         listings_url = "{listings_url}/{id}".format(listings_url=base_listing_url, id=id)
         download = api_download(url=listings_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
         data = download['data']
@@ -423,6 +476,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
             return playdata
 
         info = data['program']
+
     elif type == 'vod':
         mediaitems_url = '{mediaitems_url}/{id}'.format(mediaitems_url=CONST_URLS['mediaitems_url'], id=id)
         download = api_download(url=mediaitems_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
@@ -447,7 +501,8 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         else:
             return playdata
 
-        playout_url = '{base_url}/playout/{playout_str}/{id}?abrType=BR-AVC-DASH'.format(base_url=CONST_URLS['base_url'], playout_str=playout_str, id=id)
+        baseurl = "https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld/web"
+        playout_url = '{base_url}/playout/{playout_str}/{id}?abrType=BR-AVC-DASH'.format(base_url=baseurl, playout_str=playout_str, id=id)
         download = api_download(url=playout_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
         data = download['data']
         code = download['code']

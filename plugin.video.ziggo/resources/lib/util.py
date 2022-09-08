@@ -278,12 +278,13 @@ def plugin_process_playdata(playdata):
     CDMHEADERS = {
         'User-Agent': DEFAULT_USER_AGENT,
         #'X-Client-Id': CONST_DEFAULT_CLIENTID + '||' + DEFAULT_USER_AGENT,
-        'X-OESP-License-Token-Type': 'velocix',
-        'X-OESP-Token': profile_settings['access_token'],
+        #'X-OESP-License-Token-Type': 'velocix',
+        'Cookie': profile_settings['access_token'],
+        'X-Profile': profile_settings['ziggo_profile_id'],
         'X-OESP-Username': creds['username'],
-        'X-OESP-License-Token': profile_settings['drm_token'],
-        'X-OESP-DRM-SchemeIdUri': 'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed',
-        'X-OESP-Content-Locator': playdata['locator'],
+        'x-streaming-token': profile_settings['drm_token'],
+        'x-drm-schemeId': 'edef8ba9-79d6-4ace-a3c8-27dcd51d21ed',
+        #'X-OESP-Content-Locator': playdata['locator'],
     }
 
     params = []

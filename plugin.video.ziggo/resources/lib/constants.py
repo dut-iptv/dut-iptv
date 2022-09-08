@@ -1,33 +1,36 @@
 from resources.lib.base.l1.dnsutils import dns_lookup
 from resources.lib.base.l3.language import _
 
-CONST_BASE_DOMAIN = 'obo-prod.oesp.ziggogo.tv'
+CONST_BASE_DOMAIN = 'prod.spark.ziggogo.tv'
 CONST_BASE_DOMAIN_MOD = True
-CONST_BASE_IP = dns_lookup('obo-prod.oesp.ziggogo.tv', "1.0.0.1")['A'][0]
+CONST_BASE_IP = dns_lookup('prod.spark.ziggogo.tv', "1.0.0.1")['A'][0]
 
 CONST_URLS = {
-    'base_url': 'https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld/web',
+    'auth_url': "https://prod.spark.ziggogo.tv/auth-service/v1/authorization",
+    'base_url': 'https://prod.spark.ziggogo.tv/eng/web/',
     'channels_url': "https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld/web/channels",
     'clearstreams_url': 'https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld/web/playback/clearstreams',
+    'customer_url': "https://prod.spark.ziggogo.tv/eng/web/personalization-service/v1/customer",
     'devices_url': "https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld/web/settopboxes/profile",
+    'entitlements_url': 'https://prod.spark.ziggogo.tv/eng/web/purchase-service/v2/customers',
     'listings_url': "https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld/web/listings",
     'mediaitems_url': "https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld/web/mediaitems",
     'mediagroupsfeeds_url': "https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld/web/mediagroups/feeds",
     'search_url': "https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld/web/search/content",
-    'session_url': "https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld/web/session",
-    'token_url': 'https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld//web/license/token',
-    'widevine_url': 'https://obo-prod.oesp.ziggogo.tv/oesp/v4/NL/nld//web/license/eme',
-    'watchlist_url': 'https://prod.spark.ziggogo.tv/nld/web/watchlist-service/v1/watchlists',                                                                                       
+    'session_url': "https://prod.spark.ziggogo.tv/eng/web/session-service/session/v2/web-desktop/customers",
+    'token_url': 'https://prod.spark.ziggogo.tv/auth-service/v1/mqtt/token',
+    'widevine_url': 'https://prod.spark.ziggogo.tv/eng/web/session-manager/license',
+    'watchlist_url': 'https://prod.spark.ziggogo.tv/eng/web/watchlist-service/v2/watchlists',                                                                                       
     'web_url': 'https://www.ziggogo.tv'
 }
 
 CONST_ALLOWED_HEADERS = {
     'user-agent',
     'x-oesp-content-locator',
-    'x-oesp-token',
+    'x-streaming-token',
     'x-client-id',
     'x-oesp-username',
-    'x-oesp-drm-schemeiduri'
+    'x-drm-schemeId'
 }
 
 CONST_BASE_HEADERS = {

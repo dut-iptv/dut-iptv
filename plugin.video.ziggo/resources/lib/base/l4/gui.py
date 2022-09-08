@@ -3,6 +3,7 @@ import sys, traceback, xbmc, xbmcgui
 from contextlib import contextmanager
 from resources.lib.base.l1.constants import ADDON_ICON, ADDON_ID, ADDON_NAME
 from resources.lib.base.l3.language import _
+from resources.lib.base.l3.util import load_profile
 from urllib.parse import quote, urlparse
 
 def _make_heading(heading=None):
@@ -284,8 +285,10 @@ class Item(object):
                     li.setProperty('inputstream.adaptive.stream_headers', streamheaders)
 
                 if self.inputstream.license_key:
-                    li.setProperty('inputstream.adaptive.license_key', '{url}|Content-Type={content_type}&{headers}|{challenge}|{response}'.format(
+                    profile_settings = load_profile(profile_id=1)
+                    li.setProperty('inputstream.adaptive.license_key', '{url}?ContentId={contentid}|Content-Type={content_type}&{headers}|{challenge}|{response}'.format(
                         url = self.inputstream.license_key,
+                        contentid = profile_settings['contentid'],
                         headers = headers,
                         content_type = self.inputstream.content_type,
                         challenge = self.inputstream.challenge,
