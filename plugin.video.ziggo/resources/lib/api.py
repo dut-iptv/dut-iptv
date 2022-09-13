@@ -225,7 +225,11 @@ def api_get_session(force=0, return_data=False):
     #log('api_get_session, force {}, return_data {}'.format(force, return_data))
     force = int(force)
     profile_settings = load_profile(profile_id=1)
-    
+
+    if not 'last_login_success' in profile_settings:
+        profile_settings['last_login_success'] = 0
+        save_profile(profile_id=1, profile=profile_settings)
+
     if force==0 and return_data == False and profile_settings['last_login_success'] == 1 and int(profile_settings['last_login_time']) + 3600 > int(time.time()):
         log('api_get_session skipping')       
         return True
