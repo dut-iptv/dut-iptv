@@ -12,6 +12,7 @@ from resources.lib.base.l5.api import api_download, api_get_channels, api_get_vo
 from resources.lib.constants import CONST_URLS, CONST_DEFAULT_CLIENTID, CONST_IMAGES, CONST_VOD_CAPABILITY
 from resources.lib.util import get_image, get_play_url, plugin_process_info
 from urllib.parse import parse_qs, urlparse, quote_plus
+from contextlib import suppress
 
 #Included from base.l7.plugin
 #api_clean_after_playback
@@ -157,15 +158,6 @@ def api_get_play_token(locator=None, path=None, force=0):
         creds = get_credentials()
         username = creds['username']
 
-        headers = {
-            'User-Agent': DEFAULT_USER_AGENT,
-            'X-Profile': profile_settings['ziggo_profile_id'],
-            'Cookie': profile_settings['access_token'],
-            'X-Entitlements-Token': profile_settings['entitlements_token'],
-            'Content-Type': 'application/json',
-            'X-OESP-Username': username,
-        }
-
         #payload = json.dumps({
         #    "contentLocator": locator,
         #    "drmScheme": "sdash:BR-AVC-DASH"
@@ -173,32 +165,89 @@ def api_get_play_token(locator=None, path=None, force=0):
 
         profile_settings = load_profile(profile_id=1)
 
+        def live_layer():
+            #the full if statement
+            headers = {
+                'User-Agent': DEFAULT_USER_AGENT,
+                'X-Profile': profile_settings['ziggo_profile_id'],
+                'Cookie': profile_settings['access_token'],
+                'X-Entitlements-Token': profile_settings['entitlements_token'],
+                'Content-Type': 'application/json',
+                'X-OESP-Username': username,
+            }
+            def inner_layer():
+                #the point just before it could go wrong
+                str = profile_settings['drm_locator']
+                channelid = str[39:-17]
+                log(channelid)
+                base_session = CONST_URLS['session_url']
+                session = '{base}/{hid}/live?assetType=Orion-DASH&channelId={id}'.format(base=base_session, hid=profile_settings['household_id'], id=channelid)
+                log(session)
+                download = requests.request("POST", session, headers=headers)
+                log('getplaytoken; live sessionurl response: {}'.format(download))
+                return download
+            download = inner_layer()
+            code = download.status_code
+            print(code)
+            if code == 200:
+                #successful, continue using the token
+                contentid = download.json()['drmContentId']
+                wvtoken = download.headers['x-streaming-token']
+                return contentid, wvtoken
+            else:
+                #it went wrong, print code, refresh values and try again
+                print(download.json())
+                api_login()
+                live_layer()
+
+        def replay_layer():
+            #the full if statement
+            headers = {
+                'User-Agent': DEFAULT_USER_AGENT,
+                'X-Profile': profile_settings['ziggo_profile_id'],
+                'Cookie': profile_settings['access_token'],
+                'X-Entitlements-Token': profile_settings['entitlements_token'],
+                'Content-Type': 'application/json',
+                'X-OESP-Username': username,
+            }
+            def inner_layer():
+                #the point just before it could go wrong
+                program_id = profile_settings['replay_id']
+                base_session = CONST_URLS['session_url']
+                session = '{base}/{hid}/replay?eventId={eventid}&profileId={id}&abrType=BR-AVC-DASH'.format(base=base_session, hid=profile_settings['household_id'], eventid=program_id,id=profile_settings['ziggo_profile_id'])
+                log(session)
+                download = requests.request("POST", session, headers=headers)
+                log('getplayurl; replay sessionurl response: {}'.format(download))
+                return download
+            download = inner_layer()
+            code = download.status_code
+            print(code)
+            if code == 200:
+                #successful, continue using the token
+                contentid = download.json()['drmContentId']
+                wvtoken = download.headers['x-streaming-token']
+                return contentid, wvtoken
+            else:
+                #it went wrong, print code, refresh values and try again
+                try:
+                    log(download.json())
+                    print(download.json())
+                except:
+                    pass
+                api_login()
+                replay_layer()
+
         if profile_settings['detect_replay'] == 0:
-            str = profile_settings['drm_locator']
-            channelid = str[39:-17]
-            log(channelid)
-
-            base_session = CONST_URLS['session_url']
-            session = '{base}/{hid}/live?assetType=Orion-DASH&channelId={id}'.format(base=base_session, hid=profile_settings['household_id'], id=channelid)
-            log(session)
-            download = requests.request("POST", session, headers=headers)
-
-            log('getplaytoken; live sessionurl response: {}'.format(download))
-
-            wvtoken = download.headers['x-streaming-token']
+            #if live_tv
+            print("live")
+            contentid = live_layer()[0]
+            wvtoken = live_layer()[1]
         
         if profile_settings['detect_replay'] == 1:
-            program_id = profile_settings['replay_id']
-            base_session = CONST_URLS['session_url']
-            session = '{base}/{hid}/replay?eventId={eventid}&profileId={id}&abrType=BR-AVC-DASH'.format(base=base_session, hid=profile_settings['household_id'], eventid=program_id,id=profile_settings['ziggo_profile_id'])
-            log(session)
-            download = requests.request("POST", session, headers=headers)
-            code = download.status_code
-
-            log('getplayurl; replay sessionurl response: {}'.format(download))
-
-            wvtoken = download.headers['x-streaming-token']
-
+            #if replay_tv
+            print("replay")
+            contentid = replay_layer()[0]
+            wvtoken = replay_layer()[1]
 
         #log('URL {}'.format(CONST_URLS['token_url']))
         #log('Data {}'.format(data))
@@ -206,7 +255,7 @@ def api_get_play_token(locator=None, path=None, force=0):
         if not locator == profile_settings['drm_locator']:
             return False
 
-        profile_settings['contentid'] = download.json()['drmContentId']
+        profile_settings['contentid'] = contentid
         profile_settings['tokenrun'] = 0
         profile_settings['drm_path'] = path
         profile_settings['drm_token'] = wvtoken
