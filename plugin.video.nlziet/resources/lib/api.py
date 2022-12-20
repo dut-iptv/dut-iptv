@@ -364,22 +364,19 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     except:
         pass
 
-    if type == 'channel' and friendly:
-        channel_url = '{base_url}/v7/epg/locations/{friendly}/live/1?fromDate={date}'.format(base_url=CONST_URLS['api'], friendly=friendly, date=datetime.datetime.now().strftime("%Y-%m-%dT%H%M%S"))
+    if type == 'channel':
+        channel_url = '{base_url}/v8/epg/programlocations/live'.format(base_url=CONST_URLS['api'])
 
         download = api_download(url=channel_url, type='get', headers=None, data=None, json_data=False, return_json=True)
         data = download['data']
-        code = download['code']
+        code = download['code']       
 
         if not code or not code == 200 or not data:
             return playdata
 
-        for row in data:
-            if not check_key(row, 'Channel') or not check_key(row, 'Locations'):
-                return playdata
-
-            for row2 in row['Locations']:
-                id = row2['LocationId']
+        for row in data["data"]:
+            if row["channel"]["id"] == channel:
+                id = row["programLocations"][0]["assetId"]
     elif not type == 'vod':
         detail_url = '{base_url}/v7/content/detail/{id}'.format(base_url=CONST_URLS['api'], id=id)
 
