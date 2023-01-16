@@ -1,0 +1,604 @@
+#EXTM3U
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000001_019401&id={catchup-id}" group-title="TV" tvg-chno="1" tvg-id="lgi-nl-prod-master:NL_000001_019401" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/npo1.png?style=content-station-logo-xlarge" tvg-name="NPO 1",NPO 1
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000001_019401&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000001_019401/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000001_019401_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000002_019402&id={catchup-id}" group-title="TV" tvg-chno="2" tvg-id="lgi-nl-prod-master:NL_000002_019402" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/npo2.png?style=content-station-logo-xlarge" tvg-name="NPO 2",NPO 2
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000002_019402&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000002_019402/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000002_019402_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000003_019405&id={catchup-id}" group-title="TV" tvg-chno="3" tvg-id="lgi-nl-prod-master:NL_000003_019405" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/npo3.png?style=content-station-logo-xlarge" tvg-name="NPO 3",NPO 3
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000003_019405&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000003_019405/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000003_019405_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000004_019461&id={catchup-id}" group-title="TV" tvg-chno="4" tvg-id="lgi-nl-prod-master:NL_000004_019461" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtl4_v6.png?style=content-station-logo-xlarge" tvg-name="RTL 4",RTL 4
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000004_019461&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000004_019461/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000004_019461_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000005_019462&id={catchup-id}" group-title="TV" tvg-chno="5" tvg-id="lgi-nl-prod-master:NL_000005_019462" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtl5_2017.png?style=content-station-logo-xlarge" tvg-name="RTL 5",RTL 5
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000005_019462&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000005_019462/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000005_019462_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000006_019130&id={catchup-id}" group-title="TV" tvg-chno="6" tvg-id="lgi-nl-prod-master:NL_000006_019130" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/sbs6_2018.png?style=content-station-logo-xlarge" tvg-name="SBS 6",SBS6
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000006_019130&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000006_019130/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000006_019130_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000007_019181&id={catchup-id}" group-title="TV" tvg-chno="7" tvg-id="lgi-nl-prod-master:NL_000007_019181" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtl7_2017.png?style=content-station-logo-xlarge" tvg-name="RTL 7",RTL 7
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000007_019181&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000007_019181/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000007_019181_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000008_019442&id={catchup-id}" group-title="TV" tvg-chno="8" tvg-id="lgi-nl-prod-master:NL_000008_019442" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/veronica_disney_2018.png?style=content-station-logo-xlarge" tvg-name="Veronica/Disney XD",Veronica / Disney XD
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000008_019442&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000008_019442/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000008_019442_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000009_019024&id={catchup-id}" group-title="TV" tvg-chno="9" tvg-id="lgi-nl-prod-master:NL_000009_019024" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/net5_5.png?style=content-station-logo-xlarge" tvg-name="Net 5",Net5
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000009_019024&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000009_019024/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000009_019024_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000010_019422&id={catchup-id}" group-title="TV" tvg-chno="10" tvg-id="lgi-nl-prod-master:NL_000010_019422" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtl8_2017.png?style=content-station-logo-xlarge" tvg-name="RTL 8",RTL 8
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000010_019422&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000010_019422/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000010_019422_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000011_019563&id={catchup-id}" group-title="TV" tvg-chno="11" tvg-id="lgi-nl-prod-master:NL_000011_019563" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/fox_v2.png?style=content-station-logo-xlarge" tvg-name="FOX NL",FOX
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000011_019563&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000011_019563/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000011_019563_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000012_019191&id={catchup-id}" group-title="TV" tvg-chno="12" tvg-id="lgi-nl-prod-master:NL_000012_019191" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtl_z.png?style=content-station-logo-xlarge" tvg-name="RTL Z",RTL Z
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000012_019191&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000012_019191/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000012_019191_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000013_019327&id={catchup-id}" group-title="TV" tvg-chno="13" tvg-id="lgi-nl-prod-master:NL_000013_019327" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ziggo_tv_1.png?style=content-station-logo-xlarge" tvg-name="Ziggo TV",Ziggo TV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000013_019327&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000013_019327/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000013_019327_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000014_019661&id={catchup-id}" group-title="TV" tvg-chno="14" tvg-id="lgi-nl-prod-master:NL_000014_019661" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ziggo_sport_sport_2021.png?style=content-station-logo-xlarge" tvg-name="Ziggo Sport",Ziggo Sport
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000014_019661&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000014_019661/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000014_019661_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000015_019166&id={catchup-id}" group-title="TV" tvg-chno="15" tvg-id="ComedyCentralNetherlands.nl" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/comedy_central_v2.png?style=content-station-logo-xlarge" tvg-name="Comedy Central Nederland",Comedy Central
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000015_019166&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000015_019166/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000015_019166_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000016_019388&id={catchup-id}" group-title="TV" tvg-chno="16" tvg-id="SpikeNetherlands.nl" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/paramount_network_2022.png?style=content-station-logo-xlarge" tvg-name="Spike Nederland",Paramount Network
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000016_019388&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000016_019388/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000016_019388_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000017_019222&id={catchup-id}" group-title="TV" tvg-chno="17" tvg-id="DiscoveryChannelNetherlands.nl" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/discovery_hd_v2.png?style=content-station-logo-xlarge" tvg-name="Discovery Channel Nederland",Discovery
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000017_019222&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000017_019222/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000017_019222_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000018_019221&id={catchup-id}" group-title="TV" tvg-chno="18" tvg-id="NationalGeographicNetherlands.nl" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/nat_geo_v3.png?style=content-station-logo-xlarge" tvg-name="National Geographic Nederland",National Geographic
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000018_019221&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000018_019221/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000018_019221_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000019_019671&id={catchup-id}" group-title="TV" tvg-chno="19" tvg-id="lgi-nl-prod-master:NL_000019_019671" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/sbs9_2018.png?style=content-station-logo-xlarge" tvg-name="SBS 9",SBS9
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000019_019671&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000019_019671/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000019_019671_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000020_019432&id={catchup-id}" group-title="TV" tvg-chno="20" tvg-id="lgi-nl-prod-master:NL_000020_019432" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/eurosport1_v2.png?style=content-station-logo-xlarge" tvg-name="Eurosport 1",Eurosport 1
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000020_019432&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000020_019432/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000020_019432_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000021_019566&id={catchup-id}" group-title="TV" tvg-chno="21" tvg-id="TLCNetherlands.nl" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/TLC_2022.png?style=content-station-logo-xlarge" tvg-name="TLC Nederland",TLC
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000021_019566&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000021_019566/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000021_019566_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000022_019328&id={catchup-id}" group-title="TV" tvg-chno="22" tvg-id="BBCFirstBenelux.uk" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/bbc_first.png?style=content-station-logo-xlarge" tvg-name="BBC First Nederland",BBC First
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000022_019328&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000022_019328/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000022_019328_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000023_019363&id={catchup-id}" group-title="TV" tvg-chno="23" tvg-id="MTVNetherlands.nl" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/mtv_hd.png?style=content-station-logo-xlarge" tvg-name="MTV NL",MTV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000023_019363&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000023_019363/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000023_019363_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000024_019701&id={catchup-id}" group-title="TV" tvg-chno="24" tvg-id="lgi-nl-prod-master:NL_000024_019701" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/24_kitchen_2022.png?style=content-station-logo-xlarge" tvg-name="24Kitchen",24Kitchen
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000024_019701&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000024_019701/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000024_019701_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000025_019708&id={catchup-id}" group-title="TV" tvg-chno="25" tvg-id="lgi-nl-prod-master:NL_000025_019708" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/xite_2017.png?style=content-station-logo-xlarge" tvg-name="XITE",XITE
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000025_019708&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000025_019708/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000025_019708_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000027_019330&id={catchup-id}" group-title="TV" tvg-chno="26" tvg-id="DisneyChannelNetherlands.nl" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/disney_channel_2022.png?style=content-station-logo-xlarge" tvg-name="Disney Channel Nederland",Disney Channel
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000027_019330&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000027_019330/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000027_019330_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000028_019705&id={catchup-id}" group-title="TV" tvg-chno="27" tvg-id="HistoryNetherlands.nl" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/historyhd.png?style=content-station-logo-xlarge" tvg-name="History Benelux",HISTORY
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000028_019705&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000028_019705/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000028_019705_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000029_019046&id={catchup-id}" group-title="TV" tvg-chno="28" tvg-id="NickelodeonNetherlands.nl" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/nickelodeon_v5.png?style=content-station-logo-xlarge" tvg-name="Nickelodeon",Nickelodeon
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000029_019046&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000029_019046/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000029_019046_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000030_019152&id={catchup-id}" group-title="TV" tvg-chno="29" tvg-id="lgi-nl-prod-master:NL_000030_019152" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ons_2018.png?style=content-station-logo-xlarge" tvg-name="ONS",ONS
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000030_019152&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000030_019152/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000030_019152_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000031_019362&id={catchup-id}" group-title="TV" tvg-chno="30" tvg-id="NL_000031_019362" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/een_v3.png?style=content-station-logo-xlarge" tvg-name="Één",één
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000031_019362&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000031_019362/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000031_019362_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000032_019226&id={catchup-id}" group-title="TV" tvg-chno="31" tvg-id="NL_000032_019226" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/canvas_v2.png?style=content-station-logo-xlarge" tvg-name="Canvas",Canvas
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000032_019226&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000032_019226/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000032_019226_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000033_019025&id={catchup-id}" group-title="TV" tvg-chno="32" tvg-id="NL_000033_019025" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ketnet_v2.png?style=content-station-logo-xlarge" tvg-name="Ketnet",Ketnet
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000033_019025&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000033_019025/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000033_019025_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 group-title="TV" tvg-chno="33" tvg-id="lgi-nl-prod-master:NL_000034_020027" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ard_hd.png?style=content-station-logo-xlarge" tvg-name="ARD",ARD
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000034_020027&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000034_020027/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000034_020027_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 group-title="TV" tvg-chno="34" tvg-id="NL_000035_020028" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/zdf_hd.png?style=content-station-logo-xlarge" tvg-name="ZDF",ZDF
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000035_020028&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000035_020028/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000035_020028_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 group-title="TV" tvg-chno="35" tvg-id="lgi-nl-prod-master:NL_000036_019465" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/wdr.png?style=content-station-logo-xlarge" tvg-name="WDR",WDR
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000036_019465&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000036_019465/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000036_019465_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 group-title="TV" tvg-chno="36" tvg-id="NL_000037_019186" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ndr.png?style=content-station-logo-xlarge" tvg-name="NDR Fernsehen Hamburg",NDR
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000037_019186&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000037_019186/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000037_019186_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 group-title="TV" tvg-chno="37" tvg-id="NL_000038_019063" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtl_television_v2.png?style=content-station-logo-xlarge" tvg-name="RTL",RTL
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000038_019063&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000038_019063/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000038_019063_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 group-title="TV" tvg-chno="38" tvg-id="NL_000039_019153" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/sat_1.png?style=content-station-logo-xlarge" tvg-name="Sat. 1",Sat. 1
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000039_019153&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000039_019153/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000039_019153_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 group-title="TV" tvg-chno="39" tvg-id="NL_000040_020022" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/bbc_one_hd.png?style=content-station-logo-xlarge" tvg-name="BBC One",BBC One
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000040_020022&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000040_020022/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000040_020022_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 group-title="TV" tvg-chno="40" tvg-id="NL_000041_019369" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/bbc_two_hd.png?style=content-station-logo-xlarge" tvg-name="BBC Two",BBC Two
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000041_019369&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000041_019369/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000041_019369_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000044_019491&id={catchup-id}" group-title="TV" tvg-chno="41" tvg-id="lgi-nl-prod-master:NL_000044_019491" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/bbc_entertainment.png?style=content-station-logo-xlarge" tvg-name="BBC Entertainment",BBC Entertainment
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000044_019491&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000044_019491/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000044_019491_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000045_019354&id={catchup-id}" group-title="TV" tvg-chno="42" tvg-id="TV5MondeEurope.fr" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/tv5_monde_2022.png?style=content-station-logo-xlarge" tvg-name="TV5Monde Europe",TV5Monde
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000045_019354&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000045_019354/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000045_019354_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000046_020053&id={catchup-id}" group-title="TV" tvg-chno="43" tvg-id="lgi-nl-prod-master:NL_000046_020053" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/arte.png?style=content-station-logo-xlarge" tvg-name="Arte",Arte
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000046_020053&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000046_020053/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000046_020053_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000047_019428&id={catchup-id}" group-title="TV" tvg-chno="44" tvg-id="lgi-nl-prod-master:NL_000047_019428" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/tve.png?style=content-station-logo-xlarge" tvg-name="TVE",TVE
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000047_019428&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000047_019428/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000047_019428_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000048_020052&id={catchup-id}" group-title="TV" tvg-chno="45" tvg-id="lgi-nl-prod-master:NL_000048_020052" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/mediaset_italia.png?style=content-station-logo-xlarge" tvg-name="Mediaset Italia",Mediaset Italia
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000048_020052&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000048_020052/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000048_020052_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000049_019514&id={catchup-id}" group-title="TV" tvg-chno="46" tvg-id="lgi-nl-prod-master:NL_000049_019514" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtv7.png?style=content-station-logo-xlarge" tvg-name="RTV-7",RTV-7
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000049_019514&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000049_019514/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000049_019514_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000050_019353&id={catchup-id}" group-title="TV" tvg-chno="47" tvg-id="lgi-nl-prod-master:NL_000050_019353" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/trt_turk.png?style=content-station-logo-xlarge" tvg-name="TRT Türk",TRT Türk
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000050_019353&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000050_019353/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000050_019353_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000051_019047&id={catchup-id}" group-title="TV" tvg-chno="48" tvg-id="lgi-nl-prod-master:NL_000051_019047" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/2m.png?style=content-station-logo-xlarge" tvg-name="2M",2M
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000051_019047&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000051_019047/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000051_019047_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000214_020004&id={catchup-id}" group-title="TV" tvg-chno="49" tvg-id="lgi-nl-prod-master:NL_000214_020004" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/njam_2022.png?style=content-station-logo-xlarge" tvg-name="njam!",njam!
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000214_020004&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000214_020004/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000214_020004_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000063_019307&id={catchup-id}" group-title="TV" tvg-chno="50" tvg-id="lgi-nl-prod-master:NL_000063_019307" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/npo1_extra_2022.png?style=content-station-logo-xlarge" tvg-name="NPO 1 Extra",NPO 1 Extra
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000063_019307&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000063_019307/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000063_019307_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000080_019484&id={catchup-id}" group-title="TV" tvg-chno="51" tvg-id="lgi-nl-prod-master:NL_000080_019484" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/npo2_extra_2022.png?style=content-station-logo-xlarge" tvg-name="NPO 2 Extra",NPO 2 Extra
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000080_019484&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000080_019484/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000080_019484_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000114_019151&id={catchup-id}" group-title="TV" tvg-chno="52" tvg-id="lgi-nl-prod-master:NL_000114_019151" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/npo_politiek_nieuws_2022.png?style=content-station-logo-xlarge" tvg-name="NPO Politiek en Nieuws",NPO Politiek en Nieuws
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000114_019151&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000114_019151/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000114_019151_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000213_020003&id={catchup-id}" group-title="TV" tvg-chno="53" tvg-id="lgi-nl-prod-master:NL_000213_020003" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/filmbox_2022.png?style=content-station-logo-xlarge" tvg-name="FilmBox",FilmBox
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000213_020003&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000213_020003/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000213_020003_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000052_019655&id={catchup-id}" group-title="TV" tvg-chno="54" tvg-id="lgi-nl-prod-master:NL_000052_019655" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/film1_premiere_1.png?style=content-station-logo-xlarge" tvg-name="Film1 Premiere",Film1 Premiere
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000052_019655&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000052_019655/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000052_019655_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000053_019653&id={catchup-id}" group-title="TV" tvg-chno="55" tvg-id="lgi-nl-prod-master:NL_000053_019653" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/film1_action_1.png?style=content-station-logo-xlarge" tvg-name="Film1 Action",Film1 Action
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000053_019653&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000053_019653/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000053_019653_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000054_019654&id={catchup-id}" group-title="TV" tvg-chno="56" tvg-id="lgi-nl-prod-master:NL_000054_019654" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/film1_family_1.png?style=content-station-logo-xlarge" tvg-name="Film1 Family",Film1 Family
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000054_019654&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000054_019654/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000054_019654_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000055_019645&id={catchup-id}" group-title="TV" tvg-chno="57" tvg-id="lgi-nl-prod-master:NL_000055_019645" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/film1_drama_1.png?style=content-station-logo-xlarge" tvg-name="Film1 Drama",Film1 Drama
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000055_019645&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000055_019645/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000055_019645_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000056_019483&id={catchup-id}" group-title="TV" tvg-chno="58" tvg-id="lgi-nl-prod-master:NL_000056_019483" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtl_crime2.png?style=content-station-logo-xlarge" tvg-name="RTL Crime",RTL Crime
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000056_019483&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000056_019483/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000056_019483_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000057_019493&id={catchup-id}" group-title="TV" tvg-chno="59" tvg-id="lgi-nl-prod-master:NL_000057_019493" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/crime_invest.png?style=content-station-logo-xlarge" tvg-name="Crime+Investigation",Crime+Investigation
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000057_019493&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000057_019493/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000057_019493_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000058_019381&id={catchup-id}" group-title="TV" tvg-chno="60" tvg-id="lgi-nl-prod-master:NL_000058_019381" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/investigation_discovery_2020.png?style=content-station-logo-xlarge" tvg-name="ID",ID
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000058_019381&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000058_019381/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000058_019381_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000059_019252&id={catchup-id}" group-title="TV" tvg-chno="61" tvg-id="lgi-nl-prod-master:NL_000059_019252" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/comedy_central_extra_2018.png?style=content-station-logo-xlarge" tvg-name="Comedy Central Extra",Comedy Central Extra
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000059_019252&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000059_019252/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000059_019252_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000060_019297&id={catchup-id}" group-title="TV" tvg-chno="62" tvg-id="lgi-nl-prod-master:NL_000060_019297" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/shorts_tv2.png?style=content-station-logo-xlarge" tvg-name="Shorts TV",Shorts TV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000060_019297&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000060_019297/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000060_019297_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 group-title="TV" tvg-chno="63" tvg-id="lgi-nl-prod-master:NL_000061_019331" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/e_entertainment_new.png?style=content-station-logo-xlarge" tvg-name="E!",E!
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000061_019331&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000061_019331/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000061_019331_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000064_019275&id={catchup-id}" group-title="TV" tvg-chno="64" tvg-id="lgi-nl-prod-master:NL_000064_019275" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/outtv_v4.png?style=content-station-logo-xlarge" tvg-name="OUTTV",OUTTV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000064_019275&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000064_019275/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000064_019275_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000067_020024&id={catchup-id}" group-title="TV" tvg-chno="65" tvg-id="lgi-nl-prod-master:NL_000067_020024" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/fashiontv.png?style=content-station-logo-xlarge" tvg-name="Fashion TV HD",Fashion TV HD
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000067_020024&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000067_020024/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000067_020024_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000068_020055&id={catchup-id}" group-title="TV" tvg-chno="66" tvg-id="lgi-nl-prod-master:NL_000068_020055" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/myzen_tv.png?style=content-station-logo-xlarge" tvg-name="MyZen TV",MyZen TV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000068_020055&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000068_020055/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000068_020055_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000069_020071&id={catchup-id}" group-title="TV" tvg-chno="67" tvg-id="lgi-nl-prod-master:NL_000069_020071" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/horse_country.png?style=content-station-logo-xlarge" tvg-name="Horse & Country TV",Horse & Country TV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000069_020071&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000069_020071/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000069_020071_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000072_019298&id={catchup-id}" group-title="TV" tvg-chno="68" tvg-id="lgi-nl-prod-master:NL_000072_019298" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtl_lounge_v2.png?style=content-station-logo-xlarge" tvg-name="RTL Lounge",RTL Lounge
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000072_019298&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000072_019298/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000072_019298_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000216_019122&id={catchup-id}" group-title="TV" tvg-chno="69" tvg-id="lgi-nl-prod-master:NL_000216_019122" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/curiosity_channel_2022.png?style=content-station-logo-xlarge" tvg-name="Curiosity Channel",Curiosity Channel
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000216_019122&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000216_019122/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000216_019122_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000075_019246&id={catchup-id}" group-title="TV" tvg-chno="70" tvg-id="lgi-nl-prod-master:NL_000075_019246" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/discovery_science_2017.png?style=content-station-logo-xlarge" tvg-name="Discovery Science",Discovery Science
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000075_019246&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000075_019246/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000075_019246_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000077_019706&id={catchup-id}" group-title="TV" tvg-chno="71" tvg-id="lgi-nl-prod-master:NL_000077_019706" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/natgeowild_hd_v2.png?style=content-station-logo-xlarge" tvg-name="National Geographic WILD",National Geographic WILD
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000077_019706&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000077_019706/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000077_019706_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000191_019261&id={catchup-id}" group-title="TV" tvg-chno="72" tvg-id="lgi-nl-prod-master:NL_000191_019261" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/love_nature_hd.png?style=content-station-logo-xlarge" tvg-name="Love Nature",Love Nature
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000191_019261&id=http://wp-obc4-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000191_019261/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000191_019261_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000078_020002&id={catchup-id}" group-title="TV" tvg-chno="73" tvg-id="lgi-nl-prod-master:NL_000078_020002" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/animal_planet_hd_v2.png?style=content-station-logo-xlarge" tvg-name="Animal Planet",Animal Planet
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000078_020002&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000078_020002/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000078_020002_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000081_020051&id={catchup-id}" group-title="TV" tvg-chno="74" tvg-id="lgi-nl-prod-master:NL_000081_020051" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/family7.png?style=content-station-logo-xlarge" tvg-name="Family7",Family7
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000081_020051&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000081_020051/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000081_020051_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000193_019342&id={catchup-id}" group-title="TV" tvg-chno="75" tvg-id="lgi-nl-prod-master:NL_000193_019342" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/tommy_tv.png?style=content-station-logo-xlarge" tvg-name="Tommy TV",Tommy TV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000193_019342&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000193_019342/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000193_019342_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000084_019301&id={catchup-id}" group-title="TV" tvg-chno="76" tvg-id="lgi-nl-prod-master:NL_000084_019301" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/nick_toons1.png?style=content-station-logo-xlarge" tvg-name="Nicktoons",Nicktoons
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000084_019301&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000084_019301/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000084_019301_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000085_019494&id={catchup-id}" group-title="TV" tvg-chno="77" tvg-id="lgi-nl-prod-master:NL_000085_019494" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/nick_music.png?style=content-station-logo-xlarge" tvg-name="Nick Music",Nick Music
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000085_019494&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000085_019494/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000085_019494_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000087_019303&id={catchup-id}" group-title="TV" tvg-chno="78" tvg-id="lgi-nl-prod-master:NL_000087_019303" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/nick_jr.png?style=content-station-logo-xlarge" tvg-name="Nick Jr.",Nick Jr.
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000087_019303&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000087_019303/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000087_019303_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000088_019251&id={catchup-id}" group-title="TV" tvg-chno="79" tvg-id="lgi-nl-prod-master:NL_000088_019251" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/cartoon_network.png?style=content-station-logo-xlarge" tvg-name="Cartoon Network",Cartoon Network
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000088_019251&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000088_019251/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000088_019251_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000090_019492&id={catchup-id}" group-title="TV" tvg-chno="80" tvg-id="lgi-nl-prod-master:NL_000090_019492" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/boomerang_1.png?style=content-station-logo-xlarge" tvg-name="Boomerang",Boomerang
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000090_019492&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000090_019492/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000090_019492_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000091_019490&id={catchup-id}" group-title="TV" tvg-chno="81" tvg-id="lgi-nl-prod-master:NL_000091_019490" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/babytv_2018.png?style=content-station-logo-xlarge" tvg-name="BabyTV",BabyTV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000091_019490&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000091_019490/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000091_019490_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000215_020005&id={catchup-id}" group-title="TV" tvg-chno="82" tvg-id="lgi-nl-prod-master:NL_000215_020005" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ducktv_2022.png?style=content-station-logo-xlarge" tvg-name="ducktv",ducktv
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000215_020005&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000215_020005/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000215_020005_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000093_019299&id={catchup-id}" group-title="TV" tvg-chno="83" tvg-id="lgi-nl-prod-master:NL_000093_019299" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtl_telekids_2017.png?style=content-station-logo-xlarge" tvg-name="RTL Telekids",RTL Telekids
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000093_019299&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000093_019299/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000093_019299_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000212_020042&id={catchup-id}" group-title="TV" tvg-chno="84" tvg-id="lgi-nl-prod-master:NL_000212_020042" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/nickelodeon_ukraine_2022.png?style=content-station-logo-xlarge" tvg-name="Nickelodeon Ukraine",Nickelodeon Ukraine
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000212_020042&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000212_020042/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000212_020042_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000094_019321&id={catchup-id}" group-title="TV" tvg-chno="85" tvg-id="lgi-nl-prod-master:NL_000094_019321" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ziggo_sport_select_2021.png?style=content-station-logo-xlarge" tvg-name="Ziggo Sport Select",Ziggo Sport Select
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000094_019321&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000094_019321/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000094_019321_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000095_019371&id={catchup-id}" group-title="TV" tvg-chno="86" tvg-id="lgi-nl-prod-master:NL_000095_019371" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ziggo_sport_voetbal_2021.png?style=content-station-logo-xlarge" tvg-name="Ziggo Sport Voetbal",Ziggo Sport Voetbal
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000095_019371&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000095_019371/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000095_019371_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000096_019382&id={catchup-id}" group-title="TV" tvg-chno="87" tvg-id="lgi-nl-prod-master:NL_000096_019382" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ziggo_sport_golf_2021.png?style=content-station-logo-xlarge" tvg-name="Ziggo Sport Golf",Ziggo Sport Golf
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000096_019382&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000096_019382/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000096_019382_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000097_019370&id={catchup-id}" group-title="TV" tvg-chno="88" tvg-id="lgi-nl-prod-master:NL_000097_019370" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ziggo_sport_racing_2021.png?style=content-station-logo-xlarge" tvg-name="Ziggo Sport Racing",Ziggo Sport Racing
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000097_019370&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000097_019370/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000097_019370_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000098_019255&id={catchup-id}" group-title="TV" tvg-chno="89" tvg-id="lgi-nl-prod-master:NL_000098_019255" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ziggo_sport_docu_2021.png?style=content-station-logo-xlarge" tvg-name="Ziggo Sport Docu",Ziggo Sport Docu
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000098_019255&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000098_019255/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000098_019255_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000099_019256&id={catchup-id}" group-title="TV" tvg-chno="90" tvg-id="lgi-nl-prod-master:NL_000099_019256" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/ziggo_sport_tennis_2021.png?style=content-station-logo-xlarge" tvg-name="Ziggo Sport Tennis",Ziggo Sport Tennis
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000099_019256&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000099_019256/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000099_019256_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000103_019581&id={catchup-id}" group-title="TV" tvg-chno="91" tvg-id="lgi-nl-prod-master:NL_000103_019581" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/eurosport2_v2.png?style=content-station-logo-xlarge" tvg-name="Eurosport 2",Eurosport 2
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000103_019581&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000103_019581/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000103_019581_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000107_019441&id={catchup-id}" group-title="TV" tvg-chno="92" tvg-id="lgi-nl-prod-master:NL_000107_019441" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/espn_2021.png?style=content-station-logo-xlarge" tvg-name="ESPN",ESPN
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000107_019441&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000107_019441/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000107_019441_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000108_019561&id={catchup-id}" group-title="TV" tvg-chno="93" tvg-id="lgi-nl-prod-master:NL_000108_019561" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/espn2_2021.png?style=content-station-logo-xlarge" tvg-name="ESPN 2",ESPN 2
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000108_019561&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000108_019561/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000108_019561_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000109_019464&id={catchup-id}" group-title="TV" tvg-chno="94" tvg-id="lgi-nl-prod-master:NL_000109_019464" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/espn3_2021.png?style=content-station-logo-xlarge" tvg-name="ESPN 3",ESPN 3
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000109_019464&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000109_019464/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000109_019464_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000110_019562&id={catchup-id}" group-title="TV" tvg-chno="95" tvg-id="lgi-nl-prod-master:NL_000110_019562" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/espn4_2021.png?style=content-station-logo-xlarge" tvg-name="ESPN 4",ESPN 4
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000110_019562&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000110_019562/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000110_019562_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000115_019447&id={catchup-id}" group-title="TV" tvg-chno="96" tvg-id="lgi-nl-prod-master:NL_000115_019447" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/cnn.png?style=content-station-logo-xlarge" tvg-name="CNN",CNN
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000115_019447&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000115_019447/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000115_019447_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000116_019005&id={catchup-id}" group-title="TV" tvg-chno="97" tvg-id="lgi-nl-prod-master:NL_000116_019005" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/bbc_world_news_v2.png?style=content-station-logo-xlarge" tvg-name="BBC World News",BBC World News
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000116_019005&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000116_019005/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000116_019005_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000117_019351&id={catchup-id}" group-title="TV" tvg-chno="98" tvg-id="lgi-nl-prod-master:NL_000117_019351" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/euronews_1.png?style=content-station-logo-xlarge" tvg-name="Euronews",Euronews
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000117_019351&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000117_019351/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000117_019351_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000118_019350&id={catchup-id}" group-title="TV" tvg-chno="99" tvg-id="lgi-nl-prod-master:NL_000118_019350" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/al_jazeera_english1.png?style=content-station-logo-xlarge" tvg-name="Aljazeera English",Aljazeera English
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000118_019350&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000118_019350/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000118_019350_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000119_019481&id={catchup-id}" group-title="TV" tvg-chno="100" tvg-id="lgi-nl-prod-master:NL_000119_019481" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/cnbc.png?style=content-station-logo-xlarge" tvg-name="CNBC Europe",CNBC Europe
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000119_019481&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000119_019481/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000119_019481_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000120_020046&id={catchup-id}" group-title="TV" tvg-chno="101" tvg-id="lgi-nl-prod-master:NL_000120_020046" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/cgtn.png?style=content-station-logo-xlarge" tvg-name="CGTN",CGTN
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000120_020046&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000120_020046/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000120_020046_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000122_019495&id={catchup-id}" group-title="TV" tvg-chno="102" tvg-id="lgi-nl-prod-master:NL_000122_019495" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/tv_538_2.png?style=content-station-logo-xlarge" tvg-name="TV538",TV538
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000122_019495&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000122_019495/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000122_019495_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000123_019304&id={catchup-id}" group-title="TV" tvg-chno="103" tvg-id="lgi-nl-prod-master:NL_000123_019304" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/mtv_90s.png?style=content-station-logo-xlarge" tvg-name="MTV 90s",MTV 90s
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000123_019304&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000123_019304/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000123_019304_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000126_019486&id={catchup-id}" group-title="TV" tvg-chno="104" tvg-id="lgi-nl-prod-master:NL_000126_019486" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/mtv_hits.png?style=content-station-logo-xlarge" tvg-name="MTV Hits",MTV Hits
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000126_019486&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000126_019486/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000126_019486_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000135_020029&id={catchup-id}" group-title="TV" tvg-chno="105" tvg-id="lgi-nl-prod-master:NL_000135_020029" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/mtv_live_hd.png?style=content-station-logo-xlarge" tvg-name="MTV Live HD",MTV Live HD
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000135_020029&id=http://wp-obc1-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000135_020029/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000135_020029_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000125_019294&id={catchup-id}" group-title="TV" tvg-chno="106" tvg-id="lgi-nl-prod-master:NL_000125_019294" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/slam_tv_v2.png?style=content-station-logo-xlarge" tvg-name="SLAM!TV",SLAM!TV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000125_019294&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000125_019294/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000125_019294_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000124_019487&id={catchup-id}" group-title="TV" tvg-chno="107" tvg-id="lgi-nl-prod-master:NL_000124_019487" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/dance_television.png?style=content-station-logo-xlarge" tvg-name="DanceTelevision",DanceTelevision
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000124_019487&id=http://wp-obc5-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000124_019487/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000124_019487_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000127_019295&id={catchup-id}" group-title="TV" tvg-chno="108" tvg-id="lgi-nl-prod-master:NL_000127_019295" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/stingray_lite_tv.png?style=content-station-logo-xlarge" tvg-name="Stingray LiteTV",Stingray LiteTV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000127_019295&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000127_019295/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000127_019295_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000128_019254&id={catchup-id}" group-title="TV" tvg-chno="109" tvg-id="lgi-nl-prod-master:NL_000128_019254" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/mtv80s.png?style=content-station-logo-xlarge" tvg-name="MTV 80s",MTV 80s
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000128_019254&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000128_019254/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000128_019254_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000133_019271&id={catchup-id}" group-title="TV" tvg-chno="110" tvg-id="lgi-nl-prod-master:NL_000133_019271" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/100pnl_tv.png?style=content-station-logo-xlarge" tvg-name="100% NL TV",100% NL TV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000133_019271&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000133_019271/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000133_019271_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000132_019278&id={catchup-id}" group-title="TV" tvg-chno="111" tvg-id="lgi-nl-prod-master:NL_000132_019278" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/tv_oranje.png?style=content-station-logo-xlarge" tvg-name="TV Oranje",TV Oranje
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000132_019278&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000132_019278/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000132_019278_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000134_019296&id={catchup-id}" group-title="TV" tvg-chno="112" tvg-id="lgi-nl-prod-master:NL_000134_019296" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/192_tv.png?style=content-station-logo-xlarge" tvg-name="192TV",192TV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000134_019296&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000134_019296/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000134_019296_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000131_019248&id={catchup-id}" group-title="TV" tvg-chno="113" tvg-id="lgi-nl-prod-master:NL_000131_019248" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/stingray_djazz.png?style=content-station-logo-xlarge" tvg-name="Stingray DJAZZ",Stingray DJAZZ
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000131_019248&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000131_019248/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000131_019248_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000130_019274&id={catchup-id}" group-title="TV" tvg-chno="114" tvg-id="lgi-nl-prod-master:NL_000130_019274" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/mezzo.png?style=content-station-logo-xlarge" tvg-name="Mezzo",Mezzo
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000130_019274&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000130_019274/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000130_019274_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000129_020044&id={catchup-id}" group-title="TV" tvg-chno="115" tvg-id="lgi-nl-prod-master:NL_000129_020044" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/stingray_classica.png?style=content-station-logo-xlarge" tvg-name="Stingray Classica",Stingray Classica
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000129_020044&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000129_020044/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000129_020044_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000136_019583&id={catchup-id}" group-title="TV" tvg-chno="116" tvg-id="lgi-nl-prod-master:NL_000136_019583" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtv_noord.png?style=content-station-logo-xlarge" tvg-name="RTV Noord",RTV Noord
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000136_019583&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000136_019583/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000136_019583_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000137_019214&id={catchup-id}" group-title="TV" tvg-chno="117" tvg-id="lgi-nl-prod-master:NL_000137_019214" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/omroep_friesland_1.png?style=content-station-logo-xlarge" tvg-name="Omrop Fryslân",Omrop Fryslân
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000137_019214&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000137_019214/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000137_019214_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000138_019591&id={catchup-id}" group-title="TV" tvg-chno="118" tvg-id="lgi-nl-prod-master:NL_000138_019591" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtv_drenthe_1.png?style=content-station-logo-xlarge" tvg-name="RTV Drenthe",RTV Drenthe
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000138_019591&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000138_019591/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000138_019591_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000139_019592&id={catchup-id}" group-title="TV" tvg-chno="119" tvg-id="lgi-nl-prod-master:NL_000139_019592" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtv_oost_1.png?style=content-station-logo-xlarge" tvg-name="RTV Oost",RTV Oost
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000139_019592&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000139_019592/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000139_019592_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000140_019594&id={catchup-id}" group-title="TV" tvg-chno="120" tvg-id="lgi-nl-prod-master:NL_000140_019594" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/omroep_gelderland.png?style=content-station-logo-xlarge" tvg-name="Omroep Gelderland",Omroep Gelderland
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000140_019594&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000140_019594/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000140_019594_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000141_019209&id={catchup-id}" group-title="TV" tvg-chno="121" tvg-id="lgi-nl-prod-master:NL_000141_019209" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/omroep_flevoland.png?style=content-station-logo-xlarge" tvg-name="Omroep Flevoland",Omroep Flevoland
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000141_019209&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000141_019209/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000141_019209_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000142_019211&id={catchup-id}" group-title="TV" tvg-chno="122" tvg-id="lgi-nl-prod-master:NL_000142_019211" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/nh_nieuws.png?style=content-station-logo-xlarge" tvg-name="NH Nieuws",NH Nieuws
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000142_019211&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000142_019211/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000142_019211_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000143_019207&id={catchup-id}" group-title="TV" tvg-chno="123" tvg-id="lgi-nl-prod-master:NL_000143_019207" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/rtv_utrecht_2.png?style=content-station-logo-xlarge" tvg-name="RTV Utrecht",RTV Utrecht
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000143_019207&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000143_019207/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000143_019207_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000144_019212&id={catchup-id}" group-title="TV" tvg-chno="124" tvg-id="lgi-nl-prod-master:NL_000144_019212" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/tv_west.png?style=content-station-logo-xlarge" tvg-name="RTV West",RTV West
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000144_019212&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000144_019212/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000144_019212_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000145_019208&id={catchup-id}" group-title="TV" tvg-chno="125" tvg-id="lgi-nl-prod-master:NL_000145_019208" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/tv_rijnmond_v2.png?style=content-station-logo-xlarge" tvg-name="RTV Rijnmond",RTV Rijnmond
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000145_019208&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000145_019208/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000145_019208_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000146_019213&id={catchup-id}" group-title="TV" tvg-chno="126" tvg-id="lgi-nl-prod-master:NL_000146_019213" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/omroep_zeeland2.png?style=content-station-logo-xlarge" tvg-name="Omroep Zeeland",Omroep Zeeland
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000146_019213&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000146_019213/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000146_019213_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000147_019593&id={catchup-id}" group-title="TV" tvg-chno="127" tvg-id="lgi-nl-prod-master:NL_000147_019593" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/omroep_brabant.png?style=content-station-logo-xlarge" tvg-name="Omroep Brabant",Omroep Brabant
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000147_019593&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000147_019593/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000147_019593_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000148_019144&id={catchup-id}" group-title="TV" tvg-chno="128" tvg-id="lgi-nl-prod-master:NL_000148_019144" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/l1_limburg_2022.png?style=content-station-logo-xlarge" tvg-name="L1 TV",L1 TV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000148_019144&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000148_019144/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000148_019144_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 group-title="TV" tvg-chno="129" tvg-id="lgi-nl-prod-master:NL_000149_019210" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/at5_new.png?style=content-station-logo-xlarge" tvg-name="AT5",AT5
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000149_019210&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000149_019210/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000149_019210_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000150_020075&id={catchup-id}" group-title="TV" tvg-chno="130" tvg-id="lgi-nl-prod-master:NL_000150_020075" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/utsav_plus.png?style=content-station-logo-xlarge" tvg-name="Utsav Plus",Utsav Plus
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000150_020075&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000150_020075/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000150_020075_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000151_020074&id={catchup-id}" group-title="TV" tvg-chno="131" tvg-id="lgi-nl-prod-master:NL_000151_020074" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/utsav_gold.png?style=content-station-logo-xlarge" tvg-name="Utsav Gold",Utsav Gold
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000151_020074&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000151_020074/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000151_020074_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000152_020077&id={catchup-id}" group-title="TV" tvg-chno="132" tvg-id="lgi-nl-prod-master:NL_000152_020077" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/zee-tv-2018.png?style=content-station-logo-xlarge" tvg-name="Zee TV",Zee TV
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000152_020077&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000152_020077/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000152_020077_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000153_020076&id={catchup-id}" group-title="TV" tvg-chno="133" tvg-id="lgi-nl-prod-master:NL_000153_020076" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/zee-cinema-2018.png?style=content-station-logo-xlarge" tvg-name="Zee Cinema",Zee Cinema
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000153_020076&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000153_020076/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000153_020076_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000154_020078&id={catchup-id}" group-title="TV" tvg-chno="134" tvg-id="lgi-nl-prod-master:NL_000154_020078" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/zing_2017.png?style=content-station-logo-xlarge" tvg-name="Zing",Zing
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000154_020078&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000154_020078/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000154_020078_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000155_020073&id={catchup-id}" group-title="TV" tvg-chno="135" tvg-id="lgi-nl-prod-master:NL_000155_020073" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/set_asia.png?style=content-station-logo-xlarge" tvg-name="SET Asia",SET Asia
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000155_020073&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000155_020073/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000155_020073_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000156_020072&id={catchup-id}" group-title="TV" tvg-chno="136" tvg-id="lgi-nl-prod-master:NL_000156_020072" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/show_tv.png?style=content-station-logo-xlarge" tvg-name="ShowTürk",ShowTürk
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000156_020072&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000156_020072/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000156_020072_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000157_019270&id={catchup-id}" group-title="TV" tvg-chno="137" tvg-id="lgi-nl-prod-master:NL_000157_019270" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/euro_d1.png?style=content-station-logo-xlarge" tvg-name="Euro D",Euro D
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000157_019270&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000157_019270/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000157_019270_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000158_019266&id={catchup-id}" group-title="TV" tvg-chno="138" tvg-id="lgi-nl-prod-master:NL_000158_019266" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/eurostar.png?style=content-station-logo-xlarge" tvg-name="Eurostar",Eurostar
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000158_019266&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000158_019266/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000158_019266_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000159_019273&id={catchup-id}" group-title="TV" tvg-chno="139" tvg-id="lgi-nl-prod-master:NL_000159_019273" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/haberturk.png?style=content-station-logo-xlarge" tvg-name="Habertürk",Habertürk
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000159_019273&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000159_019273/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000159_019273_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000160_019277&id={catchup-id}" group-title="TV" tvg-chno="140" tvg-id="lgi-nl-prod-master:NL_000160_019277" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/tv8.png?style=content-station-logo-xlarge" tvg-name="TV8 Int.",TV8 Int.
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000160_019277&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000160_019277/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000160_019277_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000162_019250&id={catchup-id}" group-title="TV" tvg-chno="141" tvg-id="lgi-nl-prod-master:NL_000162_019250" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/trt_cocuk.png?style=content-station-logo-xlarge" tvg-name="TRT Çocuk",TRT Çocuk
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000162_019250&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000162_019250/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000162_019250_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000163_019272&id={catchup-id}" group-title="TV" tvg-chno="142" tvg-id="lgi-nl-prod-master:NL_000163_019272" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/atv.png?style=content-station-logo-xlarge" tvg-name="ATV Avrupa",ATV Avrupa
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000163_019272&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000163_019272/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000163_019272_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 catchup="default" catchup-days="7" catchup-source="plugin://plugin.video.ziggo/?_=play_video&type=program&channel=lgi-nl-prod-master:NL_000164_020070&id={catchup-id}" group-title="TV" tvg-chno="143" tvg-id="lgi-nl-prod-master:NL_000164_020070" tvg-logo="https://staticqbr-nl-prod.prod.cdn.dmdsdp.com/image-service/ImagesEPG/EventImages/trt_muzik.png?style=content-station-logo-xlarge" tvg-name="TRT Müzik",TRT Müzik
+plugin://plugin.video.ziggo/?_=play_video&channel=lgi-nl-prod-master:NL_000164_020070&id=http://wp-obc2-live-vxtoken-nl-prod.prod.cdn.dmdsdp.com/dash/NL_000164_020070/manifest.mpd&%%&urn:orion:media:std:lgi-nl-prod-master:NL_000164_020070_ORION_Orion-DASH&type=channel&pvr=1&_l=.pvr
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="1" tvg-id="100feest" tvg-logo="https://www.nederland.fm/i/l/100feest.gif" tvg-name="100% Feest",100% Feest
+https://stream.100p.nl/web01_mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="2" tvg-id="100kerst" tvg-logo="https://www.nederland.fm/i/l/100kerst.gif" tvg-name="100% Kerst",100% Kerst
+https://stream.100p.nl/web05_mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="3" tvg-id="100pnl" tvg-logo="https://www.nederland.fm/i/l/100pnl.gif" tvg-name="100% NL",100% NL
+http://stream.100p.nl/100pctnl.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="4" tvg-id="538classics" tvg-logo="https://www.nederland.fm/i/l/538classics.gif" tvg-name="538 Classics",538 Classics
+https://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR08.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="5" tvg-id="538dancedept" tvg-logo="https://www.nederland.fm/i/l/538dancedept.gif" tvg-name="538 Dance Department",538 Dance Department
+http://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR01.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="6" tvg-id="538hitzone" tvg-logo="https://www.nederland.fm/i/l/538hitzone.gif" tvg-name="538 Hitzone",538 Hitzone
+http://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR11.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="7" tvg-id="538ibiza" tvg-logo="https://www.nederland.fm/i/l/538ibiza.gif" tvg-name="538 Ibiza",538 Ibiza
+http://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR19.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="8" tvg-id="538nonstop" tvg-logo="https://www.nederland.fm/i/l/538nonstop.gif" tvg-name="538 Non-stop",538 Non-stop
+http://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR09.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="9" tvg-id="538party" tvg-logo="https://www.nederland.fm/i/l/538party.gif" tvg-name="538 Party",538 Party
+https://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR16.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="10" tvg-id="538top50" tvg-logo="https://www.nederland.fm/i/l/538top50.gif" tvg-name="538 Top 50",538 Top 50
+https://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR13.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="11" tvg-id="arrowbluesrock" tvg-logo="https://www.nederland.fm/i/l/arrowbluesrock.gif" tvg-name="Arrow Blues Rock",Arrow Blues Rock
+https://playerservices.streamtheworld.com/api/livestream-redirect/ARROWBLUESBOX.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="12" tvg-id="arrow" tvg-logo="https://www.nederland.fm/i/l/arrow.gif" tvg-name="Arrow Rock",Arrow Rock
+https://stream.player.arrow.nl/arrow
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="13" tvg-id="bnr" tvg-logo="https://www.nederland.fm/i/l/bnr.gif" tvg-name="BNR",BNR
+https://stream.bnr.nl/bnr_mp3_128_03
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="14" tvg-id="candlelight" tvg-logo="https://www.nederland.fm/i/l/candlelight.gif" tvg-name="Candlelight",Candlelight
+http://playerservices.streamtheworld.com/api/livestream-redirect/CANDLELIGHT.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="15" tvg-id="classicfm" tvg-logo="https://www.nederland.fm/i/l/classicfm.gif" tvg-name="Classic NL",Classic NL
+https://playerservices.streamtheworld.com/api/livestream-redirect/classicfm.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="16" tvg-id="efteling" tvg-logo="https://www.nederland.fm/i/l/efteling.gif" tvg-name="Efteling Kids Radio",Efteling Kids Radio
+https://ice.cr6.streamzilla.xlcdn.com:8000/sz=efteling=hdstream
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="17" tvg-id="funx" tvg-logo="https://www.nederland.fm/i/l/funx.gif" tvg-name="FunX",FunX
+http://icecast.omroep.nl/funx-bb-mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="18" tvg-id="grandprix" tvg-logo="https://www.nederland.fm/i/l/grandprix.gif" tvg-name="Grand Prix Radio",Grand Prix Radio
+https://playerservices.streamtheworld.com/api/livestream-redirect/GRAND_PRIX_RADIO.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="19" tvg-id="joe" tvg-logo="https://www.nederland.fm/i/l/joe.gif" tvg-name="Joe",Joe
+https://icecast-qmusicnl-cdp.triple-it.nl/Joe_nl.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="20" tvg-id="kink" tvg-logo="https://www.nederland.fm/i/l/kink.gif" tvg-name="Kink",Kink
+http://playerservices.streamtheworld.com/api/livestream-redirect/KINK.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="21" tvg-id="lindaradio" tvg-logo="https://www.nederland.fm/i/l/lindaradio.gif" tvg-name="LINDA.Radio",LINDA.Radio
+https://playerservices.streamtheworld.com/api/livestream-redirect/juke_s02.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="22" tvg-id="3fm" tvg-logo="https://www.nederland.fm/i/l/3fm.gif" tvg-name="NPO 3FM",NPO 3FM
+https://icecast.omroep.nl/3fm-bb-mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="23" tvg-id="radio1" tvg-logo="https://www.nederland.fm/i/l/radio1.gif" tvg-name="NPO Radio 1",NPO Radio 1
+https://icecast.omroep.nl/radio1-bb-mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="24" tvg-id="radio2" tvg-logo="https://www.nederland.fm/i/l/radio2.gif" tvg-name="NPO Radio 2",NPO Radio 2
+https://icecast.omroep.nl/radio2-bb-mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="25" tvg-id="radio4" tvg-logo="https://www.nederland.fm/i/l/radio4.gif" tvg-name="NPO Radio 4",NPO Radio 4
+https://icecast.omroep.nl/radio4-bb-mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="26" tvg-id="radio5" tvg-logo="https://www.nederland.fm/i/l/radio5.gif" tvg-name="NPO Radio 5",NPO Radio 5
+https://icecast.omroep.nl/radio5-bb-mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="27" tvg-id="q-music" tvg-logo="https://www.nederland.fm/i/l/q-music.gif" tvg-name="Q-Music",Q-Music
+https://icecast-qmusicnl-cdp.triple-it.nl/Qmusic_nl_live.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="28" tvg-id="qmusicchristmas" tvg-logo="https://www.nederland.fm/i/l/qmusicchristmas.gif" tvg-name="Qmusic Christmas",Qmusic Christmas
+https://icecast-qmusicnl-cdp.triple-it.nl/Qmusic_nl_thema.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="29" tvg-id="q-musicfouteuur" tvg-logo="https://www.nederland.fm/i/l/q-musicfouteuur.gif" tvg-name="Qmusic Het Foute Uur",Qmusic Het Foute Uur
+https://icecast-qmusicnl-cdp.triple-it.nl/Qmusic_nl_fouteuur.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="30" tvg-id="q-musicnonstop" tvg-logo="https://www.nederland.fm/i/l/q-musicnonstop.gif" tvg-name="Qmusic Non-Stop",Qmusic Non-Stop
+https://icecast-qmusicnl-cdp.triple-it.nl/Qmusic_nl_nonstop.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="31" tvg-id="qmusictop40" tvg-logo="https://www.nederland.fm/i/l/qmusictop40.gif" tvg-name="Qmusic Top 40",Qmusic Top 40
+https://icecast-qmusicnl-cdp.triple-it.nl/Qmusic_nl_top40.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="32" tvg-id="decibel" tvg-logo="https://www.nederland.fm/i/l/decibel.gif" tvg-name="Radio Decibel",Radio Decibel
+https://stream.decibel.nl/01.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="33" tvg-id="radio10" tvg-logo="https://www.nederland.fm/i/l/radio10.gif" tvg-name="Radio 10",Radio 10
+http://playerservices.streamtheworld.com/api/livestream-redirect/RADIO10.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="34" tvg-id="6070shits" tvg-logo="https://www.nederland.fm/i/l/6070shits.gif" tvg-name="Radio 10 60's & 70's Hits",Radio 10 60's & 70's Hits
+http://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR18.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="35" tvg-id="radio1080shits" tvg-logo="https://www.nederland.fm/i/l/radio1080shits.gif" tvg-name="Radio 10 80's Hits",Radio 10 80's Hits
+http://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR20.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="36" tvg-id="danceclassics" tvg-logo="https://www.nederland.fm/i/l/danceclassics.gif" tvg-name="Radio 10 Disco classics",Radio 10 Disco classics
+http://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR23.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="37" tvg-id="radio10lovesongs" tvg-logo="https://www.nederland.fm/i/l/radio10lovesongs.gif" tvg-name="Radio 10 Lovesongs",Radio 10 Lovesongs
+http://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR04.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="38" tvg-id="radio10nonstop" tvg-logo="https://www.nederland.fm/i/l/radio10nonstop.gif" tvg-name="Radio 10 non stop",Radio 10 non stop
+http://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR15.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="39" tvg-id="radio10top4000" tvg-logo="https://www.nederland.fm/i/l/radio10top4000.gif" tvg-name="Radio 10 Top 4000",Radio 10 Top 4000
+http://playerservices.streamtheworld.com/api/livestream-redirect/TLPSTR24.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="40" tvg-id="radio538" tvg-logo="https://www.nederland.fm/i/l/radio538.gif" tvg-name="Radio 538",Radio 538
+http://playerservices.streamtheworld.com/api/livestream-redirect/RADIO538.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="41" tvg-id="skychristmas" tvg-logo="https://www.nederland.fm/i/l/skychristmas.gif" tvg-name="Sky Christmas",Sky Christmas
+https://playerservices.streamtheworld.com/api/livestream-redirect/SRGSTR08.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="42" tvg-id="skyhits" tvg-logo="https://www.nederland.fm/i/l/skyhits.gif" tvg-name="Sky Hits",Sky Hits
+http://playerservices.streamtheworld.com/api/livestream-redirect/SRGSTR01.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="43" tvg-id="skyradio" tvg-logo="https://www.nederland.fm/i/l/skyradio.gif" tvg-name="Sky Radio",Sky Radio
+http://playerservices.streamtheworld.com/api/livestream-redirect/SKYRADIO.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="44" tvg-id="skylovesongs" tvg-logo="https://www.nederland.fm/i/l/skylovesongs.gif" tvg-name="Sky Radio Love Songs",Sky Radio Love Songs
+http://playerservices.streamtheworld.com/api/livestream-redirect/SRGSTR03.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="45" tvg-id="skyradioniceeasy" tvg-logo="https://www.nederland.fm/i/l/skyradioniceeasy.gif" tvg-name="Sky Radio Nice & Easy",Sky Radio Nice & Easy
+https://playerservices.streamtheworld.com/api/livestream-redirect/SRGSTR07.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="46" tvg-id="skywork" tvg-logo="https://www.nederland.fm/i/l/skywork.gif" tvg-name="Sky Radio Non-Stop@Work",Sky Radio Non-Stop@Work
+http://playerservices.streamtheworld.com/api/livestream-redirect/SRGSTR24.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="47" tvg-id="skysmooth" tvg-logo="https://www.nederland.fm/i/l/skysmooth.gif" tvg-name="Sky Radio Smooth Hits",Sky Radio Smooth Hits
+http://playerservices.streamtheworld.com/api/livestream-redirect/SRGSTR15.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="48" tvg-id="slamfm" tvg-logo="https://www.nederland.fm/i/l/slamfm.gif" tvg-name="SLAM!",SLAM!
+http://538hls.lswcdn.triple-it.nl/content/slamfm/index.m3u8
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="49" tvg-id="slamhousuh" tvg-logo="https://www.nederland.fm/i/l/slamhousuh.gif" tvg-name="SLAM! Housuh",SLAM! Housuh
+https://stream.slam.nl/web16_mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="50" tvg-id="slammix" tvg-logo="https://www.nederland.fm/i/l/slammix.gif" tvg-name="SLAM! Mix",SLAM! Mix
+https://stream.slam.nl/web13_mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="51" tvg-id="slamnonstop" tvg-logo="https://www.nederland.fm/i/l/slamnonstop.gif" tvg-name="SLAM! Non Stop",SLAM! Non Stop
+https://stream.slam.nl/web10_mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="52" tvg-id="soulradio" tvg-logo="https://www.nederland.fm/i/l/soulradio.gif" tvg-name="Soul Radio",Soul Radio
+http://playerservices.streamtheworld.com/api/livestream-redirect/SOULRADIO.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="53" tvg-id="sublimefm" tvg-logo="https://www.nederland.fm/i/l/sublimefm.gif" tvg-name="Sublime FM",Sublime FM
+https://playerservices.streamtheworld.com/api/livestream-redirect/SUBLIME.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="54" tvg-id="sunlite" tvg-logo="https://www.nederland.fm/i/l/sunlite.gif" tvg-name="Sunlite",Sunlite
+https://stream.sunlite.nl/
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="55" tvg-id="veronicafm" tvg-logo="https://www.nederland.fm/i/l/veronicafm.gif" tvg-name="Veronica FM",Veronica FM
+http://playerservices.streamtheworld.com/api/livestream-redirect/VERONICA.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="56" tvg-id="rockradio" tvg-logo="https://www.nederland.fm/i/l/rockradio.gif" tvg-name="Veronica Rock Radio",Veronica Rock Radio
+http://playerservices.streamtheworld.com/api/livestream-redirect/SRGSTR11.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="57" tvg-id="top1000" tvg-logo="https://www.nederland.fm/i/l/top1000.gif" tvg-name="Veronica Top 1000",Veronica Top 1000
+http://playerservices.streamtheworld.com/api/livestream-redirect/SRGSTR10.mp3
+
+#EXTINF:-1 group-title="Radio" radio="true" tvg-chno="58" tvg-id="veronicavintage" tvg-logo="https://www.nederland.fm/i/l/veronicavintage.gif" tvg-name="Veronica Vintage",Veronica Vintage
+https://playerservices.streamtheworld.com/api/livestream-redirect/SRGSTR09.mp3
