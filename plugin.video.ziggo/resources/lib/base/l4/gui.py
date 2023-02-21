@@ -1,10 +1,15 @@
-import sys, traceback, xbmc, xbmcgui
-
+import sys
+import traceback
 from contextlib import contextmanager
+from urllib.parse import quote, urlparse
+
+import xbmc
+import xbmcgui
+
 from resources.lib.base.l1.constants import ADDON_ICON, ADDON_ID, ADDON_NAME
 from resources.lib.base.l3.language import _
 from resources.lib.base.l3.util import load_profile
-from urllib.parse import quote, urlparse
+
 
 def _make_heading(heading=None):
     return heading if heading else ADDON_NAME

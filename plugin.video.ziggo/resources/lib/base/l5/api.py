@@ -1,12 +1,27 @@
-import base64, shutil, os, json, xbmc
-
+import base64
+import json
+import os
+import shutil
 from collections import OrderedDict
-from resources.lib.base.l1.constants import ADDON_PROFILE, ADDONS_PATH, CONST_DUT_EPG_BASE, CONST_DUT_EPG, SESSION_CHUNKSIZE
+
+import xbmc
+
+from urllib.request import urlopen
+from io import BytesIO
+from zipfile import ZipFile
+
+from resources.lib.base.l1.constants import (ADDON_PROFILE, ADDONS_PATH,
+                                             CONST_DUT_EPG, CONST_DUT_EPG_BASE,
+                                             SESSION_CHUNKSIZE)
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
-from resources.lib.base.l3.util import check_key, clear_cache, encode32, extract_zip, is_file_older_than_x_days, load_file, load_profile, update_prefs, write_file
+from resources.lib.base.l3.util import (check_key, clear_cache, encode32,
+                                        extract_zip, is_file_older_than_x_days,
+                                        load_file, load_profile, update_prefs,
+                                        write_file)
 from resources.lib.base.l4.session import Session
 from resources.lib.constants import CONST_MOD_CACHE
+
 
 def api_download(url, type, headers=None, data=None, json_data=True, return_json=True, allow_redirects=True, auth=None):
     session = Session(cookies_key='cookies')
@@ -79,20 +94,18 @@ def api_get_epg_by_date_channel(date, channel):
 
     type = encode32(txt=type)
 
-    epg_url = '{dut_epg_url}/{type}.json'.format(dut_epg_url=CONST_DUT_EPG, type=type)
+    cache_path = full_path = os.path.join("cache", ADDON_PROFILE)
+    epg_url = '{dut_epg_url}/list.zip'.format(dut_epg_url=CONST_DUT_EPG, type=type)
     file = os.path.join("cache", "{type}.json".format(type=type))
 
     if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=days):
         data = load_file(file=file, isJSON=True)
-    else:
-        download = api_download(url=epg_url, type='get', headers=None, data=None, json_data=True, return_json=True)
-        data = download['data']
-        code = download['code']
 
-        if code and code == 200 and data:
-            write_file(file=file, data=data, isJSON=True)
-        else:
-            return None
+    else:
+        full_path = os.path.join(cache_path, "list.zip")
+        http_response = urlopen(epg_url)
+        zipfile = ZipFile(BytesIO(http_response.read()))
+        zipfile.extractall(path=full_path)
 
     return data
 

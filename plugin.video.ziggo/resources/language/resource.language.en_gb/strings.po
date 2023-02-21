@@ -104,6 +104,10 @@ msgctxt "#30037"
 msgid "Force Surround Sound"
 msgstr ""
 
+msgctxt "#30038"
+msgid "Recordings"
+msgstr ""
+
 msgctxt "#32000"
 msgid "You need to login to access this content"
 msgstr ""
@@ -500,6 +504,10 @@ msgstr ""
 
 msgctxt "#320131"
 msgid "Disable Channels that are not available in the default subscription"
+msgstr ""
+
+msgctxt "#320132"
+msgid "Accessing the recording server went wrong, this most likely is not a problem on your end. Please try again later. If that does not help, please create an Issue on the Dut-IPTV GitHub"
 msgstr ""
 
 msgctxt "#330001"

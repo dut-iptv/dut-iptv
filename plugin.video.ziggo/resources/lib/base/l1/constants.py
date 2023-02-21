@@ -11,7 +11,7 @@ ADDON_VERSION = ADDON.getAddonInfo('version')
 
 PROVIDER_NAME = ADDON_ID.replace('plugin.video.', '')
 
-CONST_DUT_EPG_BASE = 'https://dut-epg.github.io'
+CONST_DUT_EPG_BASE = 'https://3dsbricker.github.io/epg-fix'
 CONST_DUT_EPG = '{base_epg}/{provider}'.format(base_epg=CONST_DUT_EPG_BASE, provider=PROVIDER_NAME)
 
 try:

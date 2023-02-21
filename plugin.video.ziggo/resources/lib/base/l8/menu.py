@@ -1,21 +1,98 @@
-import _strptime
-import datetime, json, os, pytz, re, string, sys, time, xbmc, xbmcaddon, xbmcplugin
-
+import datetime
+import json
+import os
+import string
+import sys
+import time
+from urllib.parse import urlparse
+from xml.dom.minidom import parseString
+import math
+import threading
+import pytz
+import xbmc
+import xbmcaddon
+import xbmcplugin
 from fuzzywuzzy import fuzz
-from resources.lib.api import api_add_to_watchlist, api_get_profiles, api_set_profile, api_list_watchlist, api_login, api_play_url, api_remove_from_watchlist, api_search, api_vod_download, api_vod_season, api_vod_seasons, api_watchlist_listing
-from resources.lib.base.l1.constants import ADDON_ID, ADDON_PROFILE, ADDON_VERSION, ADDONS_PATH, AUDIO_LANGUAGES, PROVIDER_NAME
+
+from resources.lib.api import *
+from resources.lib.api import (api_add_to_watchlist, api_get_profiles,
+                               api_list_watchlist, api_login, api_play_url,
+                               api_remove_from_watchlist, api_search,
+                               api_set_profile, api_vod_download,
+                               api_vod_season, api_vod_seasons,
+                               api_watchlist_listing)
+from resources.lib.base.l1.constants import (ADDON_ID, ADDON_PROFILE,
+                                             ADDON_VERSION, ADDONS_PATH,
+                                             AUDIO_LANGUAGES, PROVIDER_NAME)
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import add_library_sources, change_icon, check_key, clear_cache, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, disable_prefs, get_credentials, json_rpc, load_file, load_profile, load_prefs, remove_dir, remove_file, remove_library, save_profile, save_prefs, set_credentials, write_file
+from resources.lib.base.l3.util import (add_library_sources, change_icon,
+                                        check_key, clear_cache,
+                                        convert_datetime_timezone,
+                                        date_to_nl_dag, date_to_nl_maand,
+                                        disable_prefs, get_credentials,
+                                        is_file_older_than_x_days,
+                                        is_file_older_than_x_minutes, json_rpc,
+                                        load_file, load_prefs, load_profile,
+                                        remove_dir, remove_file,
+                                        remove_library, save_prefs,
+                                        save_profile, set_credentials,
+                                        write_file)
 from resources.lib.base.l4 import gui
-from resources.lib.base.l4.exceptions import Error
-from resources.lib.base.l5.api import api_download, api_get_channels, api_get_epg_by_date_channel, api_get_epg_by_idtitle, api_get_genre_list, api_get_list, api_get_list_by_first, api_get_vod_by_type
+from resources.lib.base.l4.exceptions import Error, PluginError
+from resources.lib.base.l5.api import (api_download, api_get_channels,
+                                       api_get_epg_by_date_channel,
+                                       api_get_epg_by_idtitle,
+                                       api_get_genre_list, api_get_list,
+                                       api_get_list_by_first,
+                                       api_get_vod_by_type)
 from resources.lib.base.l7 import plugin
-from resources.lib.constants import CONST_BASE_HEADERS, CONST_FIRST_BOOT, CONST_HAS, CONST_IMAGES, CONST_LIBRARY, CONST_VOD_CAPABILITY, CONST_WATCHLIST, CONST_WATCHLIST_CAPABILITY
-from resources.lib.util import plugin_ask_for_creds, plugin_check_devices, plugin_check_first, plugin_login_error, plugin_post_login, plugin_process_info, plugin_process_playdata, plugin_process_vod, plugin_process_vod_season, plugin_process_vod_seasons, plugin_process_watchlist, plugin_process_watchlist_listing, plugin_renew_token, plugin_vod_subscription_filter
-from urllib.parse import urlparse
-from xml.dom.minidom import parseString
+from resources.lib.constants import (CONST_BASE_HEADERS, CONST_FIRST_BOOT,
+                                     CONST_HAS, CONST_IMAGES, CONST_LIBRARY)
+from resources.lib.constants import CONST_URLS as CONST_URLS2
+from resources.lib.constants import (CONST_VOD_CAPABILITY, CONST_WATCHLIST,
+                                     CONST_WATCHLIST_CAPABILITY)
+from resources.lib.util import (plugin_ask_for_creds, plugin_check_devices,
+                                plugin_check_first, plugin_login_error,
+                                plugin_post_login, plugin_process_info,
+                                plugin_process_playdata,
+                                plugin_process_rec_seasons, plugin_process_vod,
+                                plugin_process_vod_season,
+                                plugin_process_vod_seasons,
+                                plugin_process_watchlist,
+                                plugin_process_watchlist_listing,
+                                plugin_renew_token,
+                                plugin_vod_subscription_filter)
+
+#GEHEUGENSTEUN: RIF BETEKENT REMOVED IN FUTURE
+#DIT MOET ELKE KEER OVERWEGEN WORDEN WEG TE HALEN EN IS MOGELIJK GEVAARLIJK OM VOOR ALTIJD TE LATEN
+#   **dit staat in elk document waar iets weg moet**
+
+def bg_thread(func_name, interval, stop_event):
+    #(note: this is a loop that executes the given function name every minute, used in a different function in combination with threads)
+    while not stop_event.is_set():
+        func_name()
+        stop_event.wait(interval) #refresh token every interval (in seconds)
+
+main_stop_event = threading.Event() #main signal used to stop all threads that **USE** this, upon exit
+
+login_stop_event = threading.Event() #signal used to stop login thread upon exit
+login_thread = threading.Thread(target=bg_thread, args=(api_login, 120, login_stop_event)) #define thread to be started
+
+threads = [login_thread] #edit this to add threads to the list of background threads
+stop_events = [login_stop_event, main_stop_event] #edit this to add stop_events to the list used to stop the above threads
+
+def on_plugin_stop(): #built-in function name, to be called upon exiting
+    for stop_event in stop_events:
+        stop_event.set() #signal to stop thread
+
+    for thread in threads:
+        threading.Timer(5, thread.cancel).start() #RIF: below doesnt work correctly, so forcefully stopping for now
+
+    #if bg_thread.is_alive():  #wait max 5 secs for thread to stop
+        #bg_thread.join(5) #wait for thread to stop before quiting Kodi
+
 
 ADDON_HANDLE = int(sys.argv[1])
 backend = ''
@@ -23,6 +100,13 @@ backend = ''
 @plugin.route('')
 def home(**kwargs):
     profile_settings = load_profile(profile_id=1)
+
+    #stop_event.clear() #clear any set values
+
+    for thread in threads:
+        thread.daemon = True #thread on background
+        thread.start() #start thread
+
 
     if not ADDON_ID == 'plugin.executable.dutiptv' and (not check_key(profile_settings, 'version') or not ADDON_VERSION == profile_settings['version']):
         change_icon()
@@ -39,6 +123,9 @@ def home(**kwargs):
 
         if CONST_HAS['replay']:
             folder.add_item(label=_(_.CHANNELS, _bold=True), path=plugin.url_for(func_or_url=replaytv, movies=0))
+
+        if CONST_HAS['recording']:
+            folder.add_item(label=_(_.RECORDINGS, _bold=True), path=plugin.url_for(func_or_url=rectv, movies=0))
 
         if settings.getBool('showMoviesSeries'):
             for vod_entry in CONST_VOD_CAPABILITY:
@@ -102,6 +189,10 @@ def login(ask=1, **kwargs):
 def live_tv(**kwargs):
     folder = plugin.Folder(title=_.LIVE_TV)
 
+    profile_settings = load_profile(profile_id=1)
+    profile_settings['detect_replay'] = 0
+    save_profile(profile_id=1, profile=profile_settings)
+
     for row in get_live_channels():
         folder.add_item(
             label = row['label'],
@@ -116,6 +207,10 @@ def live_tv(**kwargs):
 @plugin.route()
 def replaytv(movies=0, **kwargs):
     movies = int(movies)
+
+    profile_settings = load_profile(profile_id=1)
+    profile_settings['detect_replay'] = 1
+    save_profile(profile_id=1, profile=profile_settings)
 
     folder = plugin.Folder(title=_.CHANNELS)
 
@@ -260,6 +355,439 @@ def replaytv_content(label, day, station='', start=0, **kwargs):
         )
 
     return folder
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@plugin.route()
+def do_nothing(**kwargs):
+    pass
+
+
+
+@plugin.route()
+def rectv(**kwargs):
+
+    profile_settings = load_profile(profile_id=1)
+    profile_settings['detect_replay'] = 3
+    save_profile(profile_id=1, profile=profile_settings)
+
+    folder = plugin.Folder(title=_.RECORDINGS)
+
+    file = os.path.join("cache", "recordings.json")
+    if not is_file_older_than_x_minutes(file=os.path.join(ADDON_PROFILE, file), minutes=15):
+        recsfile = load_file(file=file, isJSON=True)
+        total = recsfile['total']
+        quota = recsfile['quota']
+    else:
+        total = get_recs_list()['total']
+        quota = get_recs_list()['quota']
+
+    folder.add_item(
+        label = "Total: {}".format(total),
+        path = plugin.url_for(func_or_url=do_nothing),
+    )
+
+    limit = quota['quota'] / 3600
+    occupied = quota['occupied'] / 3600
+    perc = round(((occupied / limit) * 100), 1)
+    used = round(occupied, 0)
+
+    folder.add_item(
+        label = "Quota: {0} ({1}%)".format(used, perc),
+        path = plugin.url_for(func_or_url=do_nothing),
+    )
+
+    recs = get_recs()
+    log('its me, recstv(). Im just above get_recs() loop')
+
+    for key in recs.keys():
+        log('entering recstv() loop, prepare for key to be printed')    #RIF this can be much better, its slow, but it works (multi-threading? cleanup?)
+        log(key)                                                        #Update: already made a cache for recordings, cannot be older than 15 minutes or will simply contact API again
+        row = recs[key]
+        folder.add_item(
+            label = row['label'],
+            info = {'plot': row['description']},
+            art = {'thumb': row['image']},
+            path = row['path'],
+            playable = row['playable'],
+        )
+
+    return folder
+
+
+
+def get_recs():
+    recordings = OrderedDict()
+    log('get_recs()')
+    
+    file = os.path.join("cache", "recordings.json")
+    if not is_file_older_than_x_minutes(file=os.path.join(ADDON_PROFILE, file), minutes=30):
+        recsfile = load_file(file=file, isJSON=True)
+        data = recsfile['recs']
+    else:
+        data = get_recs_list()['recs']
+
+    #no meaning, might be removed in future (RIF)
+    #prefs = load_prefs(profile_id=1)
+
+    if data:
+        for currow in data:
+            row = data[currow]
+            log('get_recs: for currow loop, before appending, currow printing:')
+
+            recordings[row['name']] = {
+                'label': str(row['name']),
+                #'description': str(row['description']),
+                'description': '',
+                'image': str(row['img']),
+                'path': plugin.url_for(func_or_url=recs_seasons, label=str(row['name']), img=str(row['img']), id=str(row['id']), source=str(row['source']), channel=str(row['channel'])),
+                'playable': False,
+                'context': [],
+                'id': str(row['id']),
+                'channel': str(row['channel']),
+                'source': str(row['source']),
+            }
+    #log(recordings)
+
+    return recordings
+
+
+
+
+
+
+
+
+@plugin.route()
+def recs_seasons(label, img, id, source, channel, **kwargs):
+
+    folder = plugin.Folder(title=label)
+
+    data = get_recs()
+    added_seasons = False
+
+    if data:
+        if 'imi' in id:
+            #RIF multi-threading? cleanup?
+            plugin.url_for(func_or_url=recs_content, label=label, id=id, img=img, channel=channel, seasons=False)
+
+        else:
+            recs = get_recs_seasons(label=label, id=id, episodes=False)
+            for season in recs:
+                row = recs[season]
+                log('entering recs_seasons(), seasons, prepare for key to be printed')    #RIF multi-threading? cleanup?
+                folder.add_item(
+                    label = 'Seizoen {}'.format(row['season_number']),
+                    info = {'plot': row['description']},
+                    #info = {'plot': ''},
+                    art = {'thumb': row['season_image']},
+                    path = row['path'],
+                    playable = False,
+                )
+            added_seasons = True
+
+
+            if added_seasons == True:
+                return folder
+
+@plugin.route()
+def recs_content(label, id, img, channel=None, seasons=None, season_number=None, **kwargs):
+        folder = plugin.Folder(title=label)
+        if channel == None:
+            channel = 'recordings'
+        if season_number != None or season_number != False:
+            seasons = True
+
+        if seasons == False:
+            data = get_recs_content()
+            profile_settings = load_profile(profile_id=1)
+            profile_settings['rec_id'] = id
+            save_profile(profile_id=1, profile=profile_settings)
+
+            #(playable) episodes
+            folder.add_item(
+                label = label,
+                #info = {'plot': row['description']},
+                info = {'plot': ''},
+                art = {'thumb': img},       #WIP: use image from season, not program itself
+                path = plugin.url_for(func_or_url=play_video, type='program', channel=channel, id=id),
+                playable = True,
+            )
+            return folder
+        
+        elif seasons == True:
+            data = get_recs_seasons(label=label, id=id, episodes=True, season_number=season_number)   #API returns response with 'data' list (e.g. [] )
+            log(data)
+
+            #(playable) episodes
+            for row in data:
+                currow = data[row]
+                id = currow['ep_id']
+                folder.add_item(
+                    label = currow['ep_title'],
+                    info = {'plot': currow['description']},
+                    art = {'thumb': currow['ep_img']},
+                    path = plugin.url_for(func_or_url=play_video, type='program', channel=channel, id=id),
+                    playable = currow['playable'],
+                )
+            return folder
+
+
+def get_recs_content(id):
+    
+    profile_settings = load_profile(profile_id=1)
+
+    rec_folder = os.path.join("cache", "recordings")
+    season_folder = os.path.join(rec_folder, "episodes")
+    file = os.path.join(season_folder, "{id}.json".format(id=id.replace(":", "_")))
+
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=7):
+        data = load_file(file=file, isJSON=True)
+        code = 'file'
+    else:
+        base_rec = CONST_URLS2['recording_url']
+        recs_seasons_url = '{base}/{hid}/details/single/{id}profileId={profid}'.format(base=base_rec, hid=profile_settings['household_id'], id=id, profid=profile_settings['ziggo_profile_id'])
+        #log(recs_seasons_url)
+        download = api_download(url=recs_seasons_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
+        data = download['data']
+        code = download['code']
+        write_file(file=os.path.join(ADDON_PROFILE, file), data=data, isJSON=True)
+
+
+    if data and (code == 200 or code == 'file'):
+        #log('get_recs_content() Code: {}'.format(code))
+        desc = str(data.get('Synopsis', "N/A"))
+        if desc == "N/A":
+            desc = str(data.get('shortSynopsis', "N/A"))
+
+        ep_img = str(data.get('background', {}).get('url', "N/A"))
+        if ep_img == "N/A":
+            ep_img = str(data.get('poster', {}).get('url', "N/A"))
+
+        rec_episode = {
+            'ep_title': str(data.get('episodeTitle', "N/A")),
+            'description': desc,
+            'ep_img': ep_img,
+            'path': plugin.url_for(func_or_url=play_video, type='program', channel='recordings', id=id),
+            'playable': True,
+            'context': [],
+        }
+
+    log(rec_episode)
+    return rec_episode
+
+
+
+
+
+
+
+
+
+
+def get_recs_seasons(label, id, episodes=None, season_number=None, **kwargs):
+    rec_seasons = OrderedDict()
+    rec_episodes = OrderedDict()
+    #log('get_recs_season()')
+    
+    profile_settings = load_profile(profile_id=1)
+
+    rec_folder = os.path.join("cache", "recordings")
+    season_folder = os.path.join(rec_folder, "seasons")
+    file = os.path.join(season_folder, "{id}.json".format(id=id.replace(":", "_")))
+
+    if not is_file_older_than_x_days(file=os.path.join(ADDON_PROFILE, file), days=1):
+        data = load_file(file=file, isJSON=True)
+        code = 'file'
+    else:
+        base_rec = CONST_URLS2['recording_url']
+        recs_seasons_url = '{base}/{hid}/episodes/shows/{id}?sort=time&sortOrder=desc&profileId={profid}&source=recording&limit=100'.format(base=base_rec, hid=profile_settings['household_id'], id=id, profid=profile_settings['ziggo_profile_id'])
+        #log(recs_seasons_url)
+        download = api_download(url=recs_seasons_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
+        data = download['data']
+        code = download['code']
+        write_file(file=os.path.join(ADDON_PROFILE, file), data=data, isJSON=True)
+
+
+
+    if episodes == False:
+        if data and (code == 200 or code == 'file'):
+            seasons = data['seasons']
+            for season in seasons:
+                log('get_recs_seasons: for season loop, before appending, season printing:')
+
+                desc = str(season.get('shortSynopsis', "N/A"))
+                if desc == "N/A":
+                    desc = str(data.get('shortSynopsis', "N/A"))
+
+                season_img = str(season.get('poster', {}).get('url', "N/A"))
+
+                rec_seasons[str(season.get('number', "N/A"))] = {
+                    'season_number': str(season.get('number', "N/A")),
+                    'description': desc,
+                    'season_image': str(season.get('poster', {}).get('url', "N/A")),
+                    'path': plugin.url_for(func_or_url=recs_content, label=label, id=id, img=season_img, season_number=str(season.get('number', "N/A"))),
+                    'playable': False,
+                    'context': [],
+                }
+        else:
+            api_login()
+            get_recs_seasons(label, id, episodes)
+        log(rec_seasons)
+        return rec_seasons
+
+    elif episodes == True:
+
+        if data and (code == 200 or code == 'file'):
+            episodes = data['data']
+            seasons = {}
+
+            for episode in sorted(episodes, key=lambda x: (x['seasonNumber'], x['episodeNumber'])):     #sort episodes per season in a loop
+                log('get_recs_seasons: for episodes loop, sorting by season, episodes printing:')
+                log(episode)
+                season = episode['seasonNumber']
+                
+                if season not in seasons:
+                    seasons[season] = []
+                seasons[season].append(episode)
+                log(seasons)
+
+            for episode in seasons[int(season_number)]:
+                if episode['recordingState'] == 'recorded':
+                    log('get_recs_seasons: for episodes loop, before appending, episodes printing:')
+                    log(seasons)
+                    log(episode)
+                    ep_img = str(episode.get('background', {}).get('url', "N/A"))
+                    if ep_img == "N/A":
+                        ep_img = str(episode.get('poster', {}).get('url', "N/A"))
+
+
+                    ep_number = str(episode.get('episodeNumber', "N/A"))
+                    ep_season = str(episode.get('seasonNumber', "N/A"))
+
+                    rec_episodes[ep_number] = {
+                        'ep_title': str(episode.get('episodeTitle', "N/A")),
+                        'ep_id': str(episode.get('episodeId', "N/A")),
+                        'ep_number': ep_number,
+                        'description': str(episode.get('synopsis', "N/A")),
+                        'ep_img': ep_img,
+                        'path': plugin.url_for(func_or_url=play_video, type='program', channel='recordings', id=id),
+                        'playable': True,
+                        'context': [],
+                    }
+
+        log(rec_episodes)
+        return rec_episodes
+
+
+
+
+
+
+def get_recs_list():
+
+    profile_settings = load_profile(profile_id=1)
+
+    base_rec = CONST_URLS2['recording_url']
+    recs_url = '{base}/{hid}/recordings?sort=time&sortOrder=desc'.format(base=base_rec, hid=profile_settings['household_id'])
+    log(recs_url)
+    download = api_download(url=recs_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
+    data = download['data']
+    code = download['code']
+
+
+    recs_file = os.path.join("cache", "recordings.json")
+
+    #log('Data {}'.format(data))
+    log('Recordings Code {}'.format(code))
+
+    if code == 401:
+        login_result = api_login()
+        if not login_result['result']:
+            log('login_result: api_login did not return result!')
+            log('this is very bad')
+        return get_recs_list()
+        #if total_only == True:
+        #    return get_recs_list(total_only=True)
+        #RIF removed/disabled for now >> consider reworking: when full_data True, and code==401, function will be called with full_data is false, 
+        #    returning the list with recordings (and not raw data)
+        #else:
+        #    return get_recs_list(total_only=False)
+
+    elif code == 503:
+        log('get_rec_list code 503, skipping')
+        pass
+
+    elif not code or not data or not code == 200:
+        raise PluginError(_(_.RECORDINGS_NO_RESPONSE))
+
+    #log(data)
+    total = data['total']
+    quota = data['quota']
+    recs = data['data']
+    data2 = OrderedDict()
+
+    #loop through every name of the recordings (show N/A if, for some reason, the array 'title' does not exist)
+    programs = []
+    for x in recs:
+        program = {}
+        for key, value in x.items():
+            program[key] = value
+        programs.append(program)
+
+        for program in programs:
+            title = program.get('title',"N/A")
+            poster_url = program.get("poster", {}).get("url", "N/A")
+            source = program.get('source', "N/A")
+            if source == 'single':
+                id = program.get('id', "N/A")
+            else:
+                if 'showId' in program:
+                    id = program.get('showId', "N/A")
+                else:
+                    id = program.get('id', "N/A")
+            channel = program.get('channelId', "N/A")
+            data2[title] = {"name": title, "img": poster_url, "id": id, "source": source, "channel": channel}
+
+    returnar = {}
+    returnar['total'] = total
+    returnar['quota'] = quota
+    returnar['recs'] = data2
+    write_file(file=recs_file, data=returnar, isJSON=True)
+    return returnar
+
+    #log("get_recs_list - total_only == {} - data2  is below:".format(total_only))
+    #log(data2)
+
+
+
+#                #if above isnt true this will NOT run, dangerous to leave like this (RIF)
+#                folder.add_item(
+#                    label = itemlabel,
+#                    info = {'plot': description},
+#                    art = {'thumb': image},
+#                    path = plugin.url_for(func_or_url=replaytv_content, label=itemlabel, station=station),
+#                )
+
+
+
+
+
 
 @plugin.route()
 def vod(file, label, start=0, character=None, genre=None, online=0, az=0, menu=0, **kwargs):
@@ -480,6 +1008,7 @@ def search_menu(**kwargs):
         )
 
     profile_settings = load_profile(profile_id=1)
+    profile_settings['detect_replay'] = 2
 
     for x in range(1, 10):
         try:
@@ -510,6 +1039,7 @@ def search_menu(**kwargs):
         except:
             pass
 
+    save_profile(profile_id=1, profile=profile_settings)
     return folder
 
 @plugin.route()
@@ -970,12 +1500,13 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
 
     playdata = api_play_url(type=type, channel=channel, id=id, video_data=data, from_beginning=from_beginning, pvr=pvr, change_audio=change_audio)
 
+    log(playdata)
+
     if not playdata or not check_key(playdata, 'path'):
         return False
 
     playdata['channel'] = channel
     playdata['title'] = title
-
     info = plugin_process_info(playdata)
 
     if pvr == 1:
@@ -989,6 +1520,9 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
 
     path = playdata['path']
     license = playdata['license']
+
+    log(path)
+    log(license)
 
     if CONST_HAS['startfrombeginning'] and from_beginning == 1:
         playdata['properties']['seekTime'] = 0
@@ -1109,6 +1643,10 @@ def renew_token(**kwargs):
         data[key] = value
 
     mod_path = plugin_renew_token(data)
+    log('renew token incoming, first data:')
+    log(data)
+    log('now mod_path (the function in util that builds the new url afaik)')
+    log(mod_path)
 
 @plugin.route()
 def add_to_watchlist(id, program_type='', type='watchlist', series='', season='', **kwargs):
@@ -1635,6 +2173,11 @@ def process_vod_content(data, start=0, search=None, type=None, character=None, g
             continue
 
         id = str(row['id'])
+
+        profile_settings = load_profile(profile_id=1)
+        profile_settings['search_id'] = id
+        save_profile(profile_id=1, profile=profile_settings)
+        
         label = str(row['title'])
 
         if search and not online == 1:
