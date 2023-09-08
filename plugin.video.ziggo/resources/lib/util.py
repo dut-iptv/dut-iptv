@@ -319,6 +319,7 @@ def plugin_process_playdata(playdata):
         )
     else:
         log('else statement executed, forcing renew; no certificate found (shouldnt be a problem)')
+        log(playdata['license'])
         item_inputstream = inputstream.Widevine(
             #license_key = "http://127.0.0.1:11189/{provider}/license".format(provider=PROVIDER_NAME),
             license_key = playdata['license'],

@@ -299,6 +299,8 @@ class Item(object):
                         challenge = self.inputstream.challenge,
                         response = self.inputstream.response,
                     ))
+                    print('{url}?ContentId={cid}'.format(url = self.inputstream.license_key, cid=profile_settings['contentid']))
+                    print(self.inputstream.response)
                 elif headers:
                     li.setProperty('inputstream.adaptive.license_key', '|{0}'.format(headers))
             elif self.inputstream.addon == 'inputstream.ffmpeg':

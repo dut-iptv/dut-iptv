@@ -206,19 +206,39 @@ def api_get_play_token(locator=None, path=None, play_url=None, force=0):
                 log(session)
                 download = requests.request("POST", session, headers=headers)
                 log('getplaytoken; live sessionurl response: {}'.format(download))
-                return download
-            download = inner_layer()
+                return download, session
+            download = inner_layer()[0]
+            session = inner_layer()[1]
             code = download.status_code
-            print(download.json(), code)
+            try:
+                statuscode = download.json()['error']['statusCode']
+            except:
+                statuscode = None
+            print(download.json(), code, statuscode)
             if code == 200:
                 #successful, continue using the token
                 contentid = download.json()['drmContentId']
+                log("contentid")
                 wvtoken = download.headers['x-streaming-token']
+                log("wvtoken")
                 return contentid, wvtoken
-
-            elif code == 404:
-                from resources.lib.base.l4 import gui
-                gui.error(message=_.NOT_FOUND)
+            
+            elif code == 404 or code == 405 or statuscode == 7666:
+                if 'customers//' in session or session == 'https://prod.spark.ziggogo.tv/eng/web/recording-service/customers//recordings?sort=time&sortOrder=desc':
+                    log('getplaytoken; live session error: contains // instead of hid, retrying the request')
+                    from resources.lib.base.l4 import gui
+                    gui.error(message=_.NOT_FOUND)
+                else:
+                    log('getplaytoken; live session error: does NOT contain the // but chances are hid is still missing')
+                    from resources.lib.base.l4 import gui
+                    gui.error(message=_.NOT_FOUND)
+            elif code == 403 or statuscode == 1101:
+                if statuscode == 1101:
+                    from resources.lib.base.l4 import gui
+                    gui.error(message=_.SESSION_LIMIT)
+                else:
+                    from resources.lib.base.l4 import gui
+                    gui.error(message=_.LOGIN_ERROR_TITLE)
 
             else:
                 #it went wrong, print code, refresh values and try again
@@ -285,17 +305,32 @@ def api_get_play_token(locator=None, path=None, play_url=None, force=0):
             def inner_layer():
                 MAX_ATTEMPTS = 3
                 counter = 0
+                hid=profile_settings['household_id']
+                profid=profile_settings['ziggo_profile_id']
                 while True:
                     #the point just before it could go wrong
+                    max_id_time = time.time() - 3
+                    if profile_settings['time_id'] < max_id_time: #RIF probably not needed and should be stable
+                        #time.sleep(1)
+                        pass #simply pass because no need to sleep, not sure if it even worked
                     program_id = profile_settings['rec_id']
                     base_rec = CONST_URLS['session_url']
-                    rec = '{base}/{hid}/recording?recordingId={recid}&profileId={id}&abrType=BR-AVC-DASH'.format(base=base_rec, hid=profile_settings['household_id'], recid=program_id, id=profile_settings['ziggo_profile_id'])
+                    rec = '{base}/{hid}/recording?recordingId={recid}&profileId={id}&abrType=BR-AVC-DASH'.format(base=base_rec, hid=hid, recid=program_id, id=profid)
                     log(rec)
                     download = requests.request("POST", rec, headers=headers)
                     log('getplaytoken; recording sessionurl response: {}'.format(download))
                     code = download.status_code
-                    if code == 200 or code == 404:
-                        break
+
+                    if code == 200:
+                        data = {'code': download.status_code, 'headers': download.headers, 'body': download.json()}
+                        return data
+            
+                    elif code == 404 or code == 405:
+                        if 'customers//' in rec or rec == 'https://prod.spark.ziggogo.tv/eng/web/recording-service/customers//recordings?sort=time&sortOrder=desc':
+                            log('getplaytoken; recording session error: contains // instead of hid, retrying the request')
+                        else:
+                            log('getplaytoken; recording session error: does NOT contain the // but chances are hid is still missing')
+                            break
                     counter += 1
                     if counter >= MAX_ATTEMPTS:
                         from resources.lib.base.l4 import gui
@@ -374,30 +409,33 @@ def api_get_play_token(locator=None, path=None, play_url=None, force=0):
         if profile_settings['detect_replay'] == 0:
             #if live_tv
             log("live")
-            contentid = live_layer()[0]
-            wvtoken = live_layer()[1]
+            func = live_layer()
+            contentid = func[0]
+            wvtoken = func[1]
         
         if profile_settings['detect_replay'] == 1:
             #if replay_tv
             log("replay")
-            contentid = replay_layer()[0]
-            wvtoken = replay_layer()[1]
+            func = replay_layer()
+            contentid = func[0]
+            wvtoken = func[1]
 
         if profile_settings['detect_replay'] == 2:
             #if searched/replay_tv
             log("searched/replay")
-            log(search_layer())
-            contentid = search_layer()[0]
-            wvtoken = search_layer()[1]
+            func = search_layer()
+            contentid = func[0]
+            wvtoken = func[1]
 
 ############ WIP ############
 
         if profile_settings['detect_replay'] == 3:
         #if recorded_tv
             log("recordings")
-            contentid = recording_layer()[0]
-            wvtoken = recording_layer()[1]
-            url = recording_layer()[2]
+            func = recording_layer()
+            contentid = func[0]
+            wvtoken = func[1]
+            url = func[2]
 
 ############ WIP ############
 
@@ -419,10 +457,13 @@ def api_get_play_token(locator=None, path=None, play_url=None, force=0):
         write_file(file='widevine_token', data=wvtoken, isJSON=False)
         profile_settings['drm_token_age'] = int(time.time())
         profile_settings['drm_locator'] = locator
-        save_profile(profile_id=1, profile=profile_settings)
-
-        if play_url == True:
-            return url
+        if profile_settings['detect_replay'] == 3:
+            profile_settings['play_url'] = url
+            write_file(file='play_url', data=url, isJSON=False)
+            save_profile(profile_id=1, profile=profile_settings)
+            return wvtoken, url
+        else:
+            save_profile(profile_id=1, profile=profile_settings)
 
         #log('api_get_play_token success')
         return wvtoken
@@ -694,9 +735,12 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
             profile_settings = load_profile(profile_id=1)
             profile_settings['rec_id'] = id
             save_profile(profile_id=1, profile=profile_settings)
+        else:
+            log('api_play_url: imi not in id')
 
+        play_token = api_get_play_token(locator=None, path=None)
         urldata2 = {}
-        urldata2['play_url'] = api_get_play_token(locator=None, path=None, play_url=True)
+        urldata2['play_url'] = play_token[1]
         log(urldata2)
 
     elif type == 'vod':
@@ -770,7 +814,13 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     profile_settings['drm_locator'] = locator
     save_profile(profile_id=1, profile=profile_settings)
 
-    token = api_get_play_token(locator=locator, path=path, force=1)
+    play_token = api_get_play_token(locator=locator, path=None) 
+    #note to self: needed for second time because of issues; it must be after the 'imi' check from type == program; but that function needs it as well
+    #RIF?
+
+    log(play_token)
+
+    token = play_token
     token_orig = token
 
     if not token or not len(str(token)) > 0:

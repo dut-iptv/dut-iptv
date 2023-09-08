@@ -73,12 +73,16 @@ def bg_thread(func_name, interval, stop_event):
     #(note: this is a loop that executes the given function name every minute, used in a different function in combination with threads)
     while not stop_event.is_set():
         func_name()
-        stop_event.wait(interval) #refresh token every interval (in seconds)
+        #check if stop_event is set within every interval (in seconds)
+        for _ in range(interval): #refresh token every interval (in seconds)
+            if stop_event.is_set():
+                break
+            time.sleep(1) #sleep 1 second so the code gets executed every second within one interval, which translates to "waiting" exactly one interval
 
 main_stop_event = threading.Event() #main signal used to stop all threads that **USE** this, upon exit
 
 login_stop_event = threading.Event() #signal used to stop login thread upon exit
-login_thread = threading.Thread(target=bg_thread, args=(api_login, 120, login_stop_event)) #define thread to be started
+login_thread = threading.Thread(target=bg_thread, args=(api_login, 110, login_stop_event)) #define thread to be started
 
 threads = [login_thread] #edit this to add threads to the list of background threads
 stop_events = [login_stop_event, main_stop_event] #edit this to add stop_events to the list used to stop the above threads
@@ -102,10 +106,18 @@ def home(**kwargs):
     profile_settings = load_profile(profile_id=1)
 
     #stop_event.clear() #clear any set values
-
-    for thread in threads:
-        thread.daemon = True #thread on background
-        thread.start() #start thread
+    try:
+        for thread in threads:
+            thread.daemon = True #thread on background
+            thread.start() #start thread
+    except:
+        gui.error(message=_.DAEMON_ALREADY_ACTIVE)
+        try:
+            for thread in threads:
+                thread.daemon = True #thread on background
+                thread.start() #start thread
+        except:
+            gui.error(message=_(_.PLUGIN_EXCEPTION, addon="Daemon"))
 
 
     if not ADDON_ID == 'plugin.executable.dutiptv' and (not check_key(profile_settings, 'version') or not ADDON_VERSION == profile_settings['version']):
@@ -176,6 +188,7 @@ def login(ask=1, **kwargs):
     else:
         profile_settings = load_profile(profile_id=1)
         profile_settings['last_login_success'] = 1
+        profile_settings['time_id'] = time.time()
         save_profile(profile_id=1, profile=profile_settings)
 
         gui.ok(message=_.LOGIN_SUCCESS)
@@ -455,7 +468,7 @@ def get_recs():
                 #'description': str(row['description']),
                 'description': '',
                 'image': str(row['img']),
-                'path': plugin.url_for(func_or_url=recs_seasons, label=str(row['name']), img=str(row['img']), id=str(row['id']), source=str(row['source']), channel=str(row['channel'])),
+                'path': plugin.url_for(func_or_url=recs_seasons, label=str(row['name']), img=str(row['img']), id=str(row['id']), source=str(row['source']), channel=str(row['channel']), e_id=str(row['e_id'])),
                 'playable': False,
                 'context': [],
                 'id': str(row['id']),
@@ -474,12 +487,15 @@ def get_recs():
 
 
 @plugin.route()
-def recs_seasons(label, img, id, source, channel, **kwargs):
+def recs_seasons(label, img, id, source, channel, e_id=None, **kwargs):
 
     folder = plugin.Folder(title=label)
 
     data = get_recs()
     added_seasons = False
+
+    if not e_id:
+        e_id == False
 
     if data:
         if 'imi' in id:
@@ -487,7 +503,8 @@ def recs_seasons(label, img, id, source, channel, **kwargs):
             plugin.url_for(func_or_url=recs_content, label=label, id=id, img=img, channel=channel, seasons=False)
 
         else:
-            recs = get_recs_seasons(label=label, id=id, episodes=False)
+            recs = get_recs_seasons(label=label, id=id, e_id=e_id, episodes=False)
+
             for season in recs:
                 row = recs[season]
                 log('entering recs_seasons(), seasons, prepare for key to be printed')    #RIF multi-threading? cleanup?
@@ -517,7 +534,9 @@ def recs_content(label, id, img, channel=None, seasons=None, season_number=None,
             data = get_recs_content()
             profile_settings = load_profile(profile_id=1)
             profile_settings['rec_id'] = id
+            profile_settings['time_id'] = time.time()
             save_profile(profile_id=1, profile=profile_settings)
+            log('menu_recs_content: saving rec_id')
 
             #(playable) episodes
             folder.add_item(
@@ -538,6 +557,9 @@ def recs_content(label, id, img, channel=None, seasons=None, season_number=None,
             for row in data:
                 currow = data[row]
                 id = currow['ep_id']
+                profile_settings = load_profile(profile_id=1)
+                profile_settings['time_id'] = time.time()
+                save_profile(profile_id=1, profile=profile_settings)
                 folder.add_item(
                     label = currow['ep_title'],
                     info = {'plot': currow['description']},
@@ -600,10 +622,12 @@ def get_recs_content(id):
 
 
 
-def get_recs_seasons(label, id, episodes=None, season_number=None, **kwargs):
+def get_recs_seasons(label, id, e_id=None, e_id_needed=None, episodes=None, season_number=None, **kwargs):
     rec_seasons = OrderedDict()
     rec_episodes = OrderedDict()
     #log('get_recs_season()')
+    if not e_id:
+        e_id == False
     
     profile_settings = load_profile(profile_id=1)
 
@@ -616,10 +640,15 @@ def get_recs_seasons(label, id, episodes=None, season_number=None, **kwargs):
         code = 'file'
     else:
         base_rec = CONST_URLS2['recording_url']
+        if e_id_needed == True:
+            id = e_id
+        else:
+            id=id
         recs_seasons_url = '{base}/{hid}/episodes/shows/{id}?sort=time&sortOrder=desc&profileId={profid}&source=recording&limit=100'.format(base=base_rec, hid=profile_settings['household_id'], id=id, profid=profile_settings['ziggo_profile_id'])
-        #log(recs_seasons_url)
+        log(recs_seasons_url)
         download = api_download(url=recs_seasons_url, type='get', headers=api_get_headers(), data=None, json_data=False, return_json=True)
         data = download['data']
+        log(data)
         code = download['code']
         write_file(file=os.path.join(ADDON_PROFILE, file), data=data, isJSON=True)
 
@@ -627,7 +656,19 @@ def get_recs_seasons(label, id, episodes=None, season_number=None, **kwargs):
 
     if episodes == False:
         if data and (code == 200 or code == 'file'):
-            seasons = data['seasons']
+            try:
+                seasons = data['seasons']
+            except: #RIF since it either works or returns false (?)
+                try:
+                    #e_id_needed == True
+                    #get_recs_seasons(label, id, e_id, e_id_needed, episodes)
+                    #log('menu: get_recs_seasons episodes false, except-try statement')
+                    #log(id)
+                    #log(e_id)
+                    pass
+                except:
+                    return False
+            
             for season in seasons:
                 log('get_recs_seasons: for season loop, before appending, season printing:')
 
@@ -759,10 +800,11 @@ def get_recs_list():
             else:
                 if 'showId' in program:
                     id = program.get('showId', "N/A")
+                    emerg_id = program.get('id', "N/A") #in case of some weird things that showId isnt correct id (remember Fire country, source: show and type:season; yet showId is wrong)
                 else:
                     id = program.get('id', "N/A")
             channel = program.get('channelId', "N/A")
-            data2[title] = {"name": title, "img": poster_url, "id": id, "source": source, "channel": channel}
+            data2[title] = {"name": title, "img": poster_url, "id": id, "e_id": emerg_id, "source": source, "channel": channel}
 
     returnar = {}
     returnar['total'] = total
@@ -1476,6 +1518,12 @@ def play_video(type=None, channel=None, id=None, data=None, title=None, from_beg
     from_beginning = int(from_beginning)
     pvr = int(pvr)
     change_audio = int(change_audio)
+
+    profile_settings = load_profile(profile_id=1)
+    profile_settings['rec_id'] = id
+    save_profile(profile_id=1, profile=profile_settings)
+    log('menu_play_video: saving rec_id') #2nd saving because it sometimes is using old id
+    #RIF solved in api_play_url because play_token was called before updating id
 
     if not type or not len(str(type)) > 0:
         return False

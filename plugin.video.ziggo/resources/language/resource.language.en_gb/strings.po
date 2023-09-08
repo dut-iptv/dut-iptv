@@ -510,6 +510,14 @@ msgctxt "#320132"
 msgid "Accessing the recording server went wrong, this most likely is not a problem on your end. Please try again later. If that does not help, please create an Issue on the Dut-IPTV GitHub"
 msgstr ""
 
+msgctxt "#320133"
+msgid "Making a background thread failed, this most likely is a problem with threading trying to set daemon on an active thread. Please try again (no need to wait). If that does not help, please create an Issue on the Dut-IPTV GitHub"
+msgstr ""
+
+msgctxt "#320134"
+msgid "Streaming sessions limit is reached! (this can happen when you use Ziggo GO on too many devices simultaneously)"
+msgstr ""
+
 msgctxt "#330001"
 msgid "Select order"
 msgstr ""

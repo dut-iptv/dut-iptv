@@ -5,17 +5,17 @@ from resources.lib.dnsutils import dns_lookup
 CONST_BASE_DOMAIN = {}
 CONST_BASE_IP = {}
 
-CONST_BASE_DOMAIN['ziggo'] = 'obo-prod.oesp.ziggogo.tv'
+CONST_BASE_DOMAIN['ziggo'] = 'prod.spark.ziggogo.tv'
 
 try:
-    CONST_BASE_IP['ziggo'] = dns_lookup('obo-prod.oesp.ziggogo.tv', "1.0.0.1")['A'][0]
+    CONST_BASE_IP['ziggo'] = dns_lookup('prod.spark.ziggogo.tv', "1.0.0.1")['A'][0]
 except:
     pass
 
-CONST_BASE_DOMAIN['betelenet'] = 'obo-prod.oesp.telenettv.be'
+CONST_BASE_DOMAIN['betelenet'] = 'prod.spark.telenettv.be'
 
 try:
-    CONST_BASE_IP['betelenet'] = dns_lookup('obo-prod.oesp.telenettv.be', "1.0.0.1")['A'][0]
+    CONST_BASE_IP['betelenet'] = dns_lookup('prod.spark.telenettv.be', "1.0.0.1")['A'][0]
 except:
     pass
 
@@ -26,19 +26,19 @@ CONST_ALLOWED_HEADERS = {}
 CONST_ALLOWED_HEADERS['betelenet'] = {
     'user-agent',
     'x-oesp-content-locator',
-    'x-oesp-token',
+    'x-streaming-token',
     'x-client-id',
     'x-oesp-username',
-    'x-oesp-drm-schemeiduri'
+    'x-drm-schemeId'
 }
 
 CONST_ALLOWED_HEADERS['ziggo'] = {
     'user-agent',
     'x-oesp-content-locator',
-    'x-oesp-token',
+    'x-streaming-token',
     'x-client-id',
     'x-oesp-username',
-    'x-oesp-drm-schemeiduri'
+    'x-drm-schemeId'
 }
 
 CONST_BASE_HEADERS = {}
