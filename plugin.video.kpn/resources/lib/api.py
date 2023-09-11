@@ -298,7 +298,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
     program_id = None
 
     if type == 'channel':
-        play_url = '{api_url}/CONTENT/VIDEOURL/LIVE/{channel}/{id}/?deviceId={device_key}&profile=G02&time={time}'.format(api_url=CONST_URLS['api'], channel=channel, id=id, device_key=profile_settings['devicekey'], time=militime)
+        play_url = '{api_url}/CONTENT/VIDEOURL/LIVE/{channel}/{id}/?deviceId={device_key}&profile=G02'.format(api_url=CONST_URLS['api'], channel=channel, id=id, device_key=profile_settings['devicekey'])
 
         if not pvr == 1:
             program_url = '{api_url}/TRAY/SEARCH/PROGRAM?maxResults=1&filter_airingEndTime=now&filter_channelIds={channel}'.format(api_url=CONST_URLS['api'], channel=channel)
@@ -344,7 +344,7 @@ def api_play_url(type, channel=None, id=None, video_data=None, from_beginning=0,
         if len(str(asset_id)) == 0:
             return playdata
 
-        play_url = '{api_url}/CONTENT/VIDEOURL/{type}/{id}/{asset_id}/?deviceId={device_key}&profile=G02&time={time}'.format(api_url=CONST_URLS['api'], type=typestr, id=id, asset_id=asset_id, device_key=profile_settings['devicekey'], time=militime)
+        play_url = '{api_url}/CONTENT/VIDEOURL/{type}/{id}/{asset_id}/?deviceId={device_key}&profile=G02'.format(api_url=CONST_URLS['api'], type=typestr, id=id, asset_id=asset_id, device_key=profile_settings['devicekey'])
 
     if program_id and not pvr == 1:
         info_url = '{api_url}/CONTENT/DETAIL/{type}/{id}'.format(api_url=CONST_URLS['api'], type=typestr, id=program_id)
