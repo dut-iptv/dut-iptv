@@ -1,11 +1,11 @@
 ## repository.anon.iptv
 
 ### **Notice: API Updates and Alpha Releases**
-Currently, nearly all providers have changed their APIs or something else happened that rendered those add-ons unusable. I do not have contact with the original developer, and it will take some time to get through all the add-ons. I only have access to Ziggo GO and are unable to fix other add-ons without having access to other accounts. Ziggo GO now works again and is released as an Alpha version. If all goes well, I'm planning to try to get KPN iTV and possibly Videoland working again. Unfortunately, I do not have access to anything regarding Dut-EPG, this means that anything replay and VOD related does not work for the time being. On the other hand, I was able to add a feature to watch recordings from Ziggo GO. I hope to add such alternatives to compensate for replay, until I figure out Dut-EPG. If anyone has any idea, feel free to create an issue with the 'enhancement' tag. 
+Currently, nearly all providers have changed their APIs or something else happened that rendered those add-ons unusable. I do not have contact with the original developer, and it will take some time to get through all the add-ons. I only have access to Ziggo GO and are unable to fix other add-ons without having access to other accounts. Ziggo GO and KPN iTV now work again and are released as Alpha versions. If all goes well, I'm trying to get Videoland working again. Unfortunately, I do not have access to anything regarding Dut-EPG, this means that anything replay and VOD related does not work for the time being. On the other hand, I was able to add a feature to watch recordings from Ziggo GO. I hope to add such alternatives to compensate for replay, until I figure out Dut-EPG. If anyone has any idea, feel free to create an issue with the 'enhancement' tag. 
 
 ### About
 
--Watch ~CanalDigitaal~/~F1 TV~/KPN/~NLZiet~/~Telenet (BE)~/~Telfort~/~T-Mobile~/~Videoland~/~XS4ALL~/Ziggo Live TV and content from anywhere in the EU
+-Watch ~CanalDigitaal~/~F1 TV~/KPN/~NLZiet~/~Telenet (BE)~/Telfort/~T-Mobile~/Videoland (WIP)/XS4ALL/Ziggo Live TV and content from anywhere in the EU
 
 ### Features
 
@@ -27,11 +27,11 @@ Currently, nearly all providers have changed their APIs or something else happen
 
 - ~CanalDigitaal: 1080P~
 - ~F1 TV: 1080P (50hz)~
-- ~KPN/Telfort/XS4ALL: 1080P~
+- KPN/Telfort/XS4ALL: 1080P
 - ~NLZiet: 1080P~
 - ~Telenet (BE): 720P~
 - ~T-Mobile: 1080P~
-- ~Videoland: 1080P~
+- ~Videoland: 1080P~ (Work in progress)
 - Ziggo: 720P
 
 ### Required
