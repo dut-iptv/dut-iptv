@@ -5,7 +5,7 @@ CONST_BASE_DOMAIN_MOD = False
 CONST_BASE_IP = ''
 
 CONST_URLS = {
-    'api': 'https://api.tv.kpn.com/101/1.2.0/A/nld/pctv/kpn',
+    'api': 'https://api.tv.prod.itvavs.prod.aws.kpn.com/101/1.2.0/A/nld/pctv/kpn',
     'base': 'https://tv.kpn.com',
     'image': 'https://images.tv.kpn.com'
 }
