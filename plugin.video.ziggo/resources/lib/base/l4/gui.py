@@ -1,9 +1,15 @@
-import sys, traceback, xbmc, xbmcgui
-
+import sys
+import traceback
 from contextlib import contextmanager
+from urllib.parse import quote, urlparse
+
+import xbmc
+import xbmcgui
+
 from resources.lib.base.l1.constants import ADDON_ICON, ADDON_ID, ADDON_NAME
 from resources.lib.base.l3.language import _
-from urllib.parse import quote, urlparse
+from resources.lib.base.l3.util import load_profile
+
 
 def _make_heading(heading=None):
     return heading if heading else ADDON_NAME
@@ -284,13 +290,17 @@ class Item(object):
                     li.setProperty('inputstream.adaptive.stream_headers', streamheaders)
 
                 if self.inputstream.license_key:
-                    li.setProperty('inputstream.adaptive.license_key', '{url}|Content-Type={content_type}&{headers}|{challenge}|{response}'.format(
+                    profile_settings = load_profile(profile_id=1)
+                    li.setProperty('inputstream.adaptive.license_key', '{url}?ContentId={contentid}|Content-Type={content_type}&{headers}|{challenge}|{response}'.format(
                         url = self.inputstream.license_key,
+                        contentid = profile_settings['contentid'],
                         headers = headers,
                         content_type = self.inputstream.content_type,
                         challenge = self.inputstream.challenge,
                         response = self.inputstream.response,
                     ))
+                    print('{url}?ContentId={cid}'.format(url = self.inputstream.license_key, cid=profile_settings['contentid']))
+                    print(self.inputstream.response)
                 elif headers:
                     li.setProperty('inputstream.adaptive.license_key', '|{0}'.format(headers))
             elif self.inputstream.addon == 'inputstream.ffmpeg':

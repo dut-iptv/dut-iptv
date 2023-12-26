@@ -1,17 +1,27 @@
-import _strptime
-import datetime, json, re, sys, xbmc
-
+import datetime
+import json
+import re
+import sys
 from collections import OrderedDict
-from resources.lib.base.l1.constants import ADDON_ID, DEFAULT_USER_AGENT, PROVIDER_NAME
+from urllib.parse import urlencode
+
+import _strptime
+import xbmc
+
+from resources.lib.base.l1.constants import (ADDON_ID, DEFAULT_USER_AGENT,
+                                             PROVIDER_NAME)
 from resources.lib.base.l2 import settings
 from resources.lib.base.l2.log import log
 from resources.lib.base.l3.language import _
-from resources.lib.base.l3.util import check_key, convert_datetime_timezone, date_to_nl_dag, date_to_nl_maand, encode_obj, get_credentials, load_file, load_profile, write_file
+from resources.lib.base.l3.util import (check_key, convert_datetime_timezone,
+                                        date_to_nl_dag, date_to_nl_maand,
+                                        encode_obj, get_credentials, load_file,
+                                        load_profile, write_file)
 from resources.lib.base.l4 import gui
 from resources.lib.base.l5.api import api_download, api_get_channels
 from resources.lib.base.l6 import inputstream
-from resources.lib.constants import CONST_URLS, CONST_DEFAULT_CLIENTID, CONST_IMAGES
-from urllib.parse import urlencode
+from resources.lib.constants import (CONST_DEFAULT_CLIENTID, CONST_IMAGES,
+                                     CONST_URLS)
 
 #Included from base.l7.plugin
 #plugin_get_device_id
@@ -278,12 +288,13 @@ def plugin_process_playdata(playdata):
     CDMHEADERS = {
         'User-Agent': DEFAULT_USER_AGENT,
         #'X-Client-Id': CONST_DEFAULT_CLIENTID + '||' + DEFAULT_USER_AGENT,
-        'X-OESP-License-Token-Type': 'velocix',
-        'X-OESP-Token': profile_settings['access_token'],
+        #'X-OESP-License-Token-Type': 'velocix',
+        'Cookie': profile_settings['access_token'],
+        'X-Profile': profile_settings['ziggo_profile_id'],
         'X-OESP-Username': creds['username'],
-        'X-OESP-License-Token': profile_settings['drm_token'],
-        'X-OESP-DRM-SchemeIdUri': 'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed',
-        'X-OESP-Content-Locator': playdata['locator'],
+        'x-streaming-token': profile_settings['drm_token'],
+        'x-drm-schemeId': 'edef8ba9-79d6-4ace-a3c8-27dcd51d21ed',
+        #'X-OESP-Content-Locator': playdata['locator'],
     }
 
     params = []
@@ -298,14 +309,17 @@ def plugin_process_playdata(playdata):
         params.append(('locator', playdata['locator']))
 
     write_file(file='token_renew', data='plugin://{0}/?{1}'.format(ADDON_ID, urlencode(encode_obj(params))), isJSON=False)
-
+    log('token renewed?')
     if check_key(playdata, 'certificate'):
+        log('if statement succesful, token renewed')
         item_inputstream = inputstream.Widevine(
             #license_key = "http://127.0.0.1:11189/{provider}/license".format(provider=PROVIDER_NAME),
             license_key = playdata['license'],
             #server_certificate = playdata['certificate'],
         )
     else:
+        log('else statement executed, forcing renew; no certificate found (shouldnt be a problem)')
+        log(playdata['license'])
         item_inputstream = inputstream.Widevine(
             #license_key = "http://127.0.0.1:11189/{provider}/license".format(provider=PROVIDER_NAME),
             license_key = playdata['license'],
@@ -379,6 +393,29 @@ def plugin_process_vod_seasons(id, data):
 
             for season in data_seasons:
                 seasons.append({'id': season['id'], 'seriesNumber': season['seriesNumber'], 'description': row['description'], 'image': row['icon']})
+
+        except:
+            return None
+
+    return {'type': 'seasons', 'seasons': seasons, 'watchlist': id}
+
+def plugin_process_rec_seasons(id, data):
+    seasons = []
+
+    if data:
+        try:
+
+            data_seasons = json.loads(data['seasonNumber'])
+            data_season_type = json.loads(data['type'])
+            
+            if data_seasons and data_season_type == 'single':
+                for season in data:
+                    seasons.append({'id': season['id'], 'seriesNumber': season['seriesNumber']})
+
+            elif data_seasons:
+                if data_season_type == 'show' or data_season_type == 'season':
+                    for season in data:
+                        seasons.append({'id': season['id'], 'seriesNumber': season['seriesNumber']})
 
         except:
             return None
@@ -565,7 +602,10 @@ def plugin_renew_token(data):
 
     api_get_play_token(locator=data['locator'], path=data['path'])
 
-    data['path'] = data['path'].replace("/manifest.mpd", "/")
+    if 'manifest.mpd' in data['path']:
+        data['path'] = data['path'].replace("/manifest.mpd", "/")
+    elif 'index.mpd' in data['path']:
+        data['path'] = data['path'].replace("/index.mpd", "/")
 
     splitpath = data['path'].split('/Manifest?device', 1)
 

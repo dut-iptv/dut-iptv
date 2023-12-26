@@ -104,6 +104,10 @@ msgctxt "#30037"
 msgid "Force Surround Sound"
 msgstr "Forceer Surround Audio"
 
+msgctxt "#30038"
+msgid "Recordings"
+msgstr "Opnames"
+
 msgctxt "#32000"
 msgid "You need to login to access this content"
 msgstr "Je moet inloggen om toegang tot deze content te krijgen"
@@ -470,7 +474,7 @@ msgstr "Login geslaagd"
 
 msgctxt "#320116"
 msgid "Proxy is not correctly started, this often happens after first installing or updating, please restart Kodi and try again"
-msgstr "Proxy is niet goed gestart, dit gebeurd meestal na de 1e installatie of een update, herstart Kodi en probeer het opnieuw"
+msgstr "Proxy is niet goed gestart, dit gebeurt meestal na de 1e installatie of een update, herstart Kodi en probeer het opnieuw"
 
 msgctxt "#320122"
 msgid "Disable 18+/Porn channels"
@@ -498,7 +502,7 @@ msgstr "Je kan ReplayTV niet inschakelen voor deze zender, omdat ReplayTV niet b
 
 msgctxt "#320128"
 msgid "You cannot enable this channel, because it is not available from this provider when not connected through an internet connection from the same provider. If you are on an internet connection from this provider change your Addon settings and try again. If you believe this to be an error please create an Issue on the Dut-IPTV GitHub"
-msgstr "Je kan deze zender niet inschakelen, omdat deze zender niet beschikbaar is bij deze provider als je neit verbonden bent met het internet via dezelfde provider. Verander je Addon instellingen als je wel gebruik maakt van een internetverbinding van deze provider en probeer het opnieuw. Maak een Issue op de Dut-IPTV GitHub aan als je denkt dat dit een fout is"
+msgstr "Je kan deze zender niet inschakelen, omdat deze zender niet beschikbaar is bij deze provider als je niet verbonden bent met het internet via dezelfde provider. Verander je Addon instellingen als je wel gebruik maakt van een internetverbinding van deze provider en probeer het opnieuw. Maak een Issue op de Dut-IPTV GitHub aan als je denkt dat dit een fout is"
 
 msgctxt "#320129"
 msgid "Disable Regional Channels"
@@ -511,6 +515,18 @@ msgstr "Zenders uitschakelen die alleen via een internet verbinding van de provi
 msgctxt "#320131"
 msgid "Disable Channels that are not available in the default subscription"
 msgstr "Zenders uitschakelen die niet in het basispakket zitten"
+
+msgctxt "#320132"
+msgid "Accessing the recording server went wrong, this most likely is not a problem on your end. Please try again later. If that does not help, please create an Issue on the Dut-IPTV GitHub"
+msgstr "De verbinding met de opname server is mislukt, dit is waarschijnlijk niet een probleem aan uw kant. Probeer het later opnieuw. Als dat niet helpt, maak dan een Issue op de Dut-IPTV Github."
+
+msgctxt "#320133"
+msgid "Making a background thread failed, this most likely is a problem with threading trying to set daemon on an active thread. Please try again (no need to wait). If that does not help, please restart Kodi and create an Issue on the Dut-IPTV GitHub"
+msgstr "Het maken van een achtergrondtaak is mislukt, dit komt waarschijnlijk doordat threading een daemon status probeert in te stellen op een al actieve thread. Probeer het opnieuw (je hoeft niet te wachten). Als dat niet helpt, herstart Kodi en maak een Issue op de Dut-IPTV Github."
+
+msgctxt "#320134"
+msgid "Streaming sessions limit is reached! (this can happen when you use Ziggo GO on too many devices simultaneously)"
+msgstr "Streaming sessie limiet bereikt! (dit kan voorkomen wanneer je Ziggo GO op te veel apparaten tegelijk gebruikt)"
 
 msgctxt "#330001"
 msgid "Select order"
@@ -665,7 +681,7 @@ msgid "Select Audio Language"
 msgstr "Selecteer Audio Taal"
 
 msgctxt "#330046"
-msgid "Unkown device"
+msgid "Unknown device"
 msgstr "Onbekend apparaat"
 
 msgctxt "#330047"

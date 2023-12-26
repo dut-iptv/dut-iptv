@@ -40,9 +40,8 @@ ALLOWED_LICENSE_HEADERS['ziggo'] = [
     "X-OESP-Content-Locator",
     "X-OESP-Username",
     "X-OESP-DRM-SchemeIdUri",
-    "X-OESP-License-Token",
-    "X-OESP-License-Token-Type", 
-    "X-OESP-Token",
+    "X-Streaming-Token",
+    "X=Client-ID",
     "Content-Type",
     "Content-Length"
 ]
